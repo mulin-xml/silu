@@ -1,4 +1,8 @@
-// import 'dart:io';
+// ignore_for_file: avoid_print
+
+import 'dart:convert';
+import 'dart:ffi';
+import 'dart:io';
 // import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -41,28 +45,33 @@ class Blog {
   var authorImg = const FlutterLogo();
 }
 
-Iterable<Blog> generateBlogs() sync* {
+generateBlogs() sync* {
   while (true) {
     yield Blog();
   }
 }
 
-void httpClientPost() async {
-  const url = 'http://0--0.top/apis/postmessage';
+uploadBlog() async {
+  const url = 'http://0--0.top/apis/upload_activity';
   var result = "";
+
   final picker = ImagePicker();
   var image = await picker.pickImage(source: ImageSource.gallery);
 
-  var dio = Dio();
+  var path = "";
+  if (image != null) {
+    path = image.path;
+  }
+  Fluttertoast.showToast(msg: path);
+  var name = path.substring(path.lastIndexOf("/") + 1, path.length);
 
-  Map<String, dynamic> m = {
+  var formData = FormData.fromMap({
     'authorName': 'admin',
-    'mainImg': image,
-  };
-  var formData = FormData.fromMap(m);
+    'mainImg': await MultipartFile.fromFile(path, filename: name),
+  });
 
   try {
-    var response = await dio.post(url, data: formData);
+    var response = await Dio().post(url, data: formData);
     result = response.toString();
   } catch (e) {
     result = '[Error Catch]' + e.toString();
@@ -82,6 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final _controllers = LinkedScrollControllerGroup();
   late ScrollController _sc1;
   late ScrollController _sc2;
+  Image img = Image.network('http://pic33.nipic.com/20131007/13639685_123501617185_2.jpg');
 
   @override
   void initState() {
@@ -103,9 +113,10 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         toolbarHeight: 45,
         backgroundColor: Colors.white,
+        foregroundColor: Colors.teal,
         elevation: 0,
-        actions: const [
-          IconButton(icon: Icon(Icons.list), onPressed: null),
+        actions: [
+          IconButton(icon: const Icon(Icons.list), onPressed: downloadBlog),
         ],
       ),
       body: Row(
@@ -119,48 +130,41 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _editBlogPage,
         child: const Icon(Icons.add),
       ),
+      backgroundColor: Colors.white,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
+        notchMargin: 2,
         child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Expanded(child:
-            IconButton(
-              icon: const Text('首页'),
-              color: Colors.teal,
-              onPressed: () {},
-            )),
-            Expanded(child: 
-            IconButton(
-              icon: const Text('我的'),
-              color: Colors.teal,
-              onPressed: () {},
-            ),
-            ),
-            Expanded(child: 
-            IconButton(
-              icon: const Text('我的'),
-              color: Colors.teal,
-              onPressed: () {},
-            ),
-            )
-            
-            IconButton(
-              icon: const Text('首页'),
-              color: Colors.teal,
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Text('我的'),
-              color: Colors.teal,
-              onPressed: () {},
-            )
+            Expanded(child: _buildBottomItem(0, Icons.home, "首页")),
+            Expanded(child: _buildBottomItem(1, Icons.library_music, "发现")),
+            Expanded(child: _buildBottomItem(-1, null, "")),
+            Expanded(child: _buildBottomItem(2, Icons.email, "消息")),
+            Expanded(child: _buildBottomItem(3, Icons.person, "我的")),
           ],
         ),
       ),
     );
   }
 
-  Widget _lineListView(final int offset, ScrollController sc) {
+  _buildBottomItem(int index, IconData? iconData, String title) {
+    return GestureDetector(
+      onTap: () {},
+      child: SizedBox(
+        height: 90,
+        child: Container(
+          color: index == 1 ? Colors.red : Colors.blue,
+          child: Column(
+            children: [Icon(iconData), Text(title)],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _lineListView(final int offset, ScrollController sc) {
     // 放在这里的局部变量只会在ListView初始化的时候定值，此后不会改变
     return ListView.builder(
         controller: sc,
@@ -177,13 +181,13 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  Widget _buildBlogCard(Blog blog) {
+  _buildBlogCard(Blog blog) {
     return Card(
       child: Column(
         children: [
           Container(
             child: blog.mainImg,
-            color: Colors.teal,
+            color: Colors.blue,
           ),
           ListTile(
             title: Text(blog.title),
@@ -211,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  void _editBlogPage() {
+  _editBlogPage() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
@@ -222,15 +226,59 @@ class _MyHomePageState extends State<MyHomePage> {
               foregroundColor: Colors.black,
               elevation: 0,
             ),
-            body: Column(
-              children: [
-                Expanded(child: Container(color: Colors.brown)),
-                Expanded(child: Container(color: Colors.red)),
-              ],
+            body: Container(
+              child: img,
+            ),
+            floatingActionButton: const FloatingActionButton(
+              onPressed: uploadBlog,
+              child: Icon(Icons.add),
             ),
           );
         },
       ),
     );
+  }
+
+  downloadBlog() async {
+    const url = 'http://0--0.top/apis/get_activity_list';
+    var result = "";
+
+    var formData = FormData.fromMap({
+      'offset': 0,
+      'limit': 5,
+    });
+
+    try {
+      var response = await Dio().post(url, data: formData);
+      result = response.toString();
+    } catch (e) {
+      result = '[Error Catch]' + e.toString();
+    }
+
+    List activityList = json.decode(result)['activityList'];
+
+    print(activityList[0]['images_ids'][0]);
+
+    const url2 = 'http://0--0.top/apis/get_image_by_id';
+    var formData2 = FormData.fromMap({
+      'imageId': activityList[0]['images_ids'][0],
+    });
+
+    try {
+      var response = await Dio().post(url2, data: formData2);
+      result = response.toString();
+    } catch (e) {
+      result = '[Error Catch]' + e.toString();
+    }
+    String a = json.decode(result)['imageBase64'];
+
+    setState(() {
+      img = Image.memory(
+        base64.decode(a),
+        fit: BoxFit.fill, //填充
+        gaplessPlayback: true, //防止重绘
+      );
+    });
+    // Fluttertoast.showToast(msg: result);
   }
 }
