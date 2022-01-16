@@ -33,17 +33,31 @@ class MyApp extends StatelessWidget {
 
 class Blog {
   Blog() {
-    final rd = Random().nextInt(2) + 1;
+    int rd = Random().nextInt(3) + 1;
     title = "魔都探店-海底捞惊喜狂欢折扣" * rd;
+
+    mainImg = Image.network(
+      'http://0--0.top/apis/image',
+      headers: {'image_id': rd.toString()},
+      // errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+      //   print(exception.toString());
+      //   return const FlutterLogo(
+      //     size: 500,
+      //   );
+      // },
+      // loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+      //   return child;
+      // },
+    );
   }
   String title = "";
   bool isSaved = false;
   String authorName = "Author Name";
-  var mainImg = const FlutterLogo(size: 300);
+  Image? mainImg;
   var authorImg = const FlutterLogo();
 }
 
-generateBlogs() sync* {
+Iterable<Blog> generateBlogs() sync* {
   while (true) {
     yield Blog();
   }
@@ -89,7 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final _controllers = LinkedScrollControllerGroup();
   late ScrollController _sc1;
   late ScrollController _sc2;
-  Image img = Image.network('http://pic33.nipic.com/20131007/13639685_123501617185_2.jpg');
 
   @override
   void initState() {
@@ -225,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
               elevation: 0,
             ),
             body: Container(
-              child: img,
+              child: null,
             ),
             floatingActionButton: const FloatingActionButton(
               onPressed: uploadBlog,
@@ -256,27 +269,5 @@ class _MyHomePageState extends State<MyHomePage> {
     List activityList = json.decode(result)['activityList'];
 
     print(activityList[0]['images_ids'][0]);
-
-    const url2 = 'http://0--0.top/apis/get_image_by_id';
-    var formData2 = FormData.fromMap({
-      'imageId': activityList[0]['images_ids'][0],
-    });
-
-    try {
-      var response = await Dio().post(url2, data: formData2);
-      result = response.toString();
-    } catch (e) {
-      result = '[Error Catch]' + e.toString();
-    }
-    String a = json.decode(result)['imageBase64'];
-
-    setState(() {
-      img = Image.memory(
-        base64.decode(a),
-        fit: BoxFit.fill, //填充
-        gaplessPlayback: true, //防止重绘
-      );
-    });
-    // Fluttertoast.showToast(msg: result);
   }
 }
