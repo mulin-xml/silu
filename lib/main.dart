@@ -252,10 +252,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: uploadBlog(controller.text),
-              child: const Icon(Icons.add),
-            ),
+            // floatingActionButton: FloatingActionButton(
+            //   onPressed: uploadBlog(controller.text),
+            //   child: const Icon(Icons.add),
+            // ),
           );
         },
       ),
