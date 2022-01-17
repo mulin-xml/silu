@@ -39,6 +39,7 @@ dependencies:
   flutter_picker: ^2.0.2
   image_picker: any
   linked_scroll_controller: ^0.2.0
+  cached_network_image: any
   english_words: any
 
 dev_dependencies:

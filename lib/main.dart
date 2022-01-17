@@ -9,6 +9,7 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
+// import 'package:cached_network_image/cached_network_image.dart';
 
 void main() => runApp(const MyApp());
 
@@ -37,16 +38,16 @@ class Blog {
     title = "魔都探店-海底捞惊喜狂欢折扣" * rd;
 
     mainImg = Image.network(
-      'http://0--0.top/apis/image',
-      headers: {'image_id': rd.toString()},
-      // errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
-      //   print(exception.toString());
-      //   return const FlutterLogo(
-      //     size: 500,
-      //   );
-      // },
+      'http://0--0.top/apis/image/' + rd.toString(),
       // loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-      //   return child;
+      //   if (loadingProgress == null) {
+      //     return child;
+      //   }
+      //   return Center(
+      //     child: CircularProgressIndicator(
+      //       value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+      //     ),
+      //   );
       // },
     );
   }
@@ -63,18 +64,15 @@ Iterable<Blog> generateBlogs() sync* {
   }
 }
 
-uploadBlog() async {
+uploadBlog(String title) async {
   const url = 'http://0--0.top/apis/upload_activity';
   var result = "";
 
   final picker = ImagePicker();
   var image = await picker.pickImage(source: ImageSource.gallery);
 
-  var path = "";
-  if (image != null) {
-    path = image.path;
-  }
-  Fluttertoast.showToast(msg: path);
+  String path = image != null ? image.path : '';
+
   var name = path.substring(path.lastIndexOf("/") + 1, path.length);
 
   var formData = FormData.fromMap({
@@ -145,16 +143,19 @@ class _MyHomePageState extends State<MyHomePage> {
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 2,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(child: _buildBottomItem(0, Icons.home, "首页")),
-            Expanded(child: _buildBottomItem(1, Icons.library_music, "发现")),
-            Expanded(child: _buildBottomItem(-1, null, "")),
-            Expanded(child: _buildBottomItem(2, Icons.email, "消息")),
-            Expanded(child: _buildBottomItem(3, Icons.person, "我的")),
-          ],
+        child: SizedBox(
+          height: 55,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Expanded(child: _buildBottomItem(0, Icons.home, "首页")),
+              Expanded(child: _buildBottomItem(1, Icons.library_music, "发现")),
+              Expanded(child: _buildBottomItem(-1, null, "")),
+              Expanded(child: _buildBottomItem(2, Icons.email, "消息")),
+              Expanded(child: _buildBottomItem(3, Icons.person, "我的")),
+            ],
+          ),
         ),
       ),
     );
@@ -163,14 +164,8 @@ class _MyHomePageState extends State<MyHomePage> {
   _buildBottomItem(int index, IconData? iconData, String title) {
     return GestureDetector(
       onTap: () {},
-      child: SizedBox(
-        height: 90,
-        child: Container(
-          color: index == 1 ? Colors.red : Colors.blue,
-          child: Column(
-            children: [Icon(iconData), Text(title)],
-          ),
-        ),
+      child: Column(
+        children: [Icon(iconData), Text(title)],
       ),
     );
   }
@@ -185,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
           final int blogIdx = physicIdx * 2 + offset;
 
           if (blogIdx >= _blogs.length) {
-            _blogs.addAll(generateBlogs().take(10));
+            _blogs.addAll(generateBlogs().take(20));
           }
 
           return _buildBlogCard(_blogs[blogIdx]);
@@ -230,6 +225,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (BuildContext context) {
+          TextEditingController controller = TextEditingController();
           return Scaffold(
             appBar: AppBar(
               toolbarHeight: 45,
@@ -237,12 +233,28 @@ class _MyHomePageState extends State<MyHomePage> {
               foregroundColor: Colors.black,
               elevation: 0,
             ),
-            body: Container(
-              child: null,
+            body: Column(
+              children: [
+                SizedBox(
+                  height: 100,
+                  child: Container(
+                    child: TextField(
+                      controller: controller,
+                    ),
+                    color: Colors.red,
+                  ),
+                ),
+                SizedBox(
+                  height: 100,
+                  child: Container(
+                    color: Colors.blue,
+                  ),
+                ),
+              ],
             ),
-            floatingActionButton: const FloatingActionButton(
-              onPressed: uploadBlog,
-              child: Icon(Icons.add),
+            floatingActionButton: FloatingActionButton(
+              onPressed: uploadBlog(controller.text),
+              child: const Icon(Icons.add),
             ),
           );
         },
