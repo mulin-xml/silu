@@ -139,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _editBlogPage,
         child: const Icon(Icons.add),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey.shade100,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 2,
@@ -227,6 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (BuildContext context) {
           TextEditingController controller = TextEditingController();
           return Scaffold(
+            backgroundColor: Colors.grey.shade100,
             appBar: AppBar(
               toolbarHeight: 45,
               backgroundColor: Colors.white,
@@ -238,11 +239,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 SizedBox(
                   height: 100,
                   child: Container(
-                    child: TextField(
-                      controller: controller,
-                    ),
-                    color: Colors.red,
+                    color: Colors.blue,
                   ),
+                ),
+                Container(
+                  child: TextField(
+                    controller: controller,
+                    maxLength: 10,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
+                      filled: true,
+                      fillColor: Colors.white,
+                      
+                    ),
+                  ),
+                  // color: Colors.white,
+                  margin: const EdgeInsets.all(30.0),
+                  // shadowColor: Colors.white,
+                  // shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))),
                 ),
                 SizedBox(
                   height: 100,
@@ -250,12 +264,14 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.blue,
                   ),
                 ),
+                ElevatedButton(
+                  child: const Text('发布动态'),
+                  onPressed: () {
+                    uploadBlog(controller.text);
+                  },
+                ),
               ],
             ),
-            // floatingActionButton: FloatingActionButton(
-            //   onPressed: uploadBlog(controller.text),
-            //   child: const Icon(Icons.add),
-            // ),
           );
         },
       ),
