@@ -22,12 +22,9 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
-    return MaterialApp(
+    return const MaterialApp(
       title: '思路',
-      theme: ThemeData(
-        primarySwatch: Colors.teal,
-      ),
-      home: const MyHomePage(),
+      home: MyHomePage(),
     );
   }
 }
@@ -77,6 +74,7 @@ uploadBlog(String title) async {
 
   var formData = FormData.fromMap({
     'authorName': 'admin',
+    'title': title,
     'mainImg': await MultipartFile.fromFile(path, filename: name),
   });
 
@@ -139,7 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _editBlogPage,
         child: const Icon(Icons.add),
       ),
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: Colors.grey.shade200,
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 2,
@@ -193,7 +191,6 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Container(
             child: blog.mainImg,
-            color: Colors.blue,
           ),
           ListTile(
             title: Text(blog.title),
@@ -227,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (BuildContext context) {
           TextEditingController controller = TextEditingController();
           return Scaffold(
-            backgroundColor: Colors.grey.shade100,
+            backgroundColor: Colors.grey.shade200,
             appBar: AppBar(
               toolbarHeight: 45,
               backgroundColor: Colors.white,
@@ -242,21 +239,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.blue,
                   ),
                 ),
-                Container(
+                Padding(
+                  padding: const EdgeInsets.all(30.0),
                   child: TextField(
                     controller: controller,
                     maxLength: 10,
                     decoration: const InputDecoration(
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(30))),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        borderSide: BorderSide.none,
+                      ),
                       filled: true,
                       fillColor: Colors.white,
-                      
                     ),
                   ),
-                  // color: Colors.white,
-                  margin: const EdgeInsets.all(30.0),
-                  // shadowColor: Colors.white,
-                  // shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(25.0))),
                 ),
                 SizedBox(
                   height: 100,
