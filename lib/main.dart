@@ -22,9 +22,13 @@ class MyApp extends StatelessWidget {
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
-    return const MaterialApp(
+    return MaterialApp(
       title: '思路',
-      home: MyHomePage(),
+      home: const MyHomePage(),
+      theme: ThemeData(
+        primarySwatch: Colors.brown,
+      ),
+      // color: Colors.white,
     );
   }
 }
@@ -120,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         toolbarHeight: 45,
         backgroundColor: Colors.white,
-        foregroundColor: Colors.teal,
+        foregroundColor: Colors.brown,
         elevation: 0,
         actions: [
           IconButton(icon: const Icon(Icons.list), onPressed: downloadBlog),
@@ -233,12 +237,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             body: Column(
               children: [
-                SizedBox(
-                  height: 100,
-                  child: Container(
-                    color: Colors.blue,
-                  ),
-                ),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(30.0),
                   child: TextField(
@@ -260,13 +259,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Colors.blue,
                   ),
                 ),
-                ElevatedButton(
+              ],
+            ),
+            bottomNavigationBar: SizedBox(
+              height: 100,
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
+                  ),
                   child: const Text('发布动态'),
                   onPressed: () {
                     uploadBlog(controller.text);
                   },
                 ),
-              ],
+              ),
             ),
           );
         },
