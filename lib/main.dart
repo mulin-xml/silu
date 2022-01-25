@@ -91,6 +91,19 @@ uploadBlog(String title) async {
   Fluttertoast.showToast(msg: result);
 }
 
+grid3x3() {
+  return Expanded(
+    child: GridView.count(
+      children: List<Widget>.filled(9, Container(color: Colors.brown)),
+      crossAxisCount: 3,
+      padding: const EdgeInsets.all(50),
+      crossAxisSpacing: 5,
+      mainAxisSpacing: 5,
+      childAspectRatio: 1, // 宽高比例
+    ),
+  );
+}
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -232,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
             appBar: AppBar(
               toolbarHeight: 45,
               backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              foregroundColor: Colors.brown,
               elevation: 0,
             ),
             body: Column(
@@ -253,12 +266,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 100,
-                  child: Container(
-                    color: Colors.blue,
-                  ),
-                ),
+                const SizedBox(height: 10),
               ],
             ),
             bottomNavigationBar: SizedBox(
@@ -285,21 +293,17 @@ class _MyHomePageState extends State<MyHomePage> {
   downloadBlog() async {
     const url = 'http://0--0.top/apis/get_activity_list';
     var result = "";
-
     var formData = FormData.fromMap({
       'offset': 0,
       'limit': 5,
     });
-
     try {
       var response = await Dio().post(url, data: formData);
       result = response.toString();
     } catch (e) {
       result = '[Error Catch]' + e.toString();
     }
-
     List activityList = json.decode(result)['activityList'];
-
     print(activityList[0]['images_ids'][0]);
   }
 }
