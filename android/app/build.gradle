@@ -56,6 +56,13 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig signingConfigs.debug
         }
+        debug {//debug版签名配置
+            // storeFile file("key.keystore")
+            // storePassword "fuDan19960627"
+            // keyAlias "key"
+            // keyPassword "fuDan19960627"
+            signingConfig signingConfigs.debug
+        }
     }
 }
 
