@@ -250,16 +250,27 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             body: Column(
               children: [
-                const SizedBox(height: 10),
-                ListView.builder(
-                  itemCount: 3,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (BuildContext context, final int physicIdx) {
-                    return Container(color: Colors.brown);
-                  },
+                SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    itemCount: 8,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (BuildContext context, final int physicIdx) {
+                      return SizedBox(
+                        width: 100,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            color: Colors.grey,
+                            child: const Icon(Icons.add),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(30.0),
+                  padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                   child: TextField(
                     controller: controller,
                     maxLength: 10,
