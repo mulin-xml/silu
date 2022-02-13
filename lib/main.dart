@@ -241,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (BuildContext context) {
           TextEditingController controller = TextEditingController();
           return Scaffold(
-            backgroundColor: Colors.grey.shade200,
+            backgroundColor: Colors.white,
             appBar: AppBar(
               toolbarHeight: 45,
               backgroundColor: Colors.white,
@@ -250,33 +250,32 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             body: Column(
               children: [
+                // 图片列表
                 SizedBox(
                   height: 100,
                   child: ListView.builder(
                     itemCount: 8,
                     scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
                     itemBuilder: (BuildContext context, final int physicIdx) {
-                      return SizedBox(
-                        width: 100,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            color: Colors.grey,
-                            child: const Icon(Icons.add),
-                          ),
+                      return const Card(
+                        child: SizedBox(
+                          width: 100,
+                          child: Icon(Icons.add),
                         ),
                       );
                     },
                   ),
                 ),
+                // 标题栏
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                   child: TextField(
                     controller: controller,
                     maxLength: 10,
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(30)),
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
@@ -287,6 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 10),
               ],
             ),
+            // 底部发布按钮
             bottomNavigationBar: SizedBox(
               height: 100,
               child: Padding(
