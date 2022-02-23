@@ -37,12 +37,11 @@ class MyApp extends StatelessWidget {
 
 class Blog {
   Blog() {
-    int rd = Random().nextInt(3) + 1;
+    int rd = Random().nextInt(6) + 1;
     title = "魔都探店-海底捞惊喜狂欢折扣" * rd;
 
     mainImg = Image.network(
       'http://0--0.top/apis/image/' + rd.toString(),
-      
     );
   }
   String title = "";
@@ -186,7 +185,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var result = "";
     var formData = FormData.fromMap({
       'offset': 0,
-      'limit': 5,
+      'limit': 10000,
     });
     try {
       var response = await Dio().post(url, data: formData);

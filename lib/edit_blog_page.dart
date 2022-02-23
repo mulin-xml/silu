@@ -4,6 +4,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 
+class UserImg {
+  const UserImg({
+    this.originImg,
+    this.cardIMg,
+  });
+  final Image? originImg;
+  final Image? cardIMg;
+}
+
 class EditBlogPage extends StatefulWidget {
   const EditBlogPage({Key? key}) : super(key: key);
 
@@ -12,6 +21,7 @@ class EditBlogPage extends StatefulWidget {
 }
 
 class _EditBlogPageState extends State<EditBlogPage> {
+  static const _maxImgNum = 5;
   final _sendImg = <Image>[];
 
   @override
@@ -37,25 +47,39 @@ class _EditBlogPageState extends State<EditBlogPage> {
               itemBuilder: (BuildContext context, final int physicIdx) {
                 if (physicIdx == _sendImg.length) {
                   return Card(
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
                     child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () async {
+                        if (_sendImg.length >= _maxImgNum) {
+                          Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
+                          return;
+                        }
                         final picker = ImagePicker();
                         final image = await picker.pickImage(source: ImageSource.gallery);
                         if (image != null) {
                           setState(() {
-                            _sendImg.add(Image.file(File(image.path)));
+                            var img = Image.file(
+                              File(image.path),
+                              fit: BoxFit.cover,
+                              width: 100,
+                            );
+                            _sendImg.add(img);
                           });
                         }
                       },
-                      child: Container(
+                      child: const SizedBox(
                         width: 100,
-                        child: const Icon(Icons.add),
-                        color: Colors.red,
+                        child: Icon(Icons.add),
                       ),
                     ),
                   );
                 } else {
-                  return _sendImg[physicIdx];
+                  return Card(
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    clipBehavior: Clip.antiAlias,
+                    child: _sendImg[physicIdx],
+                  );
                 }
               },
             ),
@@ -80,8 +104,9 @@ class _EditBlogPageState extends State<EditBlogPage> {
         ],
       ),
       // 底部发布按钮
-      bottomNavigationBar: SizedBox(
+      bottomNavigationBar: Container(
         height: 100,
+        color: Colors.green,
         child: Row(
           children: [
             Expanded(
@@ -120,7 +145,6 @@ class _EditBlogPageState extends State<EditBlogPage> {
   uploadBlog(String title) async {
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
-
     final picker = ImagePicker();
     var image = await picker.pickImage(source: ImageSource.gallery);
 
