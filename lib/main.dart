@@ -1,17 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-
-// import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
-
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:dio/dio.dart';
-
 import 'package:flutter/services.dart';
 import 'edit_blog_page.dart';
-// import 'package:cached_network_image/cached_network_image.dart';
 
 void main() => runApp(const MyApp());
 
@@ -27,9 +22,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '思路',
       home: const MyHomePage(),
-      theme: ThemeData(
-        primarySwatch: Colors.brown,
-      ),
+
+      theme: ThemeData(primarySwatch: Colors.brown),
       // color: Colors.white,
     );
   }
@@ -37,11 +31,9 @@ class MyApp extends StatelessWidget {
 
 class Blog {
   Blog() {
-    int rd = Random().nextInt(6) + 1;
-    title = "魔都探店-海底捞惊喜狂欢折扣" * rd;
-
+    title = "魔都探店-海底捞惊喜狂欢折扣" * (Random().nextInt(2) + 1);
     mainImg = Image.network(
-      'http://0--0.top/apis/image/' + rd.toString(),
+      'http://0--0.top/apis/image/' + (Random().nextInt(6) + 1).toString(),
     );
   }
   String title = "";
@@ -55,19 +47,6 @@ Iterable<Blog> generateBlogs() sync* {
   while (true) {
     yield Blog();
   }
-}
-
-grid3x3() {
-  return Expanded(
-    child: GridView.count(
-      children: List<Widget>.filled(9, Container(color: Colors.brown)),
-      crossAxisCount: 3,
-      padding: const EdgeInsets.all(50),
-      crossAxisSpacing: 5,
-      mainAxisSpacing: 5,
-      childAspectRatio: 1, // 宽高比例
-    ),
-  );
 }
 
 class MyHomePage extends StatefulWidget {
@@ -115,7 +94,6 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(child: _lineListView(1, _sc2)),
         ],
       ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(
@@ -149,6 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _buildBlogCard(Blog blog) {
     return Card(
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           Container(
@@ -193,6 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       result = '[Error Catch]' + e.toString();
     }
+    print(result);
     List activityList = json.decode(result)['activityList'];
     print(activityList[0]['images_ids'][0]);
   }

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -5,12 +7,13 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserImg {
-  const UserImg({
-    this.originImg,
-    this.cardIMg,
-  });
-  final Image? originImg;
-  final Image? cardIMg;
+  UserImg(
+    this.path,
+  )   : originImg = Image.file(File(path)),
+        thumbImg = Image.file(File(path), fit: BoxFit.cover, width: 100);
+  final String path;
+  final Image originImg;
+  final Image thumbImg;
 }
 
 class EditBlogPage extends StatefulWidget {
@@ -22,11 +25,13 @@ class EditBlogPage extends StatefulWidget {
 
 class _EditBlogPageState extends State<EditBlogPage> {
   static const _maxImgNum = 5;
-  final _sendImg = <Image>[];
+  final _sendImg = <UserImg>[];
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController controller = TextEditingController();
+    TextEditingController titleController = TextEditingController();
+    TextEditingController contextController = TextEditingController();
+    ScrollController scrollController = ScrollController();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -47,7 +52,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
               itemBuilder: (BuildContext context, final int physicIdx) {
                 if (physicIdx == _sendImg.length) {
                   return Card(
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () async {
@@ -58,14 +63,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                         final picker = ImagePicker();
                         final image = await picker.pickImage(source: ImageSource.gallery);
                         if (image != null) {
-                          setState(() {
-                            var img = Image.file(
-                              File(image.path),
-                              fit: BoxFit.cover,
-                              width: 100,
-                            );
-                            _sendImg.add(img);
-                          });
+                          setState(() => _sendImg.add(UserImg(image.path)));
                         }
                       },
                       child: const SizedBox(
@@ -76,9 +74,9 @@ class _EditBlogPageState extends State<EditBlogPage> {
                   );
                 } else {
                   return Card(
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     clipBehavior: Clip.antiAlias,
-                    child: _sendImg[physicIdx],
+                    child: _sendImg[physicIdx].originImg,
                   );
                 }
               },
@@ -86,17 +84,24 @@ class _EditBlogPageState extends State<EditBlogPage> {
           ),
           // 标题栏
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+            padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
             child: TextField(
-              controller: controller,
+              controller: titleController,
               maxLength: 10,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: Colors.white,
+              decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦"),
+            ),
+          ),
+          // 内容栏
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+            child: Scrollbar(
+              controller: scrollController,
+              child: TextField(
+                controller: contextController,
+                scrollController: scrollController,
+                maxLines: 10,
+                minLines: 1,
+                decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),
               ),
             ),
           ),
@@ -104,35 +109,32 @@ class _EditBlogPageState extends State<EditBlogPage> {
         ],
       ),
       // 底部发布按钮
-      bottomNavigationBar: Container(
-        height: 100,
-        color: Colors.green,
+      bottomNavigationBar: SizedBox(
+        height: 80,
         child: Row(
           children: [
             Expanded(
-              flex: 1,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(30, 0, 10, 0),
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Column(
-                    children: const [Icon(Icons.mail), Text("存草稿")],
+              flex: 2,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(shape: const CircleBorder()),
+                    onPressed: () {},
+                    child: const Icon(Icons.storefront),
                   ),
-                ),
-                color: Colors.red,
+                  const Text("存草稿", style: TextStyle(color: Colors.brown)),
+                ],
               ),
             ),
             Expanded(
-              flex: 4,
+              flex: 7,
               child: Container(
-                padding: const EdgeInsets.fromLTRB(10, 0, 30, 0),
-                color: Colors.blue,
+                padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                 child: ElevatedButton(
                   style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
                   child: const Text('发布动态'),
-                  onPressed: () {
-                    uploadBlog(controller.text);
-                  },
+                  onPressed: uploadBlog(titleController.text, contextController.text),
                 ),
               ),
             ),
@@ -142,19 +144,21 @@ class _EditBlogPageState extends State<EditBlogPage> {
     );
   }
 
-  uploadBlog(String title) async {
+  uploadBlog(String title, String context) async {
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
-    final picker = ImagePicker();
-    var image = await picker.pickImage(source: ImageSource.gallery);
+    final imgFiles = <MultipartFile>[];
 
-    String path = image != null ? image.path : '';
-    var name = path.substring(path.lastIndexOf("/") + 1, path.length);
+    for (var elm in _sendImg) {
+      var name = elm.path.substring(elm.path.lastIndexOf("/") + 1, elm.path.length);
+      imgFiles.add(await MultipartFile.fromFile(elm.path, filename: name));
+    }
 
     var formData = FormData.fromMap({
-      'authorName': 'admin',
+      'user_id': 'admin',
       'title': title,
-      'mainImg': await MultipartFile.fromFile(path, filename: name),
+      'context': context,
+      'img_list': imgFiles,
     });
 
     try {
@@ -163,6 +167,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     } catch (e) {
       result = '[Error Catch]' + e.toString();
     }
+    print(result);
     Fluttertoast.showToast(msg: result);
   }
 }

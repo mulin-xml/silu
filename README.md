@@ -57,3 +57,18 @@ loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingPro
     );
 },
 ```
+
+``` Dart
+grid3x3() {
+  return Expanded(
+    child: GridView.count(
+      children: List<Widget>.filled(9, Container(color: Colors.brown)),
+      crossAxisCount: 3,
+      padding: const EdgeInsets.all(50),
+      crossAxisSpacing: 5,
+      mainAxisSpacing: 5,
+      childAspectRatio: 1, // 宽高比例
+    ),
+  );
+}
+```
