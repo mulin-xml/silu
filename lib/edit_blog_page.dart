@@ -24,13 +24,13 @@ class EditBlogPage extends StatefulWidget {
 }
 
 class _EditBlogPageState extends State<EditBlogPage> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _contextController = TextEditingController();
   static const _maxImgNum = 5;
-  final _sendImg = <UserImg>[];
+  final _userImgList = <UserImg>[];
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController titleController = TextEditingController();
-    TextEditingController contextController = TextEditingController();
     ScrollController scrollController = ScrollController();
     return Scaffold(
       backgroundColor: Colors.white,
@@ -46,24 +46,23 @@ class _EditBlogPageState extends State<EditBlogPage> {
           SizedBox(
             height: 100,
             child: ListView.builder(
-              itemCount: _sendImg.length + 1,
+              itemCount: _userImgList.length + 1,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, final int physicIdx) {
-                if (physicIdx == _sendImg.length) {
+                if (physicIdx == _userImgList.length) {
                   return Card(
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
                       onTap: () async {
-                        if (_sendImg.length >= _maxImgNum) {
+                        if (_userImgList.length >= _maxImgNum) {
                           Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
                           return;
                         }
-                        final picker = ImagePicker();
-                        final image = await picker.pickImage(source: ImageSource.gallery);
+                        final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                         if (image != null) {
-                          setState(() => _sendImg.add(UserImg(image.path)));
+                          setState(() => _userImgList.add(UserImg(image.path)));
                         }
                       },
                       child: const SizedBox(
@@ -76,7 +75,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                   return Card(
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     clipBehavior: Clip.antiAlias,
-                    child: _sendImg[physicIdx].originImg,
+                    child: _userImgList[physicIdx].thumbImg,
                   );
                 }
               },
@@ -86,7 +85,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
             child: TextField(
-              controller: titleController,
+              controller: _titleController,
               maxLength: 10,
               decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦"),
             ),
@@ -97,7 +96,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
             child: Scrollbar(
               controller: scrollController,
               child: TextField(
-                controller: contextController,
+                controller: _contextController,
                 scrollController: scrollController,
                 maxLines: 10,
                 minLines: 1,
@@ -134,7 +133,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                 child: ElevatedButton(
                   style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
                   child: const Text('发布动态'),
-                  onPressed: uploadBlog(titleController.text, contextController.text),
+                  onPressed: uploadBlog,
                 ),
               ),
             ),
@@ -144,20 +143,20 @@ class _EditBlogPageState extends State<EditBlogPage> {
     );
   }
 
-  uploadBlog(String title, String context) async {
+  uploadBlog() async {
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
     final imgFiles = <MultipartFile>[];
 
-    for (var elm in _sendImg) {
-      var name = elm.path.substring(elm.path.lastIndexOf("/") + 1, elm.path.length);
-      imgFiles.add(await MultipartFile.fromFile(elm.path, filename: name));
+    for (var elm in _userImgList) {
+      // var name = elm.path.substring(elm.path.lastIndexOf("/") + 1, elm.path.length);
+      imgFiles.add(await MultipartFile.fromFile(elm.path));
     }
 
     var formData = FormData.fromMap({
       'user_id': 'admin',
-      'title': title,
-      'context': context,
+      'title': _titleController.text,
+      'context': _contextController.text,
       'img_list': imgFiles,
     });
 

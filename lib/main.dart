@@ -20,9 +20,8 @@ class MyApp extends StatelessWidget {
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
     );
     return MaterialApp(
-      title: '思路',
+      title: '思路', // 在任务管理器中显示的标题
       home: const MyHomePage(),
-
       theme: ThemeData(primarySwatch: Colors.brown),
       // color: Colors.white,
     );
@@ -30,16 +29,16 @@ class MyApp extends StatelessWidget {
 }
 
 class Blog {
-  Blog() {
-    title = "魔都探店-海底捞惊喜狂欢折扣" * (Random().nextInt(2) + 1);
-    mainImg = Image.network(
-      'http://0--0.top/apis/image/' + (Random().nextInt(6) + 1).toString(),
-    );
-  }
-  String title = "";
+  Blog()
+      : title = "魔都探店-海底捞惊喜狂欢折扣" * (Random().nextInt(2) + 1),
+        mainImg = Image.network(
+          'http://0--0.top/apis/image/' + (Random().nextInt(16) + 1).toString(),
+        );
+
+  final String title;
   bool isSaved = false;
   String authorName = "Author Name";
-  Image? mainImg;
+  final Image mainImg;
   var authorImg = const FlutterLogo();
 }
 
@@ -95,13 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (BuildContext context) {
-              return const EditBlogPage();
-            }),
-          );
-        },
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (BuildContext context) => const EditBlogPage())),
         child: const Icon(Icons.add),
       ),
       backgroundColor: Colors.grey.shade200,
@@ -111,18 +104,19 @@ class _MyHomePageState extends State<MyHomePage> {
   _lineListView(final int offset, ScrollController sc) {
     // 放在这里的局部变量只会在ListView初始化的时候定值，此后不会改变
     return ListView.builder(
-        controller: sc,
-        physics: const BouncingScrollPhysics(),
-        itemBuilder: (BuildContext context, final int physicIdx) {
-          // 放在这里的局部变量会在ListView中某一项刷新到的时候定值，实时变化
-          final int blogIdx = physicIdx * 2 + offset;
-
-          if (blogIdx >= _blogs.length) {
-            _blogs.addAll(generateBlogs().take(20));
-          }
-
-          return _buildBlogCard(_blogs[blogIdx]);
-        });
+      controller: sc,
+      // itemCount: _blogs.length + 1,
+      physics: const BouncingScrollPhysics(),
+      itemBuilder: (BuildContext context, final int physicIdx) {
+        // 放在这里的局部变量会在ListView中某一项刷新到的时候定值，实时变化
+        final int blogIdx = physicIdx * 2 + offset;
+        if (blogIdx >= _blogs.length) {
+          _blogs.addAll(generateBlogs().take(5));
+          print(blogIdx);
+        }
+        return _buildBlogCard(_blogs[blogIdx]);
+      },
+    );
   }
 
   _buildBlogCard(Blog blog) {
@@ -164,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var result = "";
     var formData = FormData.fromMap({
       'offset': 0,
-      'limit': 10000,
+      'limit': 1000,
     });
     try {
       var response = await Dio().post(url, data: formData);
@@ -172,8 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
     } catch (e) {
       result = '[Error Catch]' + e.toString();
     }
-    print(result);
     List activityList = json.decode(result)['activityList'];
-    print(activityList[0]['images_ids'][0]);
+    print(activityList);
   }
 }
