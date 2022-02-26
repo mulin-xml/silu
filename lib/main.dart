@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     );
     return MaterialApp(
       title: '思路', // 在任务管理器中显示的标题
-      home: const MyHomePage(),
+      home: const SplashPage(),
       theme: ThemeData(primarySwatch: Colors.brown),
       // color: Colors.white,
     );
@@ -94,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (BuildContext context) => const EditBlogPage())),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage())),
         child: const Icon(Icons.add),
       ),
       backgroundColor: Colors.grey.shade200,
@@ -168,5 +168,30 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     List activityList = json.decode(result)['activityList'];
     print(activityList);
+  }
+}
+
+class SplashPage extends StatefulWidget {
+  const SplashPage({Key? key}) : super(key: key);
+
+  @override
+  _SplashPageState createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    // 启动的时候将屏幕设置成全屏模式
+    // SystemChrome.setEnabledSystemUIOverlays([]);
+    super.initState();
+
+    Future.delayed(const Duration(seconds: 3), () {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const FlutterLogo();
   }
 }
