@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image/image.dart' as TPImage;
 
 class UserImg {
   UserImg(
@@ -32,6 +33,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   @override
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
+    
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

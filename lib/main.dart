@@ -16,9 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 顶部状态栏透明
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: Colors.transparent),
-    );
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MaterialApp(
       title: '思路', // 在任务管理器中显示的标题
       home: const SplashPage(),
@@ -181,17 +179,18 @@ class SplashPage extends StatefulWidget {
 class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
-    // 启动的时候将屏幕设置成全屏模式
-    // SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
-
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return const FlutterLogo();
+    
+    return Container(
+      child: const FlutterLogo(),
+      color: Colors.white,
+    );
   }
 }
