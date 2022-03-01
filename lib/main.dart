@@ -169,25 +169,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends StatelessWidget {
   const SplashPage({Key? key}) : super(key: key);
 
   @override
-  _SplashPageState createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    
     return Container(
       child: const FlutterLogo(),
       color: Colors.white,

@@ -41,6 +41,7 @@ dependencies:
   linked_scroll_controller: ^0.2.0
   cached_network_image: any
   image: any
+  extended_image: any
 
 dev_dependencies:
   flutter_test:

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as TPImage;
+// import 'package:image/image.dart' as TPImage;
 
 class UserImg {
   UserImg(
@@ -15,6 +15,28 @@ class UserImg {
   final String path;
   final Image originImg;
   final Image thumbImg;
+}
+
+class EditImgPage extends StatefulWidget {
+  const EditImgPage({Key? key}) : super(key: key);
+
+  @override
+  _EditImgPageState createState() => _EditImgPageState();
+}
+
+class _EditImgPageState extends State<EditImgPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        toolbarHeight: 45,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.brown,
+        elevation: 0,
+      ),
+    );
+  }
 }
 
 class EditBlogPage extends StatefulWidget {
@@ -33,7 +55,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   @override
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -64,6 +86,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                         }
                         final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                         if (image != null) {
+                          bool a = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditImgPage()));
                           setState(() => _userImgList.add(UserImg(image.path)));
                         }
                       },
