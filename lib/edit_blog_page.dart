@@ -75,6 +75,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
               physics: const BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, final int physicIdx) {
                 if (physicIdx == _userImgList.length) {
+                  // 添加图片按钮
                   return Card(
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     child: GestureDetector(
@@ -86,8 +87,11 @@ class _EditBlogPageState extends State<EditBlogPage> {
                         }
                         final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                         if (image != null) {
-                          bool a = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditImgPage()));
-                          setState(() => _userImgList.add(UserImg(image.path)));
+                          var a = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditImgPage()));
+                          if (a != null) {
+                            print(a.path);
+                            setState(() => _userImgList.add(UserImg(image.path)));
+                          }
                         }
                       },
                       child: const SizedBox(
@@ -97,6 +101,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                     ),
                   );
                 } else {
+                  // 呈现图片
                   return Card(
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     clipBehavior: Clip.antiAlias,
