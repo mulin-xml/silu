@@ -18,7 +18,8 @@ class UserImg {
 }
 
 class EditImgPage extends StatefulWidget {
-  const EditImgPage({Key? key}) : super(key: key);
+  const EditImgPage({Key? key, required this.path}) : super(key: key);
+  final String path;
 
   @override
   _EditImgPageState createState() => _EditImgPageState();
@@ -27,6 +28,7 @@ class EditImgPage extends StatefulWidget {
 class _EditImgPageState extends State<EditImgPage> {
   @override
   Widget build(BuildContext context) {
+    print(widget.path);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -34,6 +36,10 @@ class _EditImgPageState extends State<EditImgPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,
+      ),
+      body: ElevatedButton(
+        child: const Text("s"),
+        onPressed: () => Navigator.of(context).pop(UserImg(widget.path)),
       ),
     );
   }
@@ -87,9 +93,8 @@ class _EditBlogPageState extends State<EditBlogPage> {
                         }
                         final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                         if (image != null) {
-                          var a = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditImgPage()));
+                          var a = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditImgPage(path: image.path)));
                           if (a != null) {
-                            print(a.path);
                             setState(() => _userImgList.add(UserImg(image.path)));
                           }
                         }
