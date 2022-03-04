@@ -1,34 +1,48 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:image_picker/image_picker.dart';
-// import 'package:image/image.dart' as TPImage;
+import 'package:crop_your_image/crop_your_image.dart';
+import 'package:image/image.dart' as tp_image;
+import 'dart:typed_data';
+// import 'package:path_provider/path_provider.dart';
 
 class UserImg {
   UserImg(
-    this.path,
-  )   : originImg = Image.file(File(path)),
-        thumbImg = Image.file(File(path), fit: BoxFit.cover, width: 100);
-  final String path;
+    this.imageByte,
+  )   : originImg = Image.memory(imageByte),
+        thumbImg = Image.memory(imageByte, fit: BoxFit.cover, width: 100);
+  // final String path;
+  final Uint8List imageByte;
   final Image originImg;
   final Image thumbImg;
 }
 
 class EditImgPage extends StatefulWidget {
-  const EditImgPage({Key? key, required this.path}) : super(key: key);
-  final String path;
+  const EditImgPage({Key? key, required this.imageByte}) : super(key: key);
+  final Uint8List imageByte;
 
   @override
   _EditImgPageState createState() => _EditImgPageState();
 }
 
 class _EditImgPageState extends State<EditImgPage> {
+  final _controller = CropController();
+
+  //将回调拿到的Uint8List格式的图片转换为File格式
+  saveImage(Uint8List imageByte) async {
+    // final tempDir = await getTemporaryDirectory();
+    final file = await File('image.jpg').create();
+    file.writeAsBytesSync(imageByte);
+    // tp_image.decodeWebP(bytes)
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(widget.path);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -37,9 +51,30 @@ class _EditImgPageState extends State<EditImgPage> {
         foregroundColor: Colors.brown,
         elevation: 0,
       ),
-      body: ElevatedButton(
-        child: const Text("s"),
-        onPressed: () => Navigator.of(context).pop(UserImg(widget.path)),
+      body: Column(
+        children: [
+          Expanded(
+            child: Crop(
+              image: widget.imageByte,
+              controller: _controller,
+              onCropped: (image) {
+                //裁剪完成的回调
+                saveImage(image);
+                Fluttertoast.showToast(msg: "ok");
+                Navigator.of(context).pop();
+              },
+              initialSize: 0.8,
+              withCircleUi: false,
+              baseColor: Colors.black,
+              maskColor: Colors.black.withAlpha(150),
+              cornerDotBuilder: (size, edgeAlignment) => const DotControl(color: Colors.white54),
+            ),
+          ),
+          ElevatedButton(
+            child: const Text("s"),
+            onPressed: () => _controller.crop(),
+          ),
+        ],
       ),
     );
   }
@@ -91,11 +126,11 @@ class _EditBlogPageState extends State<EditBlogPage> {
                           Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
                           return;
                         }
-                        final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-                        if (image != null) {
-                          var a = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditImgPage(path: image.path)));
-                          if (a != null) {
-                            setState(() => _userImgList.add(UserImg(image.path)));
+                        Uint8List? imageByte = await (await ImagePicker().pickImage(source: ImageSource.gallery))?.readAsBytes();
+                        if (imageByte != null) {
+                          var img = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditImgPage(imageByte: imageByte)));
+                          if (img != null) {
+                            setState(() => _userImgList.add(img));
                           }
                         }
                       },
@@ -181,14 +216,14 @@ class _EditBlogPageState extends State<EditBlogPage> {
   uploadBlog() async {
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
-    final imgFiles = <MultipartFile>[];
+    final imgFiles = <dio.MultipartFile>[];
 
     for (var elm in _userImgList) {
       // var name = elm.path.substring(elm.path.lastIndexOf("/") + 1, elm.path.length);
-      imgFiles.add(await MultipartFile.fromFile(elm.path));
+      imgFiles.add(await dio.MultipartFile.fromFile(elm.path));
     }
 
-    var formData = FormData.fromMap({
+    var formData = dio.FormData.fromMap({
       'user_id': 'admin',
       'title': _titleController.text,
       'context': _contextController.text,
@@ -196,7 +231,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     });
 
     try {
-      var response = await Dio().post(url, data: formData);
+      var response = await dio.Dio().post(url, data: formData);
       result = response.toString();
     } catch (e) {
       result = '[Error Catch]' + e.toString();

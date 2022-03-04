@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       title: '思路', // 在任务管理器中显示的标题
       home: const SplashPage(),
       theme: ThemeData(primarySwatch: Colors.brown),
-      // color: Colors.white,
+      color: Colors.brown,
     );
   }
 }
@@ -29,14 +29,13 @@ class MyApp extends StatelessWidget {
 class Blog {
   Blog()
       : title = "魔都探店-海底捞惊喜狂欢折扣" * (Random().nextInt(2) + 1),
-        mainImg = Image.network(
-          'http://0--0.top/apis/image/' + (Random().nextInt(16) + 1).toString(),
-        );
+        mainImg = FadeInImage.assetNetwork(placeholder: 'images/0.jpg', image: 'http://0--0.top/apis/image/' + (Random().nextInt(16) + 1).toString());
+  // mainImg = Image.network('http://0--0.top/apis/image/' + (Random().nextInt(16) + 1).toString()),
 
   final String title;
   bool isSaved = false;
   String authorName = "Author Name";
-  final Image mainImg;
+  final FadeInImage mainImg;
   var authorImg = const FlutterLogo();
 }
 
