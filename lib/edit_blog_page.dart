@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,8 @@ import 'dart:typed_data';
 class UserImg {
   UserImg(
     this.imageByte,
-  )   : originImg = Image.memory(imageByte),
-        thumbImg = Image.memory(imageByte, fit: BoxFit.cover, width: 100);
-  // final String path;
+  ) : thumbImg = Image.memory(imageByte, fit: BoxFit.cover, width: 100);
   final Uint8List imageByte;
-  final Image originImg;
   final Image thumbImg;
 }
 
@@ -59,9 +57,9 @@ class _EditImgPageState extends State<EditImgPage> {
               controller: _controller,
               onCropped: (image) {
                 //裁剪完成的回调
-                saveImage(image);
+                // saveImage(image);
                 Fluttertoast.showToast(msg: "ok");
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(UserImg(image));
               },
               initialSize: 0.8,
               withCircleUi: false,
@@ -216,18 +214,17 @@ class _EditBlogPageState extends State<EditBlogPage> {
   uploadBlog() async {
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
-    final imgFiles = <dio.MultipartFile>[];
+    final imgs = [];
 
     for (var elm in _userImgList) {
-      // var name = elm.path.substring(elm.path.lastIndexOf("/") + 1, elm.path.length);
-      imgFiles.add(await dio.MultipartFile.fromFile(elm.path));
+      imgs.add(base64.encode(elm.imageByte));
     }
 
     var formData = dio.FormData.fromMap({
-      'user_id': 'admin',
+      'user_id': '5',
       'title': _titleController.text,
       'context': _contextController.text,
-      'img_list': imgFiles,
+      'img_list': imgs,
     });
 
     try {

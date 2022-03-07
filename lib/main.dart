@@ -7,6 +7,7 @@ import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'edit_blog_page.dart';
+import 'user_login_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -81,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
         foregroundColor: Colors.brown,
         elevation: 0,
         actions: [
-          IconButton(icon: const Icon(Icons.list), onPressed: downloadBlog),
+          IconButton(icon: const Icon(Icons.list), onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()))),
         ],
       ),
       body: Row(
@@ -100,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _lineListView(final int offset, ScrollController sc) {
     // 放在这里的局部变量只会在ListView初始化的时候定值，此后不会改变
+    return SizedBox(height: 100,width: 100,);
     return ListView.builder(
       controller: sc,
       // itemCount: _blogs.length + 1,
