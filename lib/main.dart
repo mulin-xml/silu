@@ -101,7 +101,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _lineListView(final int offset, ScrollController sc) {
     // 放在这里的局部变量只会在ListView初始化的时候定值，此后不会改变
-    return SizedBox(height: 100,width: 100,);
     return ListView.builder(
       controller: sc,
       // itemCount: _blogs.length + 1,

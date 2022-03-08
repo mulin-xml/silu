@@ -8,7 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:image/image.dart' as tp_image;
+// import 'package:image/image.dart' as tp_image;
 import 'dart:typed_data';
 // import 'package:path_provider/path_provider.dart';
 
@@ -31,7 +31,7 @@ class EditImgPage extends StatefulWidget {
 class _EditImgPageState extends State<EditImgPage> {
   final _controller = CropController();
 
-  //将回调拿到的Uint8List格式的图片转换为File格式
+  // 将回调拿到的Uint8List格式的图片转换为File格式
   saveImage(Uint8List imageByte) async {
     // final tempDir = await getTemporaryDirectory();
     final file = await File('image.jpg').create();
@@ -56,8 +56,6 @@ class _EditImgPageState extends State<EditImgPage> {
               image: widget.imageByte,
               controller: _controller,
               onCropped: (image) {
-                //裁剪完成的回调
-                // saveImage(image);
                 Fluttertoast.showToast(msg: "ok");
                 Navigator.of(context).pop(UserImg(image));
               },
