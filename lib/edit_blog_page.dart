@@ -1,16 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:io';
-import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-// import 'package:image/image.dart' as tp_image;
 import 'dart:typed_data';
-// import 'package:path_provider/path_provider.dart';
 
 class UserImg {
   UserImg(
@@ -18,62 +14,6 @@ class UserImg {
   ) : thumbImg = Image.memory(imageByte, fit: BoxFit.cover, width: 100);
   final Uint8List imageByte;
   final Image thumbImg;
-}
-
-class EditImgPage extends StatefulWidget {
-  const EditImgPage({Key? key, required this.imageByte}) : super(key: key);
-  final Uint8List imageByte;
-
-  @override
-  _EditImgPageState createState() => _EditImgPageState();
-}
-
-class _EditImgPageState extends State<EditImgPage> {
-  final _controller = CropController();
-
-  // 将回调拿到的Uint8List格式的图片转换为File格式
-  saveImage(Uint8List imageByte) async {
-    // final tempDir = await getTemporaryDirectory();
-    final file = await File('image.jpg').create();
-    file.writeAsBytesSync(imageByte);
-    // tp_image.decodeWebP(bytes)
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        toolbarHeight: 45,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.brown,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: Crop(
-              image: widget.imageByte,
-              controller: _controller,
-              onCropped: (image) {
-                Fluttertoast.showToast(msg: "ok");
-                Navigator.of(context).pop(UserImg(image));
-              },
-              initialSize: 0.8,
-              withCircleUi: false,
-              baseColor: Colors.black,
-              maskColor: Colors.black.withAlpha(150),
-              cornerDotBuilder: (size, edgeAlignment) => const DotControl(color: Colors.white54),
-            ),
-          ),
-          ElevatedButton(
-            child: const Text("s"),
-            onPressed: () => _controller.crop(),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class EditBlogPage extends StatefulWidget {
@@ -124,7 +64,31 @@ class _EditBlogPageState extends State<EditBlogPage> {
                         }
                         Uint8List? imageByte = await (await ImagePicker().pickImage(source: ImageSource.gallery))?.readAsBytes();
                         if (imageByte != null) {
-                          var img = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditImgPage(imageByte: imageByte)));
+                          var img = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                            final _controller = CropController();
+                            return Column(
+                              children: [
+                                Expanded(
+                                  child: Crop(
+                                    image: imageByte,
+                                    controller: _controller,
+                                    onCropped: (image) {
+                                      Navigator.of(context).pop(UserImg(image));
+                                    },
+                                    initialSize: 0.8,
+                                    withCircleUi: false,
+                                    baseColor: Colors.black,
+                                    maskColor: Colors.black.withAlpha(150),
+                                    cornerDotBuilder: (size, edgeAlignment) => const DotControl(color: Colors.white54),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  child: const Text("选择图片"),
+                                  onPressed: () => _controller.crop(),
+                                ),
+                              ],
+                            );
+                          }));
                           if (img != null) {
                             setState(() => _userImgList.add(img));
                           }
