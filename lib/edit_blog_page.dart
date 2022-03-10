@@ -116,7 +116,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
             child: TextField(
               controller: _titleController,
-              maxLength: 10,
+              maxLength: 50,
               decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦"),
             ),
           ),
@@ -174,6 +174,10 @@ class _EditBlogPageState extends State<EditBlogPage> {
   }
 
   uploadBlog() async {
+    if (_titleController.text.isEmpty || _contextController.text.isEmpty) {
+      Fluttertoast.showToast(msg: '内容不能为空哦');
+      return;
+    }
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
     final imgs = [];
