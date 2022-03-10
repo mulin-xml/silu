@@ -105,7 +105,44 @@ class _EditBlogPageState extends State<EditBlogPage> {
                   return Card(
                     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
                     clipBehavior: Clip.antiAlias,
-                    child: _userImgList[physicIdx].thumbImg,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return SimpleDialog(
+                            children: [
+                              SimpleDialogOption(
+                                child: const Text(
+                                  '预览图片',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
+                                  return Image.memory(_userImgList[physicIdx].imageByte);
+                                })),
+                              ),
+                              const Divider(),
+                              SimpleDialogOption(
+                                child: const Text(
+                                  '删除图片',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _userImgList.removeAt(physicIdx);
+                                  });
+
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      child: _userImgList[physicIdx].thumbImg,
+                    ),
                   );
                 }
               },
