@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
 
 class Blog {
   Blog()
-      : title = "魔都探店-海底捞惊喜狂欢折扣" * (Random().nextInt(2) + 1),
+      : title = "魔都探店海底捞惊喜狂欢折扣" * (Random().nextInt(2) + 1),
         mainImg = FadeInImage.assetNetwork(placeholder: 'images/0.jpg', image: 'http://0--0.top/apis/image/' + (Random().nextInt(16) + 1).toString());
   // mainImg = Image.network('http://0--0.top/apis/image/' + (Random().nextInt(16) + 1).toString()),
 
@@ -126,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: blog.mainImg,
           ),
           ListTile(
-            title: Text(blog.title),
+            title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis),
             subtitle: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
