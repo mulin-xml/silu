@@ -74,6 +74,37 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
+  getUserInfo() async {
+    const url = 'http://0--0.top/apis/get_user_info';
+    var result = "";
+    var formData = FormData.fromMap({
+      'user_id': '5',
+    });
+    try {
+      var response = await Dio().post(url, data: formData);
+      result = response.toString();
+    } catch (e) {
+      result = '[Error Catch]' + e.toString();
+    }
+    print(result);
+  }
+
+  editUserInfo() async {
+    const url = 'http://0--0.top/apis/edit_user_info';
+    var result = "";
+    var formData = FormData.fromMap({
+      'user_id': '5',
+      'new_username': '思路官方账号1',
+    });
+    try {
+      var response = await Dio().post(url, data: formData);
+      result = response.toString();
+    } catch (e) {
+      result = '[Error Catch]' + e.toString();
+    }
+    print(result);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -84,13 +115,15 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         actions: [
           IconButton(icon: const Icon(Icons.list), onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()))),
+          IconButton(icon: const Icon(Icons.home), onPressed: getUserInfo),
           IconButton(
-              icon: const Icon(Icons.home),
+              icon: const Icon(Icons.face),
               onPressed: () async {
-                const url = 'http://0--0.top/apis/get_user_info';
+                String url = "http://silu-bucket.oss-cn-shanghai.aliyuncs.com";
+
                 var result = "";
                 var formData = FormData.fromMap({
-                  'userId': '5',
+                  'key': '456.jpg',
                 });
                 try {
                   var response = await Dio().post(url, data: formData);
@@ -98,7 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 } catch (e) {
                   result = '[Error Catch]' + e.toString();
                 }
-                // List activityList = json.decode(result)['activityList'];
                 print(result);
               }),
         ],
