@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'edit_blog_page.dart';
 import 'user_login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(const MyApp());
 
@@ -83,6 +84,23 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         actions: [
           IconButton(icon: const Icon(Icons.list), onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()))),
+          IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () async {
+                const url = 'http://0--0.top/apis/get_user_info';
+                var result = "";
+                var formData = FormData.fromMap({
+                  'userId': '5',
+                });
+                try {
+                  var response = await Dio().post(url, data: formData);
+                  result = response.toString();
+                } catch (e) {
+                  result = '[Error Catch]' + e.toString();
+                }
+                // List activityList = json.decode(result)['activityList'];
+                print(result);
+              }),
         ],
       ),
       body: Row(
@@ -92,7 +110,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage())),
+        onPressed: () async {
+          final sp = await SharedPreferences.getInstance();
+          if (sp.getBool('is_login') ?? false) {
+            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
+          } else {
+            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+          }
+        },
         child: const Icon(Icons.add),
       ),
       backgroundColor: Colors.grey.shade200,

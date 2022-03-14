@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:dio/dio.dart' as dio;
+import 'dart:async';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserLoginPage extends StatefulWidget {
   const UserLoginPage({Key? key}) : super(key: key);
@@ -14,7 +17,17 @@ class UserLoginPage extends StatefulWidget {
 class _UserLoginPageState extends State<UserLoginPage> {
   final _phoneNumController = TextEditingController();
   final _verifyController = TextEditingController();
+  static const _maxCountdownTime = 10;
   var _isReadProtocol = false;
+  var _countdownTime = 0;
+  var _verifyButtonText = "获取验证码";
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    super.dispose();
+    _timer?.cancel();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,56 +52,89 @@ class _UserLoginPageState extends State<UserLoginPage> {
               controller: _phoneNumController,
               keyboardType: TextInputType.phone,
               maxLength: 11,
-
-              // decoration: const InputDecoration(
-              //   hintText: "请输入手机号码",
-              //   border: OutlineInputBorder(
-              //     borderRadius: BorderRadius.all(Radius.circular(30)),
-              //     borderSide: BorderSide.none,
-              //   ),
-              //   filled: true,
-              //   fillColor: Colors.white,
-              // ),
-              decoration: const InputDecoration(hintText: "请输入手机号码"),
+              decoration: const InputDecoration(hintText: "请输入手机号码", counterText: ""),
             ),
           ),
           // 验证码输入栏
           Padding(
             padding: const EdgeInsets.fromLTRB(50, 10, 50, 0),
-            child: TextField(
-              controller: _verifyController,
-              // decoration: const InputDecoration(
-              //   hintText: "请输入验证码",
-              //   border: OutlineInputBorder(
-              //     borderRadius: BorderRadius.all(Radius.circular(30)),
-              //     borderSide: BorderSide.none,
-              //   ),
-              //   filled: true,
-              //   fillColor: Colors.white,
-              // ),
-              decoration: const InputDecoration(hintText: "请输入验证码"),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 10, 50, 0),
             child: Row(
               children: [
-                Container(
-                  color: Colors.red,
-                  child: Checkbox(
-                      shape: const CircleBorder(),
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      value: _isReadProtocol,
-                      onChanged: (value) {
-                        setState(() {
-                          _isReadProtocol = !_isReadProtocol;
-                        });
-                      }),
+                Expanded(
+                  child: TextField(
+                    controller: _verifyController,
+                    maxLength: 6,
+                    decoration: const InputDecoration(hintText: "请输入验证码", counterText: ""),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    if (_countdownTime > 0) {
+                      return;
+                    }
+
+                    if (_phoneNumController.text.length < 11) {
+                      Fluttertoast.showToast(msg: '请输入完整的手机号');
+                      return;
+                    }
+                    const url = 'http://0--0.top/apis/login_phone_step1';
+                    var result = "";
+                    bool isSucc = true;
+
+                    var formData = dio.FormData.fromMap({
+                      'phoneNumber': _phoneNumController.text,
+                    });
+
+                    try {
+                      var response = await dio.Dio().post(url, data: formData);
+                      result = response.toString();
+                    } catch (e) {
+                      result = '[Error Catch]' + e.toString();
+                      isSucc = false;
+                    } finally {
+                      print(result);
+                    }
+
+                    if (isSucc) {
+                      Fluttertoast.showToast(msg: '短信验证码已发送，请注意查收');
+                      _countdownTime = _maxCountdownTime;
+                      _timer = Timer.periodic(
+                        const Duration(seconds: 1),
+                        (timer) => setState(() {
+                          if (_countdownTime <= 0) {
+                            _verifyButtonText = '重新获取';
+                            timer.cancel();
+                          } else {
+                            _verifyButtonText = _countdownTime.toString() + 's后重新发送';
+                            _countdownTime -= 1;
+                          }
+                        }),
+                      );
+                    } else {
+                      Fluttertoast.showToast(msg: '短信验证码发送失败');
+                    }
+                  },
+                  child: Text(_verifyButtonText),
+                ),
+              ],
+            ),
+          ),
+          // 阅读协议勾选
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 30, 50, 0),
+            child: Row(
+              children: [
+                Checkbox(
+                  shape: const CircleBorder(),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  value: _isReadProtocol,
+                  onChanged: (value) => setState(() => _isReadProtocol = !_isReadProtocol),
                 ),
                 const Expanded(child: Text('我已阅读并同意用户协议和隐私政策和儿童/青少年个人信息保护规则', textScaleFactor: 0.8)),
               ],
             ),
           ),
+          // 登录按钮
           Container(
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(50, 10, 50, 0),
@@ -96,8 +142,14 @@ class _UserLoginPageState extends State<UserLoginPage> {
               style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
               child: const Text('登录', textScaleFactor: 1.5),
               onPressed: () async {
+                if (!_isReadProtocol || _phoneNumController.text.length < 11 || _verifyController.text.isEmpty) {
+                  Fluttertoast.showToast(msg: '请检查手机号和验证码');
+                  return;
+                }
+
                 const url = 'http://0--0.top/apis/login_phone_step2';
                 var result = "";
+                var isSucc = true;
 
                 var formData = dio.FormData.fromMap({
                   'phoneNumber': _phoneNumController.text,
@@ -108,51 +160,24 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   var response = await dio.Dio().post(url, data: formData);
                   result = response.toString();
                 } catch (e) {
+                  isSucc = false;
                   result = '[Error Catch]' + e.toString();
+                } finally {
+                  print(result);
                 }
-                print(result);
                 Fluttertoast.showToast(msg: result);
+
+                if (isSucc) {
+                  if (json.decode(result)['status']) {
+                    Fluttertoast.showToast(msg: 'ok');
+                    var sp = await SharedPreferences.getInstance();
+                    sp.setBool('is_login', true);
+                  }
+                } else {}
               },
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: SizedBox(
-        height: 80,
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(shape: const CircleBorder()),
-                    onPressed: () async {
-                      const url = 'http://0--0.top/apis/login_phone_step1';
-                      var result = "";
-
-                      var formData = dio.FormData.fromMap({
-                        'phoneNumber': _phoneNumController.text,
-                      });
-
-                      try {
-                        var response = await dio.Dio().post(url, data: formData);
-                        result = response.toString();
-                      } catch (e) {
-                        result = '[Error Catch]' + e.toString();
-                      }
-                      print(result);
-                      Fluttertoast.showToast(msg: result);
-                    },
-                    child: const Icon(Icons.storefront),
-                  ),
-                  const Text("验证码", style: TextStyle(color: Colors.white)),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

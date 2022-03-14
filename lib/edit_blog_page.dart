@@ -218,6 +218,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     const url = 'http://0--0.top/apis/upload_activity';
     var result = "";
     final imgs = [];
+    var isSucc = true;
 
     for (var elm in _userImgList) {
       imgs.add(base64.encode(elm.imageByte));
@@ -235,8 +236,16 @@ class _EditBlogPageState extends State<EditBlogPage> {
       result = response.toString();
     } catch (e) {
       result = '[Error Catch]' + e.toString();
+      isSucc = false;
+    } finally {
+      print(result);
     }
-    print(result);
-    Fluttertoast.showToast(msg: result);
+
+    if (isSucc) {
+      Fluttertoast.showToast(msg: '上传成功');
+      Navigator.of(context).pop();
+    } else {
+      Fluttertoast.showToast(msg: '上传失败，请检查网络');
+    }
   }
 }
