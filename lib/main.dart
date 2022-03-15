@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'edit_blog_page.dart';
 import 'user_login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'oss.dart';
 
 void main() => runApp(const MyApp());
 
@@ -119,19 +120,8 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
               icon: const Icon(Icons.face),
               onPressed: () async {
-                String url = "http://silu-bucket.oss-cn-shanghai.aliyuncs.com";
-
-                var result = "";
-                var formData = FormData.fromMap({
-                  'key': '456.jpg',
-                });
-                try {
-                  var response = await Dio().post(url, data: formData);
-                  result = response.toString();
-                } catch (e) {
-                  result = '[Error Catch]' + e.toString();
-                }
-                print(result);
+                func();
+                // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Container(child: Image.file(File('$cachePath/123.jpg')))));
               }),
         ],
       ),

@@ -43,8 +43,9 @@ dependencies:
   image: any
   extended_image: any
   crop_your_image: ^0.6.0+1
-  # path_provider: ^2.0.9
+  path_provider: any
   shared_preferences: any
+  permission_handler: any
 
 dev_dependencies:
   flutter_test:
