@@ -1,14 +1,16 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_blog_page.dart';
 import 'user_login_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'oss.dart';
 
 void main() => runApp(const MyApp());
@@ -116,12 +118,21 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         actions: [
           IconButton(icon: const Icon(Icons.list), onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()))),
-          IconButton(icon: const Icon(Icons.home), onPressed: getUserInfo),
+          IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () async {
+                await Bucket().putObject('47.jpg');
+              }),
           IconButton(
               icon: const Icon(Icons.face),
               onPressed: () async {
-                func();
-                // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Container(child: Image.file(File('$cachePath/123.jpg')))));
+                var cachePath = (await getTemporaryDirectory()).path;
+                var filename = '123.jpg';
+                if (await Bucket().getObject(filename, '$cachePath/$filename')) {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Container(child: Image.file(File('$cachePath/$filename')))));
+                } else {
+                  print('fuck');
+                }
               }),
         ],
       ),

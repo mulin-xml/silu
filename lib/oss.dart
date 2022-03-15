@@ -8,57 +8,91 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
-// import 'dart:math';
-import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Auth {
   Auth(this.accessKeyId, this.accessKetSecret);
   String accessKeyId;
   String accessKetSecret;
 
-  String makeSignature(String date) {
-    var a = utf8.encode(date);
-    return base64.encode(Hmac(sha1, utf8.encode(accessKetSecret)).convert(a).bytes);
+  String makeGetSignature(String date, String bucketName, String key) {
+    var stringToSign = utf8.encode("GET\n\n\n$date\n/$bucketName/$key");
+    return base64.encode(Hmac(sha1, utf8.encode(accessKetSecret)).convert(stringToSign).bytes);
+  }
+
+  String makePostSignature() {
+    var policy = {"expiration": "2100-12-01T12:00:00.000Z", "conditions": []}.toString();
+    return base64.encode(Hmac(sha1, utf8.encode(accessKetSecret)).convert(utf8.encode(policy)).bytes);
   }
 }
 
 class Bucket {
-  Bucket(this.auth, this.endpoint);
-  Auth auth;
-  String endpoint;
+  Bucket._internal();
+  static final _instance = Bucket._internal();
+  factory Bucket() => getInstance();
+  static getInstance() => _instance;
 
-  getObject(String key, String filename) async {
-    var dio = Dio();
+  static final _auth = Auth('LTAI5tHGNaWaav3ifG5RJL8M', 'rRPWittvDvkxICj9qwOgQ8RDBefj3c');
+  static const _endpoint = 'http://silu-bucket.oss-cn-shanghai.aliyuncs.com';
+  static const _bucketName = 'silu-bucket';
+  static final _dio = Dio();
 
+  getObject(String key, String filepath) async {
     String date = HttpDate.format(DateTime.now());
-    print(auth.makeSignature('Tue, 15 Mar 2022 07:14:14 GMT'));
-
-    return;
-    dio.options.headers = {
-      'date': 'Tue, 15 Mar 2022 07:14:14 GMT',
-      'authorization': 'OSS ' + auth.accessKeyId + ':' + '0lLlUXmOlUYN/lhxoZ5pg8xM81Q=',
+    _dio.options.headers = {
+      'date': date,
+      'authorization': 'OSS ' + _auth.accessKeyId + ':' + _auth.makeGetSignature(date, _bucketName, key),
     };
     var result = "";
     var isSucc = true;
 
     try {
-      var response = await dio.get(endpoint + '/' + key);
-      // var response = await dio.download(url, filename);
+      var response = await _dio.download(_endpoint + '/' + key, filepath);
       result = response.toString();
     } catch (e) {
       result = '[Error Catch]' + e.toString();
       isSucc = false;
     } finally {
-      print(result.length);
       print(result);
     }
+    return isSucc;
   }
-}
 
-func() async {
-  var auth = Auth('LTAI5tHGNaWaav3ifG5RJL8M', 'rRPWittvDvkxICj9qwOgQ8RDBefj3c');
-  var bucket = Bucket(auth, 'http://silu-bucket.oss-cn-shanghai.aliyuncs.com');
-  var cachePath = (await getTemporaryDirectory()).path;
-  bucket.getObject('123.jpg', '$cachePath/123.jpg');
+  putObject(String key) async {
+    String date = HttpDate.format(DateTime.now());
+    jsonEncode({
+      "expiration": "2050-12-01T12:00:00.000Z",
+      "conditions": [
+        ["content-length-range", 0, 1048576000],
+      ],
+    });
+    var policy = base64Encode(utf8.encode('{"expiration": "2100-12-01T12:00:00.000Z","conditions": [["content-length-range", 0, 1048576000]]}'));
+    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    String path = image != null ? image.path : "";
+    var formData = FormData.fromMap({
+      "key": key,
+      "success_action_status": 200,
+      "OSSAccessKeyId": _auth.accessKeyId,
+      "policy": policy,
+      "Signature": base64.encode(Hmac(sha1, utf8.encode(_auth.accessKetSecret)).convert(utf8.encode(policy)).bytes),
+      "file": await MultipartFile.fromFile(path),
+    });
+
+    var result = "";
+    var isSucc = true;
+
+    try {
+      var response = await Dio().post(_endpoint, data: formData);
+      print(response.statusCode);
+      print(response.statusMessage);
+    } on DioError catch (e) {
+      result = '[Error Catch]' + e.toString();
+      isSucc = false;
+      print(e.response?.toString());
+    } finally {
+      print(result);
+    }
+    return isSucc;
+  }
 }

@@ -82,7 +82,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                     bool isSucc = true;
 
                     var formData = dio.FormData.fromMap({
-                      'phoneNumber': _phoneNumController.text,
+                      'phone_number': _phoneNumController.text,
                     });
 
                     try {
@@ -152,8 +152,8 @@ class _UserLoginPageState extends State<UserLoginPage> {
                 var isSucc = true;
 
                 var formData = dio.FormData.fromMap({
-                  'phoneNumber': _phoneNumController.text,
-                  'validateCode': _verifyController.text,
+                  'phone_number': _phoneNumController.text,
+                  'validate_code': _verifyController.text,
                 });
 
                 try {
