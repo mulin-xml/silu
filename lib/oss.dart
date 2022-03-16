@@ -1,15 +1,10 @@
 // ignore_for_file: avoid_print
 
-// 用户登录名称 silu@1721203709818866.onaliyun.com
-// 登录密码 cUb!MHCX(&g22xBAKIoL%il4hQMq2xhz
-// AccessKey ID LTAI5tHGNaWaav3ifG5RJL8M
-// AccessKey Secret rRPWittvDvkxICj9qwOgQ8RDBefj3c
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'package:image_picker/image_picker.dart';
+import 'http_manager.dart';
 
 class Auth {
   Auth(this.accessKeyId, this.accessKetSecret);
@@ -21,12 +16,12 @@ class Auth {
     return base64.encode(Hmac(sha1, utf8.encode(accessKetSecret)).convert(stringToSign).bytes);
   }
 
-  String makePostSignature() {
-    var policy = {"expiration": "2100-12-01T12:00:00.000Z", "conditions": []}.toString();
+  String makePostSignature(String policy) {
     return base64.encode(Hmac(sha1, utf8.encode(accessKetSecret)).convert(utf8.encode(policy)).bytes);
   }
 }
 
+// 单例模式
 class Bucket {
   Bucket._internal();
   static final _instance = Bucket._internal();
@@ -38,61 +33,41 @@ class Bucket {
   static const _bucketName = 'silu-bucket';
   static final _dio = Dio();
 
-  getObject(String key, String filepath) async {
+  Future<SiluResponse> getObject(String key, String filepath) async {
     String date = HttpDate.format(DateTime.now());
-    _dio.options.headers = {
-      'date': date,
-      'authorization': 'OSS ' + _auth.accessKeyId + ':' + _auth.makeGetSignature(date, _bucketName, key),
-    };
-    var result = "";
-    var isSucc = true;
-
     try {
-      var response = await _dio.download(_endpoint + '/' + key, filepath);
-      result = response.toString();
-    } catch (e) {
-      result = '[Error Catch]' + e.toString();
-      isSucc = false;
-    } finally {
-      print(result);
+      var response = await _dio.download('$_endpoint/$key', filepath,
+          options: Options(headers: {'date': date, 'authorization': 'OSS ' + _auth.accessKeyId + ':' + _auth.makeGetSignature(date, _bucketName, key)}));
+      return SiluResponse(response.statusCode!, jsonDecode(response.toString()));
+    } on DioError catch (e) {
+      print(e.response.toString());
+      return SiluResponse(e.response!.statusCode!, e.response.toString());
     }
-    return isSucc;
   }
 
-  putObject(String key) async {
-    String date = HttpDate.format(DateTime.now());
-    jsonEncode({
+  Future<SiluResponse> postObject(String key, filepath) async {
+    final policy = base64Encode(utf8.encode(jsonEncode({
       "expiration": "2050-12-01T12:00:00.000Z",
       "conditions": [
         ["content-length-range", 0, 1048576000],
       ],
-    });
-    var policy = base64Encode(utf8.encode('{"expiration": "2100-12-01T12:00:00.000Z","conditions": [["content-length-range", 0, 1048576000]]}'));
-    var image = await ImagePicker().pickImage(source: ImageSource.gallery);
-    String path = image != null ? image.path : "";
-    var formData = FormData.fromMap({
+    })));
+
+    final formData = FormData.fromMap({
       "key": key,
       "success_action_status": 200,
       "OSSAccessKeyId": _auth.accessKeyId,
       "policy": policy,
-      "Signature": base64.encode(Hmac(sha1, utf8.encode(_auth.accessKetSecret)).convert(utf8.encode(policy)).bytes),
-      "file": await MultipartFile.fromFile(path),
+      "Signature": _auth.makePostSignature(policy),
+      "file": await MultipartFile.fromFile(filepath),
     });
 
-    var result = "";
-    var isSucc = true;
-
     try {
-      var response = await Dio().post(_endpoint, data: formData);
-      print(response.statusCode);
-      print(response.statusMessage);
+      var response = await _dio.post(_endpoint, data: formData);
+      return SiluResponse(response.statusCode!, null);
     } on DioError catch (e) {
-      result = '[Error Catch]' + e.toString();
-      isSucc = false;
-      print(e.response?.toString());
-    } finally {
-      print(result);
+      print(e.response.toString());
+      return SiluResponse(e.response!.statusCode!, e.response.toString());
     }
-    return isSucc;
   }
 }

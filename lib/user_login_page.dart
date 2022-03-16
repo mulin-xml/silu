@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:dio/dio.dart' as dio;
-import 'dart:async';
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
+import 'dart:io';
+import 'http_manager.dart';
 
 class UserLoginPage extends StatefulWidget {
   const UserLoginPage({Key? key}) : super(key: key);
@@ -71,31 +71,14 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   onPressed: () async {
                     if (_countdownTime > 0) {
                       return;
-                    }
-
-                    if (_phoneNumController.text.length < 11) {
+                    } else if (_phoneNumController.text.length < 11) {
                       Fluttertoast.showToast(msg: '请输入完整的手机号');
                       return;
                     }
-                    const url = 'http://0--0.top/apis/login_phone_step1';
-                    var result = "";
-                    bool isSucc = true;
 
-                    var formData = dio.FormData.fromMap({
-                      'phone_number': _phoneNumController.text,
-                    });
+                    var rsp = await SiluRequest().post('login_phone_step1', {'phone_number': _phoneNumController.text});
 
-                    try {
-                      var response = await dio.Dio().post(url, data: formData);
-                      result = response.toString();
-                    } catch (e) {
-                      result = '[Error Catch]' + e.toString();
-                      isSucc = false;
-                    } finally {
-                      print(result);
-                    }
-
-                    if (isSucc) {
+                    if (rsp.statusCode == HttpStatus.ok) {
                       Fluttertoast.showToast(msg: '短信验证码已发送，请注意查收');
                       _countdownTime = _maxCountdownTime;
                       _timer = Timer.periodic(
@@ -147,33 +130,17 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   return;
                 }
 
-                const url = 'http://0--0.top/apis/login_phone_step2';
-                var result = "";
-                var isSucc = true;
+                var rsp = await SiluRequest().post('login_phone_step2', {'phone_number': _phoneNumController.text, 'validate_code': _verifyController.text});
 
-                var formData = dio.FormData.fromMap({
-                  'phone_number': _phoneNumController.text,
-                  'validate_code': _verifyController.text,
-                });
-
-                try {
-                  var response = await dio.Dio().post(url, data: formData);
-                  result = response.toString();
-                } catch (e) {
-                  isSucc = false;
-                  result = '[Error Catch]' + e.toString();
-                } finally {
-                  print(result);
+                if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+                  Fluttertoast.showToast(msg: '登录成功');
+                  var sp = await SharedPreferences.getInstance();
+                  sp.setBool('is_login', true);
+                  sp.setString('user_id', rsp.data['user_id'] ?? '');
+                  Navigator.of(context).pop();
+                } else {
+                  Fluttertoast.showToast(msg: '验证码错误');
                 }
-                Fluttertoast.showToast(msg: result);
-
-                if (isSucc) {
-                  if (json.decode(result)['status']) {
-                    Fluttertoast.showToast(msg: 'ok');
-                    var sp = await SharedPreferences.getInstance();
-                    sp.setBool('is_login', true);
-                  }
-                } else {}
               },
             ),
           ),

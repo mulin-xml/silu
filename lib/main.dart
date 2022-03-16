@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_blog_page.dart';
 import 'user_login_page.dart';
 import 'oss.dart';
+import 'http_manager.dart';
 
 void main() => runApp(const MyApp());
 
@@ -78,34 +79,17 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   getUserInfo() async {
-    const url = 'http://0--0.top/apis/get_user_info';
-    var result = "";
-    var formData = FormData.fromMap({
-      'user_id': '5',
-    });
-    try {
-      var response = await Dio().post(url, data: formData);
-      result = response.toString();
-    } catch (e) {
-      result = '[Error Catch]' + e.toString();
-    }
-    print(result);
+    var rsp = await SiluRequest().post('get_user_info', {'user_id': '5'});
+    print(rsp.data);
   }
 
   editUserInfo() async {
-    const url = 'http://0--0.top/apis/edit_user_info';
-    var result = "";
-    var formData = FormData.fromMap({
+    var form = {
       'user_id': '5',
       'new_username': '思路官方账号1',
-    });
-    try {
-      var response = await Dio().post(url, data: formData);
-      result = response.toString();
-    } catch (e) {
-      result = '[Error Catch]' + e.toString();
-    }
-    print(result);
+    };
+    var rsp = await SiluRequest().post('edit_user_info', form);
+    print(rsp.data);
   }
 
   @override
@@ -117,19 +101,31 @@ class _MyHomePageState extends State<MyHomePage> {
         foregroundColor: Colors.brown,
         elevation: 0,
         actions: [
-          IconButton(icon: const Icon(Icons.list), onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()))),
           IconButton(
-              icon: const Icon(Icons.home),
+              icon: const Icon(Icons.list),
               onPressed: () async {
-                await Bucket().putObject('47.jpg');
+                for (int i = 0; i < 100; i++) {
+                  var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': i});
+                  if (rsp.statusCode == HttpStatus.ok) {
+                    print(i);
+                  } else {
+                    // print('fuck');
+                  }
+                }
+              }),
+          IconButton(
+              icon: const Icon(Icons.back_hand),
+              onPressed: () {
+                downloadBlog();
               }),
           IconButton(
               icon: const Icon(Icons.face),
               onPressed: () async {
                 var cachePath = (await getTemporaryDirectory()).path;
                 var filename = '123.jpg';
-                if (await Bucket().getObject(filename, '$cachePath/$filename')) {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Container(child: Image.file(File('$cachePath/$filename')))));
+                var rsp = await Bucket().getObject(filename, '$cachePath/$filename');
+                if (rsp.statusCode == HttpStatus.ok) {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => Center(child: Image.file(File('$cachePath/$filename')))));
                 } else {
                   print('fuck');
                 }
@@ -165,6 +161,10 @@ class _MyHomePageState extends State<MyHomePage> {
       physics: const BouncingScrollPhysics(),
       itemBuilder: (BuildContext context, final int physicIdx) {
         // 放在这里的局部变量会在ListView中某一项刷新到的时候定值，实时变化
+        return SizedBox(
+          width: 100,
+          height: 100,
+        );
         final int blogIdx = physicIdx * 2 + offset;
         if (blogIdx >= _blogs.length) {
           _blogs.addAll(generateBlogs().take(5));
@@ -213,7 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const url = 'http://0--0.top/apis/get_activity_list';
     var result = "";
     var formData = FormData.fromMap({
-      'offset': 0,
+      'offset': 20,
       'limit': 1000,
     });
     try {

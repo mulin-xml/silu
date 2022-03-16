@@ -1,12 +1,16 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:dio/dio.dart' as dio;
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'dart:typed_data';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as tpimg;
+import 'package:silu/oss.dart';
+import 'http_manager.dart';
 
 class UserImg {
   UserImg(
@@ -211,37 +215,41 @@ class _EditBlogPageState extends State<EditBlogPage> {
   }
 
   uploadBlog() async {
-    if (_titleController.text.isEmpty || _contextController.text.isEmpty) {
+    final sp = await SharedPreferences.getInstance();
+    if (sp.getString('user_id')?.isEmpty ?? false) {
+      Fluttertoast.showToast(msg: '获取用户信息失败');
+      return;
+    } else if (_titleController.text.isEmpty || _contextController.text.isEmpty || _userImgList.isEmpty) {
       Fluttertoast.showToast(msg: '内容不能为空哦');
       return;
     }
-    const url = 'http://0--0.top/apis/upload_activity';
-    var result = "";
-    final imgs = [];
-    var isSucc = true;
+    final userId = sp.getString('user_id') ?? '';
+    final cachePath = (await getTemporaryDirectory()).path;
 
+    final imgKeys = <String>[];
+    final date = DateTime.now().toIso8601String().substring(0, 19);
+    int imgIdx = 0;
     for (var elm in _userImgList) {
-      imgs.add(base64.encode(elm.imageByte));
+      imgIdx++;
+      final img = tpimg.decodeImage(elm.imageByte)!;
+      final key = 'img$date-$imgIdx-$userId.jpg';
+      File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(img));
+      final rsp = await Bucket().postObject('images/$key', '$cachePath/$key');
+      if (rsp.statusCode == HttpStatus.ok) {
+        imgKeys.add(key);
+      }
     }
 
-    var formData = dio.FormData.fromMap({
+    // 表单上传后端
+    var form = {
       'user_id': '5',
       'title': _titleController.text,
       'context': _contextController.text,
-      'img_list': imgs,
-    });
+      'oss_img_keys': imgKeys,
+    };
+    var rsp = await SiluRequest().post('upload_activity', form);
 
-    try {
-      var response = await dio.Dio().post(url, data: formData);
-      result = response.toString();
-    } catch (e) {
-      result = '[Error Catch]' + e.toString();
-      isSucc = false;
-    } finally {
-      print(result);
-    }
-
-    if (isSucc) {
+    if (rsp.statusCode == HttpStatus.ok) {
       Fluttertoast.showToast(msg: '上传成功');
       Navigator.of(context).pop();
     } else {
