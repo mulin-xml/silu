@@ -63,6 +63,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                 Expanded(
                   child: TextField(
                     controller: _verifyController,
+                    keyboardType: TextInputType.number,
                     maxLength: 6,
                     decoration: const InputDecoration(hintText: "请输入验证码", counterText: ""),
                   ),

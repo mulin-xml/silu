@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
 import 'package:dio/dio.dart';
 
 class SiluResponse {
@@ -20,7 +19,7 @@ class SiluRequest {
   Future<SiluResponse> post(String api, Map<String, dynamic> map) async {
     try {
       var response = await _dio.post(api, data: FormData.fromMap(map));
-      return SiluResponse(response.statusCode!, jsonDecode(response.toString()));
+      return SiluResponse(response.statusCode ?? 0, response.toString());
     } on DioError catch (e) {
       print(e.response.toString());
       return SiluResponse(e.response?.statusCode ?? -1, e.response.toString());

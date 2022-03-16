@@ -223,16 +223,14 @@ class _EditBlogPageState extends State<EditBlogPage> {
       Fluttertoast.showToast(msg: '内容不能为空哦');
       return;
     }
+
+    // 图片上传OSS
     final userId = sp.getString('user_id') ?? '';
     final cachePath = (await getTemporaryDirectory()).path;
-
     final imgKeys = <String>[];
-    final date = DateTime.now().toIso8601String().substring(0, 19);
-    int imgIdx = 0;
     for (var elm in _userImgList) {
-      imgIdx++;
       final img = tpimg.decodeImage(elm.imageByte)!;
-      final key = 'img$date-$imgIdx-$userId.jpg';
+      final key = '${DateTime.now().toIso8601String()}-$userId.jpg';
       File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(img));
       final rsp = await Bucket().postObject('images/$key', '$cachePath/$key');
       if (rsp.statusCode == HttpStatus.ok) {

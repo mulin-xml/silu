@@ -38,10 +38,9 @@ dependencies:
   dio: ^4.0.5-beta1
   flutter_picker: ^2.0.2
   image_picker: any
-  linked_scroll_controller: ^0.2.0
+  linked_scroll_controller: any
   cached_network_image: any
   image: any
-  extended_image: any
   crop_your_image: ^0.6.0+1
   path_provider: any
   shared_preferences: any
