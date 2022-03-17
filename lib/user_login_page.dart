@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -133,11 +135,11 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                 var rsp = await SiluRequest().post('login_phone_step2', {'phone_number': _phoneNumController.text, 'validate_code': _verifyController.text});
 
-                if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+                if (rsp.statusCode == HttpStatus.ok && jsonDecode(rsp.data)['status']) {
                   Fluttertoast.showToast(msg: '登录成功');
                   var sp = await SharedPreferences.getInstance();
                   sp.setBool('is_login', true);
-                  sp.setString('user_id', rsp.data['user_id'] ?? '');
+                  sp.setString('user_id', jsonDecode(rsp.data)['user_id'] ?? '');
                   Navigator.of(context).pop();
                 } else {
                   Fluttertoast.showToast(msg: '验证码错误');

@@ -5,12 +5,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'edit_blog_page.dart';
 import 'user_login_page.dart';
-import 'oss.dart';
 import 'http_manager.dart';
+import 'image_cache.dart';
 
 void main() => runApp(const MyApp());
 
@@ -30,38 +29,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TestImg extends StatefulWidget {
-  const TestImg({Key? key}) : super(key: key);
-
-  @override
-  State<TestImg> createState() => _TestImgState();
-}
-
-class _TestImgState extends State<TestImg> {
-  var img = Image.asset('images/0.jpg');
-  @override
-  Widget build(BuildContext context) {
-    return img;
-  }
-
-  func() async {
-    var cachePath = (await getTemporaryDirectory()).path;
-    var filename = '123.jpg';
-    var rsp = await Bucket().getObject(filename, '$cachePath/$filename');
-
-    if (rsp.statusCode == HttpStatus.ok) {
-      img = Image.file(File('$cachePath/$filename'));
-    }
-  }
-}
-
 class Blog {
-  Blog(this.title) : mainImg = TestImg();
+  Blog(this.title, this.ossImgKey);
+
+  bool isSaved = false;
 
   final String title;
-  bool isSaved = false;
+  final String ossImgKey;
   final String authorName = "Author Name";
-  Widget mainImg;
+
   final authorImg = const FlutterLogo();
 }
 
@@ -92,12 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _sc1 = _controllers.addAndGet();
     _sc2 = _controllers.addAndGet();
 
-    _sc1.addListener(() {
-      print(_sc1.offset);
-    });
-    _sc1.addListener(() {
-      print(_sc2.offset);
-    });
+    getBatchBlogs();
   }
 
   @override
@@ -130,7 +101,11 @@ class _MyHomePageState extends State<MyHomePage> {
         foregroundColor: Colors.brown,
         elevation: 0,
         actions: [
-          IconButton(icon: const Icon(Icons.face), onPressed: () async {}),
+          IconButton(
+              icon: const Icon(Icons.face),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+              }),
         ],
       ),
       body: Row(
@@ -158,16 +133,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // 放在这里的局部变量只会在ListView初始化的时候定值，此后不会改变
     return ListView.builder(
       controller: sc,
-      itemCount: _blogs.length + 1,
+      itemCount: _blogs.length,
       physics: const BouncingScrollPhysics(),
       itemBuilder: (BuildContext context, final int physicIdx) {
         // 放在这里的局部变量会在ListView中某一项刷新到的时候定值，实时变化
-        final int blogIdx = physicIdx * 2 + offset;
-        if (blogIdx >= _blogs.length) {
-          getBatchBlogs();
-          return const Divider();
-        }
-        return _buildBlogCard(_blogs[blogIdx]);
+        // final int blogIdx = physicIdx * 2 + offset;
+        // if (blogIdx >= _blogs.length) {
+        //   getBatchBlogs();
+        //   return const Divider();
+        // }
+        return _buildBlogCard(_blogs[physicIdx]);
       },
     );
   }
@@ -177,8 +152,9 @@ class _MyHomePageState extends State<MyHomePage> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          Container(
-            child: blog.mainImg,
+          FadeInImage(
+            image: OssImage(blog.ossImgKey),
+            placeholder: const AssetImage('images/0.jpg'),
           ),
           ListTile(
             title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -214,10 +190,10 @@ class _MyHomePageState extends State<MyHomePage> {
     print('huoqu');
     var rsp = await SiluRequest().post('get_activity_list', {'offset': _offset, 'limit': 50});
     if (rsp.statusCode == HttpStatus.ok) {
-      List activityList = json.decode(rsp.data)['activityList'];
+      List activityList = jsonDecode(rsp.data)['activityList'];
       for (var elm in activityList) {
         print(_blogs.length);
-        _blogs.add(Blog(elm['title']));
+        _blogs.add(Blog(elm['title'], elm['images_keys'][0]));
       }
     }
     _offset += 50;
@@ -231,7 +207,7 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });
     return Container(
