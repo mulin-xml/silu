@@ -10,6 +10,7 @@ import 'edit_blog_page.dart';
 import 'user_login_page.dart';
 import 'http_manager.dart';
 import 'image_cache.dart';
+import 'utils.dart';
 
 void main() => runApp(const MyApp());
 
@@ -187,12 +188,10 @@ class _MyHomePageState extends State<MyHomePage> {
       return;
     }
     _isGetting = true;
-    print('huoqu');
     var rsp = await SiluRequest().post('get_activity_list', {'offset': _offset, 'limit': 50});
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = jsonDecode(rsp.data)['activityList'];
       for (var elm in activityList) {
-        print(_blogs.length);
         _blogs.add(Blog(elm['title'], elm['images_keys'][0]));
       }
     }
@@ -207,6 +206,7 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Utils();
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });

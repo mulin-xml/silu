@@ -7,9 +7,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as tpimg;
 import 'package:silu/oss.dart';
+import 'package:silu/utils.dart';
 import 'http_manager.dart';
 
 class UserImg {
@@ -226,7 +226,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
 
     // 图片上传OSS
     final userId = sp.getString('user_id') ?? '';
-    final cachePath = (await getTemporaryDirectory()).path;
+    final cachePath = Utils().cachePath;
     final imgKeys = <String>[];
     for (var elm in _userImgList) {
       final img = tpimg.decodeImage(elm.imageByte)!;
