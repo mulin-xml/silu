@@ -1,13 +1,12 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:async';
-import 'dart:io';
-import 'http_manager.dart';
+import '../http_manager.dart';
 
 class UserLoginPage extends StatefulWidget {
   const UserLoginPage({Key? key}) : super(key: key);

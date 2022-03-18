@@ -3,11 +3,12 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'edit_blog_page.dart';
-import 'user_login_page.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'pages/edit_blog_page.dart';
+import 'pages/user_login_page.dart';
+import 'pages/blog_view_page.dart';
 import 'http_manager.dart';
 import 'image_cache.dart';
 import 'utils.dart';
@@ -42,12 +43,6 @@ class Blog {
   final authorImg = const FlutterLogo();
 }
 
-// Iterable<Blog> generateBlogs() sync* {
-//   while (true) {
-//     yield Blog();
-//   }
-// }
-
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
 
@@ -57,25 +52,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final _blogs = <Blog>[];
-  final _controllers = LinkedScrollControllerGroup();
-  late ScrollController _sc1;
-  late ScrollController _sc2;
   var _isGetting = false;
   var _offset = 0;
 
   @override
   void initState() {
     super.initState();
-    _sc1 = _controllers.addAndGet();
-    _sc2 = _controllers.addAndGet();
-
     getBatchBlogs();
   }
 
   @override
   void dispose() {
-    _sc1.dispose();
-    _sc2.dispose();
     super.dispose();
   }
 
@@ -109,12 +96,13 @@ class _MyHomePageState extends State<MyHomePage> {
               }),
         ],
       ),
-      body: Row(
-        children: [
-          Expanded(child: _lineListView(0, _sc1)),
-          Expanded(child: _lineListView(1, _sc2)),
-        ],
-      ),
+      body: MasonryGridView.count(
+          crossAxisCount: 2,
+          itemCount: _blogs.length,
+          physics: const BouncingScrollPhysics(),
+          itemBuilder: (BuildContext context, int index) {
+            return _buildBlogCard(_blogs[index]);
+          }),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final sp = await SharedPreferences.getInstance();
@@ -130,43 +118,30 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _lineListView(final int offset, ScrollController sc) {
-    // 放在这里的局部变量只会在ListView初始化的时候定值，此后不会改变
-    return ListView.builder(
-      controller: sc,
-      itemCount: _blogs.length,
-      physics: const BouncingScrollPhysics(),
-      itemBuilder: (BuildContext context, final int physicIdx) {
-        // 放在这里的局部变量会在ListView中某一项刷新到的时候定值，实时变化
-        // final int blogIdx = physicIdx * 2 + offset;
-        // if (blogIdx >= _blogs.length) {
-        //   getBatchBlogs();
-        //   return const Divider();
-        // }
-        return _buildBlogCard(_blogs[physicIdx]);
-      },
-    );
-  }
-
   _buildBlogCard(Blog blog) {
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          FadeInImage(
-            image: OssImage(blog.ossImgKey),
-            placeholder: const AssetImage('images/0.jpg'),
+          GestureDetector(
+            child: FadeInImage(
+              image: OssImage(blog.ossImgKey),
+              placeholder: const AssetImage('images/0.jpg'),
+            ),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const BlogViewPage())),
           ),
           ListTile(
             title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis),
             subtitle: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                blog.authorImg,
-                Text(
-                  blog.authorName,
-                  textScaleFactor: 0.7,
-                ),
+                // blog.authorImg,
+                // Text(
+                //   blog.authorName,
+                //   textScaleFactor: 0.7,
+                // ),
+                const Icon(Icons.location_on_outlined),
+                const Text('0.0km'),
                 Icon(
                   blog.isSaved ? Icons.favorite : Icons.favorite_border,
                   color: blog.isSaved ? Colors.red : null,

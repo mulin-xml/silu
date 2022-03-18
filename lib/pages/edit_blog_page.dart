@@ -10,7 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as tpimg;
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
-import 'http_manager.dart';
+import '../http_manager.dart';
 
 class UserImg {
   UserImg(
