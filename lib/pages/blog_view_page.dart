@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -72,8 +73,8 @@ class _BlogViewPageState extends State<BlogViewPage> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(shape: const CircleBorder()),
                     onPressed: () async {
-                      var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
-                      if (rsp.statusCode == HttpStatus.ok) {
+                      var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': '5'});
+                      if (rsp.statusCode == HttpStatus.ok && jsonDecode(rsp.data)['status']) {
                         Fluttertoast.showToast(msg: '删除成功');
                         Navigator.of(context).pop();
                       } else {

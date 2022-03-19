@@ -226,7 +226,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     // 图片上传OSS
     final userId = sp.getString('user_id') ?? '';
     final cachePath = Utils().cachePath;
-    final imgInfoList = <Map>[];
+    final imgInfoList = <Map<String, dynamic>>[];
     for (var elm in _userImgList) {
       final img = tpimg.decodeImage(elm.imageByte)!;
       final key = '${DateTime.now().toIso8601String()}-$userId.jpg';
@@ -234,6 +234,8 @@ class _EditBlogPageState extends State<EditBlogPage> {
       final rsp = await Bucket().postObject('images/$key', '$cachePath/$key');
       if (rsp.statusCode == HttpStatus.ok) {
         imgInfoList.add({'key': key, 'width': img.width, 'height': img.height});
+      } else {
+        print('OSS上传$key失败');
       }
     }
 
@@ -245,6 +247,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       'oss_img_list': imgInfoList,
     };
     var rsp = await SiluRequest().post('upload_activity', form);
+    print(form['oss_img_list']);
 
     if (rsp.statusCode == HttpStatus.ok) {
       Fluttertoast.showToast(msg: '上传成功');

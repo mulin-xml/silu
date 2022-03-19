@@ -16,9 +16,9 @@ class SiluRequest {
 
   static final _dio = Dio(BaseOptions(baseUrl: 'http://0--0.top/apis/'));
 
-  Future<SiluResponse> post(String api, Map<String, dynamic> map) async {
+  Future<SiluResponse> post(String api, dynamic map) async {
     try {
-      var response = await _dio.post(api, data: FormData.fromMap(map));
+      var response = await _dio.post(api, data: map);
       return SiluResponse(response.statusCode ?? 0, response.toString());
     } on DioError catch (e) {
       print(e.response.toString());

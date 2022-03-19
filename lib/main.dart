@@ -64,6 +64,11 @@ class _MyHomePageState extends State<MyHomePage> {
         elevation: 0,
         actions: [
           IconButton(
+              icon: const Icon(Icons.access_time),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+              }),
+          IconButton(
               icon: const Icon(Icons.face),
               onPressed: () {
                 final sp = Utils().sharedPreferences;
@@ -104,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           GestureDetector(
             child: FadeInImage(
-              image: OssImage(blog.ossImgKey[0]),
+              image: OssImage(blog.ossImgKey[0]['key']),
               placeholder: const AssetImage('images/0.jpg'),
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
@@ -146,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = jsonDecode(rsp.data)['activityList'];
       for (var elm in activityList) {
-        _blogs.add(Blog(elm['id'], elm['title'], elm['content'], elm['images_keys']));
+        _blogs.add(Blog(elm['id'], elm['title'], elm['content'], elm['images_info']));
       }
     }
     _offset += 50;
