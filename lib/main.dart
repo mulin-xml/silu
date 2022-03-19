@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -80,6 +79,12 @@ class _MyHomePageState extends State<MyHomePage> {
               }),
         ],
       ),
+      // body: ListView.builder(
+      //     itemCount: _blogs.length,
+      //     physics: const BouncingScrollPhysics(),
+      //     itemBuilder: (BuildContext context, int index) {
+      //       return _buildBlogCard(_blogs[index]);
+      //     }),
       body: MasonryGridView.count(
           crossAxisCount: 2,
           itemCount: _blogs.length,
@@ -103,14 +108,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _buildBlogCard(Blog blog) {
+    // final double width = 1000;
+
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           GestureDetector(
             child: FadeInImage(
-              image: OssImage(blog.ossImgKey[0]['key']),
-              placeholder: const AssetImage('images/0.jpg'),
+              image: OssImage(blog.imagesInfo[0]['key']),
+              placeholder: ResizeImage.resizeIfNeeded(
+                blog.imagesInfo[0]['width'],
+                blog.imagesInfo[0]['height'],
+                const AssetImage('images/0.jpg'),
+              ),
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
           ),
@@ -148,8 +159,8 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     _isGetting = true;
     var rsp = await SiluRequest().post('get_activity_list', {'offset': _offset, 'limit': 50});
-    if (rsp.statusCode == HttpStatus.ok) {
-      List activityList = jsonDecode(rsp.data)['activityList'];
+    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+      List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
         _blogs.add(Blog(elm['id'], elm['title'], elm['content'], elm['images_info']));
       }

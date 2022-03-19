@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -80,7 +79,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                     var rsp = await SiluRequest().post('login_phone_step1', {'phone_number': _phoneNumController.text});
 
-                    if (rsp.statusCode == HttpStatus.ok) {
+                    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
                       Fluttertoast.showToast(msg: '短信验证码已发送，请注意查收');
                       _countdownTime = _maxCountdownTime;
                       _timer = Timer.periodic(
@@ -134,11 +133,11 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                 var rsp = await SiluRequest().post('login_phone_step2', {'phone_number': _phoneNumController.text, 'validate_code': _verifyController.text});
 
-                if (rsp.statusCode == HttpStatus.ok && jsonDecode(rsp.data)['status']) {
+                if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
                   Fluttertoast.showToast(msg: '登录成功');
                   var sp = Utils().sharedPreferences;
                   sp.setBool('is_login', true);
-                  sp.setString('user_id', jsonDecode(rsp.data)['user_id'] ?? '');
+                  sp.setString('user_id', rsp.data['user_id'] ?? '');
                   Navigator.of(context).pop();
                 } else {
                   Fluttertoast.showToast(msg: '验证码错误');

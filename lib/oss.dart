@@ -38,10 +38,9 @@ class Bucket {
     try {
       var response = await _dio.download('$_endpoint/$key', filepath,
           options: Options(headers: {'date': date, 'authorization': 'OSS ' + _auth.accessKeyId + ':' + _auth.makeGetSignature(date, _bucketName, key)}));
-      return SiluResponse(response.statusCode ?? 0, response.toString());
+      return SiluResponse(response.statusCode ?? 0, null);
     } on DioError catch (e) {
-      print(e.response.toString());
-      return SiluResponse(e.response!.statusCode!, e.response.toString());
+      return SiluResponse(e.response?.statusCode ?? -1, e.response?.data);
     }
   }
 
@@ -64,10 +63,9 @@ class Bucket {
 
     try {
       var response = await _dio.post(_endpoint, data: formData);
-      return SiluResponse(response.statusCode ?? 0, response.toString());
+      return SiluResponse(response.statusCode ?? 0, jsonDecode(response.data));
     } on DioError catch (e) {
-      print(e.response.toString());
-      return SiluResponse(e.response!.statusCode!, e.response.toString());
+      return SiluResponse(e.response?.statusCode ?? -1, e.response?.data);
     }
   }
 }

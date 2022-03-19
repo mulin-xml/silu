@@ -76,12 +76,7 @@ Future<bool> loadImg(String ossImgKey) async {
   if (File('$cachePath/$ossImgKey').existsSync()) {
     return true;
   } else {
-    print(ossImgKey);
     var rsp = await Bucket().getObject('images/$ossImgKey', '$cachePath/$ossImgKey');
-    if (rsp.statusCode == HttpStatus.ok) {
-      return true;
-    } else {
-      return false;
-    }
+    return rsp.statusCode == HttpStatus.ok;
   }
 }

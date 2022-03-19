@@ -1,22 +1,19 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:silu/http_manager.dart';
 
 class Blog {
-  Blog(this.activityId, this.title, this.content, this.ossImgKey) {
-    print(activityId);
-  }
+  Blog(this.activityId, this.title, this.content, this.imagesInfo);
 
   bool isSaved = false;
 
   final int activityId;
   final String title;
   final String content;
-  final List<dynamic> ossImgKey;
+  final List<dynamic> imagesInfo;
   final String authorName = "Author Name";
 
   final authorImg = const FlutterLogo();
@@ -74,7 +71,7 @@ class _BlogViewPageState extends State<BlogViewPage> {
                     style: OutlinedButton.styleFrom(shape: const CircleBorder()),
                     onPressed: () async {
                       var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': '5'});
-                      if (rsp.statusCode == HttpStatus.ok && jsonDecode(rsp.data)['status']) {
+                      if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
                         Fluttertoast.showToast(msg: '删除成功');
                         Navigator.of(context).pop();
                       } else {

@@ -247,9 +247,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       'oss_img_list': imgInfoList,
     };
     var rsp = await SiluRequest().post('upload_activity', form);
-    print(form['oss_img_list']);
-
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
       Fluttertoast.showToast(msg: '上传成功');
       Navigator.of(context).pop();
     } else {
