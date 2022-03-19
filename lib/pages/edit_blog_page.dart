@@ -6,11 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image/image.dart' as tpimg;
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
-import '../http_manager.dart';
+import 'package:silu/http_manager.dart';
 
 class UserImg {
   UserImg(
@@ -215,7 +214,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   }
 
   uploadBlog() async {
-    final sp = await SharedPreferences.getInstance();
+    final sp = Utils().sharedPreferences;
     if (sp.getString('user_id')?.isEmpty ?? false) {
       Fluttertoast.showToast(msg: '获取用户信息失败');
       return;
@@ -227,14 +226,14 @@ class _EditBlogPageState extends State<EditBlogPage> {
     // 图片上传OSS
     final userId = sp.getString('user_id') ?? '';
     final cachePath = Utils().cachePath;
-    final imgKeys = <String>[];
+    final imgInfoList = <Map>[];
     for (var elm in _userImgList) {
       final img = tpimg.decodeImage(elm.imageByte)!;
       final key = '${DateTime.now().toIso8601String()}-$userId.jpg';
       File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(img));
       final rsp = await Bucket().postObject('images/$key', '$cachePath/$key');
       if (rsp.statusCode == HttpStatus.ok) {
-        imgKeys.add(key);
+        imgInfoList.add({'key': key, 'width': img.width, 'height': img.height});
       }
     }
 
@@ -243,7 +242,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       'user_id': '5',
       'title': _titleController.text,
       'context': _contextController.text,
-      'oss_img_keys': imgKeys,
+      'oss_img_list': imgInfoList,
     };
     var rsp = await SiluRequest().post('upload_activity', form);
 

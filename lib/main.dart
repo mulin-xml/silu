@@ -4,14 +4,14 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'pages/edit_blog_page.dart';
-import 'pages/user_login_page.dart';
-import 'pages/blog_view_page.dart';
-import 'http_manager.dart';
-import 'image_cache.dart';
-import 'utils.dart';
+import 'package:silu/pages/user_info_page.dart';
+import 'package:silu/pages/edit_blog_page.dart';
+import 'package:silu/pages/user_login_page.dart';
+import 'package:silu/pages/blog_view_page.dart';
+import 'package:silu/http_manager.dart';
+import 'package:silu/image_cache.dart';
+import 'package:silu/utils.dart';
 
 void main() => runApp(const MyApp());
 
@@ -29,18 +29,6 @@ class MyApp extends StatelessWidget {
       color: Colors.brown,
     );
   }
-}
-
-class Blog {
-  Blog(this.title, this.ossImgKey);
-
-  bool isSaved = false;
-
-  final String title;
-  final String ossImgKey;
-  final String authorName = "Author Name";
-
-  final authorImg = const FlutterLogo();
 }
 
 class MyHomePage extends StatefulWidget {
@@ -66,20 +54,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  getUserInfo() async {
-    var rsp = await SiluRequest().post('get_user_info', {'user_id': '5'});
-    print(rsp.data);
-  }
-
-  editUserInfo() async {
-    var form = {
-      'user_id': '5',
-      'new_username': '思路官方账号1',
-    };
-    var rsp = await SiluRequest().post('edit_user_info', form);
-    print(rsp.data);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +66,12 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
               icon: const Icon(Icons.face),
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+                final sp = Utils().sharedPreferences;
+                if (sp.getBool('is_login') ?? false) {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserInfoPage()));
+                } else {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+                }
               }),
         ],
       ),
@@ -104,8 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
             return _buildBlogCard(_blogs[index]);
           }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final sp = await SharedPreferences.getInstance();
+        onPressed: () {
+          final sp = Utils().sharedPreferences;
           if (sp.getBool('is_login') ?? false) {
             Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
           } else {
@@ -125,10 +104,10 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           GestureDetector(
             child: FadeInImage(
-              image: OssImage(blog.ossImgKey),
+              image: OssImage(blog.ossImgKey[0]),
               placeholder: const AssetImage('images/0.jpg'),
             ),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const BlogViewPage())),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
           ),
           ListTile(
             title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -167,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = jsonDecode(rsp.data)['activityList'];
       for (var elm in activityList) {
-        _blogs.add(Blog(elm['title'], elm['images_keys'][0]));
+        _blogs.add(Blog(elm['id'], elm['title'], elm['content'], elm['images_keys']));
       }
     }
     _offset += 50;

@@ -5,8 +5,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../http_manager.dart';
+import 'package:silu/utils.dart';
+import 'package:silu/http_manager.dart';
 
 class UserLoginPage extends StatefulWidget {
   const UserLoginPage({Key? key}) : super(key: key);
@@ -42,11 +42,11 @@ class _UserLoginPageState extends State<UserLoginPage> {
       ),
       body: Column(
         children: [
-          // 手机号输入栏
           const Padding(
             padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
             child: Text("登录后更精彩", textScaleFactor: 2.5),
           ),
+          // 手机号输入栏
           Padding(
             padding: const EdgeInsets.fromLTRB(50, 50, 50, 0),
             child: TextField(
@@ -136,7 +136,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                 if (rsp.statusCode == HttpStatus.ok && jsonDecode(rsp.data)['status']) {
                   Fluttertoast.showToast(msg: '登录成功');
-                  var sp = await SharedPreferences.getInstance();
+                  var sp = Utils().sharedPreferences;
                   sp.setBool('is_login', true);
                   sp.setString('user_id', jsonDecode(rsp.data)['user_id'] ?? '');
                   Navigator.of(context).pop();
