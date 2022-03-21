@@ -56,42 +56,62 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 45,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.brown,
-        elevation: 0,
-        actions: [
-          IconButton(
-              icon: const Icon(Icons.access_time),
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-              }),
-          IconButton(
-              icon: const Icon(Icons.face),
-              onPressed: () {
-                final sp = Utils().sharedPreferences;
-                if (sp.getBool('is_login') ?? false) {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserInfoPage()));
-                } else {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-                }
-              }),
+      appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white, elevation: 0),
+      body: Column(
+        children: [
+          Container(
+            height: 45,
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                    icon: const Icon(Icons.search, color: Colors.brown),
+                    onPressed: () {
+                      // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+                    }),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextButton(onPressed: () {}, child: const Text('发现', style: TextStyle(fontWeight: FontWeight.bold))),
+                    TextButton(
+                      child: const Text('关注', style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        final sp = Utils().sharedPreferences;
+                        if (sp.getBool('is_login') ?? false) {
+                          // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserInfoPage()));
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+                        }
+                      },
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.face, color: Colors.brown),
+                  onPressed: () {
+                    final sp = Utils().sharedPreferences;
+                    if (sp.getBool('is_login') ?? false) {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserInfoPage()));
+                    } else {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: MasonryGridView.count(
+                crossAxisCount: 2,
+                itemCount: _blogs.length,
+                physics: const BouncingScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  return _buildBlogCard(_blogs[index]);
+                }),
+          )
         ],
       ),
-      // body: ListView.builder(
-      //     itemCount: _blogs.length,
-      //     physics: const BouncingScrollPhysics(),
-      //     itemBuilder: (BuildContext context, int index) {
-      //       return _buildBlogCard(_blogs[index]);
-      //     }),
-      body: MasonryGridView.count(
-          crossAxisCount: 2,
-          itemCount: _blogs.length,
-          physics: const BouncingScrollPhysics(),
-          itemBuilder: (BuildContext context, int index) {
-            return _buildBlogCard(_blogs[index]);
-          }),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final sp = Utils().sharedPreferences;
@@ -108,40 +128,37 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _buildBlogCard(Blog blog) {
-    // final double width = 1000;
-
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           GestureDetector(
             child: FadeInImage(
+              height: 200,
               image: OssImage(blog.imagesInfo[0]['key']),
-              placeholder: ResizeImage.resizeIfNeeded(
-                blog.imagesInfo[0]['width'],
-                blog.imagesInfo[0]['height'],
-                const AssetImage('images/0.jpg'),
-              ),
+              placeholder: const AssetImage('images/0.jpg'),
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
           ),
           ListTile(
-            title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-            subtitle: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // blog.authorImg,
-                // Text(
-                //   blog.authorName,
-                //   textScaleFactor: 0.7,
-                // ),
-                const Icon(Icons.location_on_outlined),
-                const Text('0.0km'),
-                Icon(
-                  blog.isSaved ? Icons.favorite : Icons.favorite_border,
-                  color: blog.isSaved ? Colors.red : null,
-                ),
-              ],
+            title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Padding(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: const [
+                      Icon(Icons.location_on_outlined),
+                      Text('0.0km'),
+                    ],
+                  ),
+                  Icon(
+                    blog.isSaved ? Icons.favorite : Icons.favorite_border,
+                    color: blog.isSaved ? Colors.red : null,
+                  ),
+                ],
+              ),
             ),
             onTap: () {
               // 如果不使用setState的话，红心状态不会立刻刷新

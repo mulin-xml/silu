@@ -156,13 +156,13 @@ class _EditBlogPageState extends State<EditBlogPage> {
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
             child: TextField(
               controller: _titleController,
-              maxLength: 50,
-              decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦"),
+              maxLength: 20,
+              decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
             ),
           ),
           // 内容栏
           Container(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 5),
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
             child: Scrollbar(
               controller: scrollController,
               child: TextField(
@@ -174,6 +174,16 @@ class _EditBlogPageState extends State<EditBlogPage> {
               ),
             ),
           ),
+          const Divider(),
+          // 日期选择器
+          ElevatedButton(
+            style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+            child: const Text('data'),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => DatePickerDialog(initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100))));
+            },
+          ),
+
           const SizedBox(height: 10),
         ],
       ),

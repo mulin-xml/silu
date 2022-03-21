@@ -3,20 +3,18 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 import 'package:silu/http_manager.dart';
+import 'package:silu/image_cache.dart';
 
 class Blog {
   Blog(this.activityId, this.title, this.content, this.imagesInfo);
-
   bool isSaved = false;
-
   final int activityId;
   final String title;
   final String content;
   final List<dynamic> imagesInfo;
   final String authorName = "Author Name";
-
-  final authorImg = const FlutterLogo();
 }
 
 class BlogViewPage extends StatefulWidget {
@@ -34,37 +32,43 @@ class _BlogViewPageState extends State<BlogViewPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 45,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
-        elevation: 0,
+        elevation: 0.5,
       ),
-      body: Column(
+      body: ListView(
         children: [
           // 图片列表
-          const Text('测试界面，请勿删除动态'),
           SizedBox(
-            height: 500,
-            child: ListView.builder(
-              itemCount: 5,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (BuildContext context, final int physicIdx) {
-                return Container();
-              },
+            height: 600,
+            child: Swiper(
+              itemBuilder: (BuildContext context, int index) => FadeInImage(
+                image: OssImage(widget.blog.imagesInfo[index]['key']),
+                placeholder: const AssetImage('images/0.jpg'),
+              ),
+              loop: false,
+              itemCount: widget.blog.imagesInfo.length,
+              pagination: const SwiperPagination(),
             ),
           ),
-          Text(widget.blog.title),
-          Text(widget.blog.content),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 30, 10, 30),
+            child: Text(widget.blog.title, textScaleFactor: 1.5),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 50),
+            child: Text(widget.blog.content, textScaleFactor: 1.2),
+          ),
+          const Divider(),
         ],
       ),
       bottomNavigationBar: SizedBox(
-        height: 80,
+        height: 20,
         child: Row(
           children: [
             Expanded(
               flex: 2,
-              child: Column(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   OutlinedButton(
@@ -84,17 +88,13 @@ class _BlogViewPageState extends State<BlogViewPage> {
                 ],
               ),
             ),
-            // Expanded(
-            //   flex: 7,
-            //   child: Container(
-            //     padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-            //     child: ElevatedButton(
-            //       style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-            //       child: const Text('发布动态'),
-            //       onPressed: () {},
-            //     ),
-            //   ),
-            // ),
+            Expanded(
+              flex: 1,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                child: null,
+              ),
+            ),
           ],
         ),
       ),

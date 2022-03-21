@@ -45,6 +45,7 @@ dependencies:
   shared_preferences: any
   permission_handler: any
   flutter_staggered_grid_view: any
+  flutter_swiper_null_safety: any
 
 dev_dependencies:
   flutter_test:
