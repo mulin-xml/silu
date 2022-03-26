@@ -42,13 +42,10 @@ class _BlogViewPageState extends State<BlogViewPage> {
           SizedBox(
             height: 600,
             child: Swiper(
-              itemBuilder: (BuildContext context, int index) => FadeInImage(
-                image: OssImage(widget.blog.imagesInfo[index]['key']),
-                placeholder: const AssetImage('images/0.jpg'),
-              ),
+              itemBuilder: (BuildContext context, int index) => Image(image: OssImage(widget.blog.imagesInfo[index]['key'])),
               loop: false,
               itemCount: widget.blog.imagesInfo.length,
-              pagination: const SwiperPagination(),
+              pagination: widget.blog.imagesInfo.length > 1 ? const SwiperPagination() : null,
             ),
           ),
           Padding(

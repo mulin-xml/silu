@@ -3,7 +3,6 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class Utils {
   static getInstance() => _instance;
   static final _instance = Utils._internal();

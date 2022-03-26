@@ -7,6 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:image/image.dart' as tpimg;
+import 'package:amap_flutter_location/amap_flutter_location.dart';
+import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
@@ -31,11 +33,12 @@ class _EditBlogPageState extends State<EditBlogPage> {
   final TextEditingController _contextController = TextEditingController();
   static const _maxImgNum = 5;
   final _userImgList = <UserImg>[];
+  var _isBlogLongTime = false;
+  var _blogAccessTime = '';
 
   @override
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -156,7 +159,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
             padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
             child: TextField(
               controller: _titleController,
-              maxLength: 20,
+              maxLength: 40,
               decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
             ),
           ),
@@ -169,22 +172,52 @@ class _EditBlogPageState extends State<EditBlogPage> {
                 controller: _contextController,
                 scrollController: scrollController,
                 maxLines: 10,
-                minLines: 1,
+                minLines: 5,
                 decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),
               ),
             ),
           ),
-          const Divider(),
+          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
           // 日期选择器
-          ElevatedButton(
-            style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-            child: const Text('data'),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => DatePickerDialog(initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100))));
-            },
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                TextButton(
+                  onPressed: () async {
+                    var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
+                    setState(() {
+                      _blogAccessTime = date?.toString().substring(0, 10) ?? '';
+                      _isBlogLongTime = date == null;
+                    });
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.access_time),
+                      const Text('动态有效时间'),
+                      const Icon(Icons.chevron_right),
+                      Text(_blogAccessTime),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _isBlogLongTime,
+                      onChanged: (value) => setState(() {
+                        _isBlogLongTime = !_isBlogLongTime;
+                        _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
+                      }),
+                    ),
+                    const Text('长期', style: TextStyle(color: Colors.brown)),
+                  ],
+                )
+              ],
+            ),
           ),
-
-          const SizedBox(height: 10),
+          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
         ],
       ),
       // 底部发布按钮

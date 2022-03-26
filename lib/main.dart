@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:silu/pages/user_info_page.dart';
 import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/user_login_page.dart';
@@ -26,6 +27,14 @@ class MyApp extends StatelessWidget {
       home: const SplashPage(),
       theme: ThemeData(primarySwatch: Colors.brown),
       color: Colors.brown,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('zh', 'CH'),
+        Locale('en', 'US'),
+      ],
     );
   }
 }
@@ -56,9 +65,11 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white, elevation: 0),
       body: Column(
         children: [
+          // AppBar
           Container(
             height: 45,
             color: Colors.white,
@@ -101,10 +112,12 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
           ),
+          // MasonryGridView
           Expanded(
             child: MasonryGridView.count(
                 crossAxisCount: 2,
                 itemCount: _blogs.length,
+                addAutomaticKeepAlives: true,
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
                   return _buildBlogCard(_blogs[index]);
@@ -123,27 +136,26 @@ class _MyHomePageState extends State<MyHomePage> {
         },
         child: const Icon(Icons.add),
       ),
-      backgroundColor: Colors.grey.shade200,
     );
   }
 
   _buildBlogCard(Blog blog) {
     return Card(
+      elevation: 0,
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           GestureDetector(
-            child: FadeInImage(
-              height: 200,
-              image: OssImage(blog.imagesInfo[0]['key']),
-              placeholder: const AssetImage('images/0.jpg'),
+            child: AspectRatio(
+              child: Image(image: OssImage(blog.imagesInfo[0]['key'])),
+              aspectRatio: blog.imagesInfo[0]['width'] / blog.imagesInfo[0]['height'],
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
           ),
           ListTile(
             title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

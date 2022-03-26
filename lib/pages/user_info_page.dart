@@ -1,6 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:silu/http_manager.dart';
 
 editUserInfo() async {
@@ -36,13 +39,36 @@ class _UserInfoPageState extends State<UserInfoPage> {
         elevation: 0,
       ),
       body: Column(
-        children: const [
-          Padding(
+        children: [
+          const Padding(
             padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
             child: Text("This is user info page."),
+          ),
+          ElevatedButton(
+            style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+            child: const Text('清除缓存'),
+            onPressed: clear,
           ),
         ],
       ),
     );
+  }
+
+  /// 清除缓存
+  static clear() async {
+    Directory tempDir = await getTemporaryDirectory();
+    await _delete(tempDir);
+  }
+
+  /// 递归删除缓存目录和文件
+  static _delete(FileSystemEntity file) async {
+    if (file is Directory) {
+      final List<FileSystemEntity> children = file.listSync();
+      for (final FileSystemEntity child in children) {
+        await _delete(child);
+      }
+    } else {
+      await file.delete();
+    }
   }
 }
