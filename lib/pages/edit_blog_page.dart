@@ -7,8 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:image/image.dart' as tpimg;
-import 'package:amap_flutter_location/amap_flutter_location.dart';
-import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
@@ -218,6 +216,11 @@ class _EditBlogPageState extends State<EditBlogPage> {
             ),
           ),
           const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+          ListTile(
+            onTap: () async {
+            },
+            title: const Text('or'),
+          )
         ],
       ),
       // 底部发布按钮
@@ -284,9 +287,9 @@ class _EditBlogPageState extends State<EditBlogPage> {
 
     // 表单上传后端
     var form = {
-      'user_id': '5',
+      'user_id': userId,
       'title': _titleController.text,
-      'context': _contextController.text,
+      'context': _contextController.text.replaceAll('\n', '\\n'),
       'oss_img_list': imgInfoList,
     };
     var rsp = await SiluRequest().post('upload_activity', form);

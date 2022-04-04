@@ -45,7 +45,7 @@ class OssImage extends ImageProvider<OssImage> {
     assert(key == this);
 
     if (!isFileExist) {
-      isFileExist = await loadImg(filename);
+      isFileExist = await _loadImg(filename);
     }
     var cachePath = Utils().cachePath;
     final Uint8List bytes = await File('$cachePath/$filename').readAsBytes();
@@ -71,7 +71,7 @@ class OssImage extends ImageProvider<OssImage> {
   String toString() => '${objectRuntimeType(this, 'OssImage')}("$filename", scale: $scale)';
 }
 
-Future<bool> loadImg(String ossImgKey) async {
+Future<bool> _loadImg(String ossImgKey) async {
   var cachePath = Utils().cachePath;
   if (File('$cachePath/$ossImgKey').existsSync()) {
     return true;

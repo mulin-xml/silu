@@ -1,10 +1,13 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
+import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:silu/amap.dart';
 import 'package:silu/pages/user_info_page.dart';
 import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/user_login_page.dart';
@@ -79,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 IconButton(
                     icon: const Icon(Icons.search, color: Colors.brown),
                     onPressed: () {
-                      // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
                     }),
                 Row(
                   mainAxisSize: MainAxisSize.min,
@@ -99,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(Icons.face, color: Colors.brown),
+                  icon: const Icon(Icons.person, color: Colors.brown),
                   onPressed: () {
                     final sp = Utils().sharedPreferences;
                     if (sp.getBool('is_login') ?? false) {
@@ -109,6 +112,17 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                   },
                 ),
+              ],
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton(onPressed: AMap().startLocation, child: const Text('开始定位')),
+                Container(width: 20.0),
+                ElevatedButton(onPressed: AMap().stopLocation, child: const Text('停止定位')),
               ],
             ),
           ),
@@ -160,9 +174,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    children: const [
-                      Icon(Icons.location_on_outlined),
-                      Text('0.0km'),
+                    children: [
+                      const Icon(Icons.location_on_outlined),
+                      Text((Random().nextDouble() * 2).toString().substring(0, 3) + 'km'),
                     ],
                   ),
                   Icon(
@@ -206,6 +220,7 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Utils();
+    AMap();
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });

@@ -63,7 +63,7 @@ class Bucket {
 
     try {
       var response = await _dio.post(_endpoint, data: formData);
-      return SiluResponse(response.statusCode ?? 0, jsonDecode(response.data));
+      return SiluResponse(response.statusCode ?? 0, null);
     } on DioError catch (e) {
       return SiluResponse(e.response?.statusCode ?? -1, e.response?.data);
     }
