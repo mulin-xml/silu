@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:image/image.dart' as tpimg;
+import 'package:silu/amap.dart';
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
@@ -176,51 +177,42 @@ class _EditBlogPageState extends State<EditBlogPage> {
             ),
           ),
           const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-          // 日期选择器
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextButton(
-                  onPressed: () async {
-                    var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
-                    setState(() {
-                      _blogAccessTime = date?.toString().substring(0, 10) ?? '';
-                      _isBlogLongTime = date == null;
-                    });
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.access_time),
-                      const Text('动态有效时间'),
-                      const Icon(Icons.chevron_right),
-                      Text(_blogAccessTime),
-                    ],
-                  ),
-                ),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: _isBlogLongTime,
-                      onChanged: (value) => setState(() {
-                        _isBlogLongTime = !_isBlogLongTime;
-                        _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
-                      }),
-                    ),
-                    const Text('长期', style: TextStyle(color: Colors.brown)),
-                  ],
-                )
-              ],
-            ),
+          // 位置选择
+          ListTile(
+            leading: const Icon(Icons.location_on_outlined),
+            title: const Text('位置选择'),
+            trailing: const Icon(Icons.chevron_right),
+            subtitle: Text(AMap().location['address'].toString()),
           ),
           const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+          // 日期选择器
           ListTile(
+            leading: const Icon(Icons.access_time),
+            title: const Text('动态有效时间'),
+            subtitle: Text(_blogAccessTime),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Checkbox(
+                  value: _isBlogLongTime,
+                  onChanged: (value) => setState(() {
+                    _isBlogLongTime = !_isBlogLongTime;
+                    _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
+                  }),
+                ),
+                const Text('长期', style: TextStyle(color: Colors.brown)),
+                const Icon(Icons.chevron_right),
+              ],
+            ),
             onTap: () async {
+              var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
+              setState(() {
+                _blogAccessTime = date?.toString().substring(0, 10) ?? '';
+                _isBlogLongTime = date == null;
+              });
             },
-            title: const Text('or'),
-          )
+          ),
+          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
         ],
       ),
       // 底部发布按钮
@@ -285,14 +277,16 @@ class _EditBlogPageState extends State<EditBlogPage> {
       }
     }
 
-    // 表单上传后端
-    var form = {
+    var data = {
       'user_id': userId,
       'title': _titleController.text,
       'context': _contextController.text.replaceAll('\n', '\\n'),
       'oss_img_list': imgInfoList,
+      'location': AMap().location,
+      'activity_type': 0,
+      'access_time': _blogAccessTime,
     };
-    var rsp = await SiluRequest().post('upload_activity', form);
+    var rsp = await SiluRequest().post('upload_activity', data);
     if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
       Fluttertoast.showToast(msg: '上传成功');
       Navigator.of(context).pop();

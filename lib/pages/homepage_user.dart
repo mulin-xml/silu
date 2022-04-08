@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:silu/blog.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/pages/blog_view_page.dart';
@@ -25,14 +25,14 @@ getUserInfo() async {
   print(rsp.data);
 }
 
-class UserInfoPage extends StatefulWidget {
-  const UserInfoPage({Key? key}) : super(key: key);
+class UserPage extends StatefulWidget {
+  const UserPage({Key? key}) : super(key: key);
 
   @override
-  State<UserInfoPage> createState() => _UserInfoPageState();
+  State<UserPage> createState() => _UserInfoPageState();
 }
 
-class _UserInfoPageState extends State<UserInfoPage> {
+class _UserInfoPageState extends State<UserPage> {
   final _blogs = <Blog>[];
 
   @override
@@ -73,12 +73,6 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     itemBuilder: (BuildContext context, int index) => _buildBlogCardForMySelf(_blogs[index])),
               );
             })),
-          ),
-          const Divider(),
-          const ListTile(
-            title: Text('清除缓存'),
-            onTap: clearCache,
-            trailing: Icon(Icons.chevron_right),
           ),
           const Divider(),
         ],
@@ -131,26 +125,19 @@ class _UserInfoPageState extends State<UserInfoPage> {
   }
 
   getMyBlogs() async {
-    var form = {
+    final sp = Utils().sharedPreferences;
+    var data = {
       'offset': 0,
       'limit': 50,
-      'user_id': Utils().sharedPreferences.getString('user_id'),
+      'login_user_id': sp.getString('user_id'),
+      'search_user_id': sp.getString('user_id'),
     };
-    var rsp = await SiluRequest().post('get_user_activity_list', form);
+    var rsp = await SiluRequest().post('get_user_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _blogs.add(Blog(elm['id'], elm['title'], elm['content'], elm['images_info']));
+        _blogs.add(Blog(elm));
       }
-    }
-  }
-
-  static clearCache() async {
-    Directory tempDir = await getTemporaryDirectory();
-    final List<FileSystemEntity> children = tempDir.listSync();
-    for (final FileSystemEntity child in children) {
-      print(child.path);
-      await child.delete();
     }
   }
 }

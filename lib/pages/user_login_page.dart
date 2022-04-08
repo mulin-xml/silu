@@ -138,7 +138,7 @@ class _UserLoginPageState extends State<UserLoginPage> {
                   var sp = Utils().sharedPreferences;
                   sp.setBool('is_login', true);
                   sp.setString('user_id', rsp.data['user_id'] ?? '');
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(true);
                 } else {
                   Fluttertoast.showToast(msg: '验证码错误');
                 }

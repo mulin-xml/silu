@@ -2,17 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:silu/blog.dart';
 import 'package:silu/image_cache.dart';
-
-class Blog {
-  Blog(this.activityId, this.title, this.content, this.imagesInfo);
-  bool isSaved = false;
-  final int activityId;
-  final String title;
-  final String content;
-  final List<dynamic> imagesInfo;
-  final String authorName = "Author Name";
-}
 
 class BlogViewPage extends StatefulWidget {
   const BlogViewPage(this.blog, {Key? key}) : super(key: key);

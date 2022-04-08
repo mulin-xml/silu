@@ -2,10 +2,24 @@
 
 import 'dart:async';
 import 'dart:io';
-
+import 'dart:math';
 import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+double calcDistance(double lat1, double lng1, double lat2, double lng2) {
+  if (lat1 < 0 || lng1 < 0) {
+    return 0;
+  }
+  double rad(double d) => d * pi / 180.0;
+
+  double radLat1 = rad(lat1);
+  double radLat2 = rad(lat2);
+  double a = radLat1 - radLat2;
+  double b = rad(lng1) - rad(lng2);
+  double s = 2 * asin(sqrt(pow(sin(a / 2), 2) + cos(radLat1) * cos(radLat2) * pow(sin(b / 2), 2)));
+  return (s * 6378.137 * 10000).round() / 10000;
+}
 
 class AMap {
   static getInstance() => _instance;
@@ -21,11 +35,17 @@ class AMap {
       _requestAccuracyAuthorization();
     }
     // 注册定位结果监听
-    _locationListener = _locationPlugin.onLocationChanged().listen((Map<String, Object> result) {});
+    _locationListener = _locationPlugin.onLocationChanged().listen((Map<String, Object> result) {
+      location = result;
+      stopLocation();
+      print(location);
+    });
+    startLocation();
   }
 
   StreamSubscription<Map<String, Object>>? _locationListener;
   final _locationPlugin = AMapFlutterLocation();
+  Map<String, dynamic> location = {};
 
   dispose() {
     _locationListener?.cancel(); // 移除定位监听

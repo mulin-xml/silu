@@ -1,19 +1,16 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-import 'dart:math';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:silu/amap.dart';
-import 'package:silu/pages/user_info_page.dart';
 import 'package:silu/pages/edit_blog_page.dart';
+import 'package:silu/pages/homepage_discover.dart';
+import 'package:silu/pages/homepage_user.dart';
 import 'package:silu/pages/user_login_page.dart';
-import 'package:silu/pages/blog_view_page.dart';
-import 'package:silu/http_manager.dart';
-import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
 
 void main() => runApp(const MyApp());
@@ -50,167 +47,120 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final _blogs = <Blog>[];
-  var _isGetting = false;
-  var _offset = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    getBatchBlogs();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  int _currentIndex = 0;
+  final _pageController = PageController();
+  final sp = Utils().sharedPreferences;
+  final pages = [
+    const DiscoverPage(),
+    const Text('Favourite Page.'),
+    const Text('Message Page.'),
+    const UserPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white, elevation: 0),
-      body: Column(
-        children: [
-          // AppBar
-          Container(
-            height: 45,
-            color: Colors.white,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                    icon: const Icon(Icons.search, color: Colors.brown),
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-                    }),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextButton(onPressed: () {}, child: const Text('发现', style: TextStyle(fontWeight: FontWeight.bold))),
-                    TextButton(
-                      child: const Text('关注', style: TextStyle(fontWeight: FontWeight.bold)),
-                      onPressed: () {
-                        final sp = Utils().sharedPreferences;
-                        if (sp.getBool('is_login') ?? false) {
-                          // Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserInfoPage()));
-                        } else {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-                        }
-                      },
-                    ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.person, color: Colors.brown),
-                  onPressed: () {
-                    final sp = Utils().sharedPreferences;
-                    if (sp.getBool('is_login') ?? false) {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserInfoPage()));
-                    } else {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          Container(
-            alignment: Alignment.center,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(onPressed: AMap().startLocation, child: const Text('开始定位')),
-                Container(width: 20.0),
-                ElevatedButton(onPressed: AMap().stopLocation, child: const Text('停止定位')),
-              ],
-            ),
-          ),
-          // MasonryGridView
-          Expanded(
-            child: MasonryGridView.count(
-                crossAxisCount: 2,
-                itemCount: _blogs.length,
-                addAutomaticKeepAlives: true,
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return _buildBlogCard(_blogs[index]);
-                }),
-          )
-        ],
+      // appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white, elevation: 0),
+      appBar: AppBar(
+        toolbarHeight: 45,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.brown,
+        title: const Text('思路'),
+        elevation: 0,
+      ),
+
+      body: PageView.builder(
+        controller: _pageController,
+        itemCount: pages.length,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          return pages[index];
+        },
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          final sp = Utils().sharedPreferences;
+        onPressed: () async {
           if (sp.getBool('is_login') ?? false) {
             Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
           } else {
-            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+            var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+            if (result == true) {
+              // updatePage();
+            }
           }
         },
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  _buildBlogCard(Blog blog) {
-    return Card(
-      elevation: 0,
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          GestureDetector(
-            child: AspectRatio(
-              child: Image(image: OssImage(blog.imagesInfo[0]['key'])),
-              aspectRatio: blog.imagesInfo[0]['width'] / blog.imagesInfo[0]['height'],
-            ),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
-          ),
-          ListTile(
-            title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined),
-                      Text((Random().nextDouble() * 2).toString().substring(0, 3) + 'km'),
-                    ],
-                  ),
-                  Icon(
-                    blog.isSaved ? Icons.favorite : Icons.favorite_border,
-                    color: blog.isSaved ? Colors.red : null,
-                  ),
-                ],
-              ),
-            ),
-            onTap: () {
-              // 如果不使用setState的话，红心状态不会立刻刷新
-              setState(() => blog.isSaved = !blog.isSaved);
-            },
-          ),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: '发现'),
+          BottomNavigationBarItem(icon: Icon(Icons.attach_file_outlined), label: '关注'),
+          BottomNavigationBarItem(icon: Icon(Icons.mail_outline), label: '消息'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: '我'),
         ],
+        currentIndex: _currentIndex,
+        onTap: (index) async {
+          if (index == 0 || (sp.getBool('is_login') ?? false)) {
+            _pageController.jumpToPage(index);
+          } else {
+            var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
+            if (result == true) {
+              // updatePage();
+            }
+          }
+        },
+      ),
+      drawer: SizedBox(
+        width: 250,
+        child: Drawer(
+          shape: DrawerTheme.of(context).shape,
+          child: ListView(
+            children: [
+              const UserAccountsDrawerHeader(
+                accountName: Text('3'),
+                accountEmail: Text('4'),
+                currentAccountPicture: CircleAvatar(child: FlutterLogo(size: 42.0)),
+              ),
+              ListTile(
+                title: const Text('发布动态'),
+                leading: const Icon(Icons.favorite),
+                onTap: () async {
+                  Navigator.pop(context);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
+                },
+              ),
+              ListTile(
+                title: const Text('我发布的'),
+                leading: const Icon(Icons.favorite),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: const Text('清除缓存'),
+                leading: const Icon(Icons.cached),
+                onTap: () async {
+                  Directory tempDir = await getTemporaryDirectory();
+                  final List<FileSystemEntity> children = tempDir.listSync();
+                  for (final FileSystemEntity child in children) {
+                    print(child.path);
+                    await child.delete();
+                  }
+                  Navigator.pop(context);
+                },
+                // trailing: Icon(Icons.chevron_right),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-  }
-
-  getBatchBlogs() async {
-    if (_isGetting) {
-      return;
-    }
-    _isGetting = true;
-    var rsp = await SiluRequest().post('get_activity_list', {'offset': _offset, 'limit': 50});
-    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
-      List activityList = rsp.data['activityList'];
-      for (var elm in activityList) {
-        _blogs.add(Blog(elm['id'], elm['title'], elm['content'], elm['images_info']));
-      }
-    }
-    _offset += 50;
-    setState(() {});
-    _isGetting = false;
   }
 }
 
@@ -219,8 +169,8 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Utils();
     AMap();
+    Utils();
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });
