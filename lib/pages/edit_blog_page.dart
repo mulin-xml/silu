@@ -2,11 +2,13 @@
 
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
 import 'package:image/image.dart' as tpimg;
+
 import 'package:silu/amap.dart';
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
@@ -30,7 +32,7 @@ class EditBlogPage extends StatefulWidget {
 class _EditBlogPageState extends State<EditBlogPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contextController = TextEditingController();
-  static const _maxImgNum = 5;
+  static const _maxImgNum = 9;
   final _userImgList = <UserImg>[];
   var _isBlogLongTime = false;
   var _blogAccessTime = '';
@@ -39,6 +41,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
     return Scaffold(
+      // resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 45,
@@ -46,7 +49,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
         foregroundColor: Colors.brown,
         elevation: 0,
       ),
-      body: Column(
+      body: ListView(
         children: [
           // 图片列表
           SizedBox(
@@ -252,7 +255,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   }
 
   uploadBlog() async {
-    final sp = Utils().sharedPreferences;
+    final sp = u.sharedPreferences;
     if (sp.getString('user_id')?.isEmpty ?? false) {
       Fluttertoast.showToast(msg: '获取用户信息失败');
       return;
@@ -263,7 +266,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
 
     // 图片上传OSS
     final userId = sp.getString('user_id') ?? '';
-    final cachePath = Utils().cachePath;
+    final cachePath = u.cachePath;
     final imgInfoList = <Map<String, dynamic>>[];
     for (var elm in _userImgList) {
       final img = tpimg.decodeImage(elm.imageByte)!;

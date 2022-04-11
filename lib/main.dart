@@ -2,15 +2,17 @@
 
 import 'dart:io';
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
+
 import 'package:silu/amap.dart';
 import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
-import 'package:silu/pages/homepage_user.dart';
-import 'package:silu/pages/user_login_page.dart';
+import 'package:silu/pages/user_page.dart';
+import 'package:silu/pages/login_page.dart';
 import 'package:silu/utils.dart';
 
 void main() => runApp(const MyApp());
@@ -49,7 +51,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final _pageController = PageController();
-  final sp = Utils().sharedPreferences;
+  final sp = u.sharedPreferences;
   final pages = [
     const DiscoverPage(),
     const Text('Favourite Page.'),
@@ -88,10 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
           if (sp.getBool('is_login') ?? false) {
             Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
           } else {
-            var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-            if (result == true) {
-              // updatePage();
-            }
+            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));
           }
         },
         child: const Icon(Icons.add),
@@ -109,10 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
           if (index == 0 || (sp.getBool('is_login') ?? false)) {
             _pageController.jumpToPage(index);
           } else {
-            var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UserLoginPage()));
-            if (result == true) {
-              // updatePage();
-            }
+            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));
           }
         },
       ),
@@ -121,42 +117,50 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Drawer(
           shape: DrawerTheme.of(context).shape,
           child: ListView(
-            children: [
-              const UserAccountsDrawerHeader(
-                accountName: Text('3'),
-                accountEmail: Text('4'),
-                currentAccountPicture: CircleAvatar(child: FlutterLogo(size: 42.0)),
-              ),
-              ListTile(
-                title: const Text('发布动态'),
-                leading: const Icon(Icons.favorite),
-                onTap: () async {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
-                },
-              ),
-              ListTile(
-                title: const Text('我发布的'),
-                leading: const Icon(Icons.favorite),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                title: const Text('清除缓存'),
-                leading: const Icon(Icons.cached),
-                onTap: () async {
-                  Directory tempDir = await getTemporaryDirectory();
-                  final List<FileSystemEntity> children = tempDir.listSync();
-                  for (final FileSystemEntity child in children) {
-                    print(child.path);
-                    await child.delete();
-                  }
-                  Navigator.pop(context);
-                },
-                // trailing: Icon(Icons.chevron_right),
-              ),
-            ],
+            children: (sp.getBool('is_login') ?? false)
+                ? [
+                    const UserAccountsDrawerHeader(
+                      accountName: Text('3'),
+                      accountEmail: Text('4'),
+                      currentAccountPicture: CircleAvatar(child: FlutterLogo(size: 42.0)),
+                    ),
+                    ListTile(
+                      title: const Text('发布动态'),
+                      leading: const Icon(Icons.favorite),
+                      onTap: () async {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('我发布的'),
+                      leading: const Icon(Icons.favorite),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('清除缓存'),
+                      leading: const Icon(Icons.cached),
+                      onTap: () async {
+                        Directory tempDir = await getTemporaryDirectory();
+                        final List<FileSystemEntity> children = tempDir.listSync();
+                        for (final FileSystemEntity child in children) {
+                          print(child.path);
+                          await child.delete();
+                        }
+                        Navigator.pop(context);
+                      },
+                      // trailing: Icon(Icons.chevron_right),
+                    ),
+                  ]
+                : [
+                    const UserAccountsDrawerHeader(
+                      accountName: Text('3'),
+                      accountEmail: Text('4'),
+                      currentAccountPicture: CircleAvatar(child: FlutterLogo(size: 42.0)),
+                    ),
+                  ],
           ),
         ),
       ),

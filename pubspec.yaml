@@ -48,6 +48,7 @@ dependencies:
   flutter_staggered_grid_view: any
   flutter_swiper_null_safety: any
   amap_flutter_location: any
+  provider: any
 
 dev_dependencies:
   flutter_test:

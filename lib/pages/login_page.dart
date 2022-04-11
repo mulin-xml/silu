@@ -2,19 +2,22 @@
 
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:silu/event_bus.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 
-class UserLoginPage extends StatefulWidget {
-  const UserLoginPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
-  State<UserLoginPage> createState() => _UserLoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _UserLoginPageState extends State<UserLoginPage> {
+class _LoginPageState extends State<LoginPage> {
   final _phoneNumController = TextEditingController();
   final _verifyController = TextEditingController();
   static const _maxCountdownTime = 10;
@@ -135,10 +138,11 @@ class _UserLoginPageState extends State<UserLoginPage> {
 
                 if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
                   Fluttertoast.showToast(msg: '登录成功');
-                  var sp = Utils().sharedPreferences;
+                  var sp = u.sharedPreferences;
                   sp.setBool('is_login', true);
                   sp.setString('user_id', rsp.data['user_id'] ?? '');
-                  Navigator.of(context).pop(true);
+                  bus.emit('discover_page_update');
+                  Navigator.of(context).pop();
                 } else {
                   Fluttertoast.showToast(msg: '验证码错误');
                 }

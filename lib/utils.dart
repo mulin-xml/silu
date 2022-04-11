@@ -23,3 +23,5 @@ class Utils {
   SharedPreferences get sharedPreferences => _sharedPreferences!;
   String get cachePath => _cachePath!;
 }
+
+var u = Utils();
