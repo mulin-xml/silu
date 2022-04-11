@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:amap_flutter_map/amap_flutter_map.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,101 +59,8 @@ class _EditBlogPageState extends State<EditBlogPage> {
               itemCount: _userImgList.length + 1,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
-              itemBuilder: (BuildContext context, final int physicIdx) {
-                if (physicIdx == _userImgList.length) {
-                  // 添加图片按钮
-                  return Card(
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () async {
-                        if (_userImgList.length >= _maxImgNum) {
-                          Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
-                          return;
-                        }
-                        Uint8List? imageByte = await (await ImagePicker().pickImage(source: ImageSource.gallery))?.readAsBytes();
-                        if (imageByte != null) {
-                          var img = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-                            final _controller = CropController();
-                            return Column(
-                              children: [
-                                Expanded(
-                                  child: Crop(
-                                    image: imageByte,
-                                    controller: _controller,
-                                    onCropped: (image) {
-                                      Navigator.of(context).pop(UserImg(image));
-                                    },
-                                    initialSize: 0.8,
-                                    withCircleUi: false,
-                                    baseColor: Colors.black,
-                                    maskColor: Colors.black.withAlpha(150),
-                                    cornerDotBuilder: (size, edgeAlignment) => const DotControl(color: Colors.white54),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  child: const Text("选择图片"),
-                                  onPressed: () => _controller.crop(),
-                                ),
-                              ],
-                            );
-                          }));
-                          if (img != null) {
-                            setState(() => _userImgList.add(img));
-                          }
-                        }
-                      },
-                      child: const SizedBox(
-                        width: 100,
-                        child: Icon(Icons.add),
-                      ),
-                    ),
-                  );
-                } else {
-                  // 呈现图片
-                  return Card(
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
-                    clipBehavior: Clip.antiAlias,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () => showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return SimpleDialog(
-                            children: [
-                              SimpleDialogOption(
-                                child: const Text(
-                                  '预览图片',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
-                                ),
-                                onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-                                  return Image.memory(_userImgList[physicIdx].imageByte);
-                                })),
-                              ),
-                              const Divider(),
-                              SimpleDialogOption(
-                                child: const Text(
-                                  '删除图片',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _userImgList.removeAt(physicIdx);
-                                  });
-
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      child: _userImgList[physicIdx].thumbImg,
-                    ),
-                  );
-                }
+              itemBuilder: (BuildContext context, int index) {
+                return (index == _userImgList.length) ? _addImgCard() : _imgCard(index);
               },
             ),
           ),
@@ -186,6 +94,11 @@ class _EditBlogPageState extends State<EditBlogPage> {
             title: const Text('位置选择'),
             trailing: const Icon(Icons.chevron_right),
             subtitle: Text(AMap().location['address'].toString()),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+                return SiluMap();
+              }));
+            },
           ),
           const Divider(indent: 10, endIndent: 10, thickness: 0.1),
           // 日期选择器
@@ -254,8 +167,100 @@ class _EditBlogPageState extends State<EditBlogPage> {
     );
   }
 
+  _imgCard(int index) {
+    return Card(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+      clipBehavior: Clip.antiAlias,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return SimpleDialog(
+              children: [
+                SimpleDialogOption(
+                  child: const Text(
+                    '预览图片',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
+                    return Image.memory(_userImgList[index].imageByte);
+                  })),
+                ),
+                const Divider(),
+                SimpleDialogOption(
+                  child: const Text(
+                    '删除图片',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    setState(() => _userImgList.removeAt(index));
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+        child: _userImgList[index].thumbImg,
+      ),
+    );
+  }
+
+  _addImgCard() {
+    return Card(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () async {
+          if (_userImgList.length >= _maxImgNum) {
+            Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
+            return;
+          }
+          Uint8List? imageByte = await (await ImagePicker().pickImage(source: ImageSource.gallery))?.readAsBytes();
+          if (imageByte != null) {
+            var img = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
+              final _controller = CropController();
+              return Column(
+                children: [
+                  Expanded(
+                    child: Crop(
+                      image: imageByte,
+                      controller: _controller,
+                      onCropped: (image) {
+                        Navigator.of(context).pop(UserImg(image));
+                      },
+                      withCircleUi: false,
+                      baseColor: Colors.black,
+                      maskColor: Colors.black.withAlpha(150),
+                      cornerDotBuilder: (size, edgeAlignment) => const DotControl(color: Colors.white54),
+                    ),
+                  ),
+                  ElevatedButton(
+                    child: const Text("选择图片"),
+                    onPressed: () => _controller.crop(),
+                  ),
+                ],
+              );
+            }));
+            if (img != null) {
+              setState(() => _userImgList.add(img));
+            }
+          }
+        },
+        child: const SizedBox(
+          width: 100,
+          child: Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+
   uploadBlog() async {
     final sp = u.sharedPreferences;
+    // 检查内容是否合法
     if (sp.getString('user_id')?.isEmpty ?? false) {
       Fluttertoast.showToast(msg: '获取用户信息失败');
       return;
@@ -280,6 +285,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       }
     }
 
+    // 表单上传后端
     var data = {
       'user_id': userId,
       'title': _titleController.text,

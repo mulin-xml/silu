@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:silu/blog.dart';
-import 'package:silu/build_blog_widget.dart';
+import 'package:silu/widgets/build_blog_widget.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
@@ -79,11 +79,11 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
         _blogItems.add(BuildBlogItem(Blog(elm)));
       }
     }
+    setState(() {});
   }
 
   updatePage() {
     _blogItems.clear();
     _getMyBlogs();
-    setState(() {});
   }
 }

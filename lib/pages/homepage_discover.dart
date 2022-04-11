@@ -1,10 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:silu/blog.dart';
-import 'package:silu/build_blog_widget.dart';
+import 'package:silu/widgets/build_blog_widget.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
@@ -58,11 +60,11 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
         _blogs.add(Blog(elm));
       }
     }
+    setState(() {});
   }
 
   updatePage() {
     _blogs.clear();
     _getBatchBlogs();
-    setState(() {});
   }
 }

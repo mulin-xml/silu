@@ -67,10 +67,9 @@ class _BuildBlogCardState extends State<BuildBlogCard> {
 }
 
 class BuildBlogItem extends StatefulWidget {
-  const BuildBlogItem(this.blog, {Key? key, this.onDeleted}) : super(key: key);
+  const BuildBlogItem(this.blog, {Key? key}) : super(key: key);
 
   final Blog blog;
-  final Function(int)? onDeleted;
 
   @override
   State<BuildBlogItem> createState() => _BuildBlogItemState();

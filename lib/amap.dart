@@ -4,6 +4,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:amap_flutter_map/amap_flutter_map.dart';
+import 'package:amap_flutter_base/amap_flutter_base.dart';
+import 'package:flutter/material.dart';
 import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -47,6 +50,9 @@ class AMap {
   StreamSubscription<Map<String, Object>>? _locationListener;
   final _locationPlugin = AMapFlutterLocation();
   Map<String, dynamic> location = {};
+  var a = const AMapWidget(
+      // onMapCreated: onMapCreated,
+      );
 
   dispose() {
     _locationListener?.cancel(); // 移除定位监听
@@ -134,5 +140,50 @@ class AMap {
     } else {
       print("未知定位类型");
     }
+  }
+}
+
+class ConstConfig {
+  /// 配置您申请的apikey，在此处配置之后，可以在初始化[AMapWidget]时，通过`apiKey`属性设置
+  /// 注意：使用[AMapWidget]的`apiKey`属性设置的key的优先级高于通过Native配置key的优先级，
+  /// 使用[AMapWidget]的`apiKey`属性配置后Native配置的key将失效，请根据实际情况选择使用
+  static const AMapApiKey amapApiKeys = AMapApiKey(androidKey: '0f85c261d48608ece2b180d7778d6861', iosKey: '您申请的iOS平台的key');
+
+  /// 高德隐私合规声明，这里只是示例，实际使用中请按照实际参数设置[AMapPrivacyStatement]的'hasContains''hasShow''hasAgree'这三个参数
+  /// 注意：[AMapPrivacyStatement]的'hasContains''hasShow''hasAgree'这三个参数中有一个为false，高德SDK均不会工作，会造成地图白屏等现象
+  /// 高德开发者合规指南请参考：https://lbs.amap.com/agreement/compliance
+  /// 高德SDK合规使用方案请参考：https://lbs.amap.com/news/sdkhgsy
+  static const AMapPrivacyStatement amapPrivacyStatement = AMapPrivacyStatement(hasContains: true, hasShow: true, hasAgree: true);
+}
+
+class SiluMap extends StatefulWidget {
+  const SiluMap({Key? key}) : super(key: key);
+
+  @override
+  State<SiluMap> createState() => _SiluMapState();
+}
+
+class _SiluMapState extends State<SiluMap> {
+  @override
+  void initState() {
+    super.initState();
+    Permission.location.request();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+      body: AMap().a,
+    );
+  }
+
+  /// 获取审图号
+  void getApprovalNumber() async {
   }
 }

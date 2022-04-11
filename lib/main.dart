@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final pages = [
     const DiscoverPage(),
     const Text('Favourite Page.'),
-    const Text('Message Page.'),
+    const Text('Favourite Page.'),
     const UserPage(),
   ];
 
@@ -71,7 +71,6 @@ class _MyHomePageState extends State<MyHomePage> {
         title: const Text('思路'),
         elevation: 0,
       ),
-
       body: PageView.builder(
         controller: _pageController,
         itemCount: pages.length,
@@ -151,7 +150,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         }
                         Navigator.pop(context);
                       },
-                      // trailing: Icon(Icons.chevron_right),
                     ),
                   ]
                 : [
