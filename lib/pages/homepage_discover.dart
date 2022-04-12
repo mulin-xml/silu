@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'package:silu/blog.dart';
-import 'package:silu/widgets/build_blog_widget.dart';
+import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
@@ -40,9 +40,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
         addAutomaticKeepAlives: true,
         physics: const BouncingScrollPhysics(),
         itemBuilder: (BuildContext context, int index) {
-          return BuildBlogCard(
-            _blogs[index],
-          );
+          return BlogCardView(_blogs[index]);
         });
   }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:amap_flutter_base/amap_flutter_base.dart';
 
 import 'package:silu/blog.dart';
 import 'package:silu/event_bus.dart';
@@ -10,19 +11,26 @@ import 'package:silu/pages/blog_view_page.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/amap.dart';
 
-class BuildBlogCard extends StatefulWidget {
-  const BuildBlogCard(this.blog, {Key? key}) : super(key: key);
+class BlogCardView extends StatefulWidget {
+  const BlogCardView(this.blog, {Key? key}) : super(key: key);
 
   final Blog blog;
 
   @override
-  State<BuildBlogCard> createState() => _BuildBlogCardState();
+  State<BlogCardView> createState() => _BlogCardViewState();
 }
 
-class _BuildBlogCardState extends State<BuildBlogCard> {
+class _BlogCardViewState extends State<BlogCardView> {
   @override
   Widget build(BuildContext context) {
     final blog = widget.blog;
+    double distance;
+    if (blog.latitude < 0 || blog.longtitude < 0) {
+      distance = -1;
+    } else {
+      distance = AMapTools.distanceBetween(LatLng(blog.latitude, blog.longtitude), AMap().lastLatLng).round() / 1000;
+    }
+
     return Card(
       elevation: 0,
       clipBehavior: Clip.antiAlias,
@@ -45,7 +53,7 @@ class _BuildBlogCardState extends State<BuildBlogCard> {
                   Row(
                     children: [
                       const Icon(Icons.location_on_outlined),
-                      Text(calcDistance(blog.latitude, blog.longtitude, AMap().location['latitude'], AMap().location['longitude']).toString() + 'km'),
+                      Text(distance.toString() + 'km'),
                     ],
                   ),
                   Icon(
@@ -66,16 +74,16 @@ class _BuildBlogCardState extends State<BuildBlogCard> {
   }
 }
 
-class BuildBlogItem extends StatefulWidget {
-  const BuildBlogItem(this.blog, {Key? key}) : super(key: key);
+class BlogItemView extends StatefulWidget {
+  const BlogItemView(this.blog, {Key? key}) : super(key: key);
 
   final Blog blog;
 
   @override
-  State<BuildBlogItem> createState() => _BuildBlogItemState();
+  State<BlogItemView> createState() => _BlogItemViewState();
 }
 
-class _BuildBlogItemState extends State<BuildBlogItem> {
+class _BlogItemViewState extends State<BlogItemView> {
   final imgs = [];
 
   @override
@@ -91,8 +99,16 @@ class _BuildBlogItemState extends State<BuildBlogItem> {
         Expanded(
           child: Column(
             children: [
-              Text(
-                widget.blog.title + widget.blog.content,
+              // Text(
+              //   widget.blog.title + widget.blog.content,
+              //   maxLines: 5,
+              // ),
+              Text.rich(
+                TextSpan(children: [
+                  TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const TextSpan(text: '  '),
+                  TextSpan(text: widget.blog.content),
+                ]),
                 maxLines: 5,
               ),
               _nineGrid(),

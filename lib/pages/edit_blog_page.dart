@@ -3,7 +3,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:amap_flutter_map/amap_flutter_map.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,6 +13,7 @@ import 'package:silu/amap.dart';
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
+import 'package:silu/widgets/amap_view.dart';
 
 class UserImg {
   UserImg(
@@ -37,6 +37,8 @@ class _EditBlogPageState extends State<EditBlogPage> {
   final _userImgList = <UserImg>[];
   var _isBlogLongTime = false;
   var _blogAccessTime = '';
+  var _address = AMap().location['address'].toString();
+  var _latLng = AMap().lastLatLng;
 
   @override
   Widget build(BuildContext context) {
@@ -93,11 +95,15 @@ class _EditBlogPageState extends State<EditBlogPage> {
             leading: const Icon(Icons.location_on_outlined),
             title: const Text('位置选择'),
             trailing: const Icon(Icons.chevron_right),
-            subtitle: Text(AMap().location['address'].toString()),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-                return SiluMap();
-              }));
+            subtitle: Text(_address),
+            onTap: () async {
+              var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
+              if (result[0] != null) {
+                setState(() {
+                  _latLng = result[0];
+                  _address = result[1];
+                });
+              }
             },
           ),
           const Divider(indent: 10, endIndent: 10, thickness: 0.1),
@@ -291,7 +297,11 @@ class _EditBlogPageState extends State<EditBlogPage> {
       'title': _titleController.text,
       'context': _contextController.text.replaceAll('\n', '\\n'),
       'oss_img_list': imgInfoList,
-      'location': AMap().location,
+      'location': {
+        'latitude': _latLng.latitude,
+        'longitude': _latLng.longitude,
+        'address': _address,
+      },
       'activity_type': 0,
       'access_time': _blogAccessTime,
     };

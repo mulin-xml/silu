@@ -55,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final pages = [
     const DiscoverPage(),
     const Text('Favourite Page.'),
-    const Text('Favourite Page.'),
+    const Text('Message Page.'),
     const UserPage(),
   ];
 

@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:silu/blog.dart';
-import 'package:silu/widgets/build_blog_widget.dart';
+import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
@@ -76,7 +76,7 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
     if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _blogItems.add(BuildBlogItem(Blog(elm)));
+        _blogItems.add(BlogItemView(Blog(elm)));
       }
     }
     setState(() {});
