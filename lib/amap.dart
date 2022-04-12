@@ -2,26 +2,13 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:amap_flutter_base/amap_flutter_base.dart';
 import 'package:amap_flutter_location/amap_flutter_location.dart';
 import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-double calcDistance(double lat1, double lng1, double lat2, double lng2) {
-  if (lat1 < 0 || lng1 < 0) {
-    return 0;
-  }
-  double rad(double d) => d * pi / 180.0;
-
-  double radLat1 = rad(lat1);
-  double radLat2 = rad(lat2);
-  double a = radLat1 - radLat2;
-  double b = rad(lng1) - rad(lng2);
-  double s = 2 * asin(sqrt(pow(sin(a / 2), 2) + cos(radLat1) * cos(radLat2) * pow(sin(b / 2), 2)));
-  return (s * 6378.137 * 10000).round() / 10000;
-}
+import 'package:silu/event_bus.dart';
 
 class AMap {
   static getInstance() => _instance;
@@ -40,11 +27,11 @@ class AMap {
     _locationListener = _locationPlugin.onLocationChanged().listen((Map<String, dynamic> result) {
       location = result;
       lastLatLng = LatLng(result['latitude'], result['longitude']);
-      if (result['accuracy'] < 100) {
+      if (result['accuracy'] < 200) {
+        bus.emit('discover_page_update');
         stopLocation();
       }
     });
-    startLocation();
   }
 
   StreamSubscription<Map<String, Object>>? _locationListener;
@@ -118,11 +105,13 @@ class AMap {
     var status = await Permission.location.status;
     if (status == PermissionStatus.granted) {
       //已经授权
+      startLocation();
       return true;
     } else {
       //未授权则发起一次申请
       status = await Permission.location.request();
       if (status == PermissionStatus.granted) {
+        startLocation();
         return true;
       } else {
         return false;

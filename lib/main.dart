@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: Colors.grey.shade100,
       // appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white, elevation: 0),
       appBar: AppBar(
         toolbarHeight: 45,
@@ -173,7 +173,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     AMap();
     Utils();
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });
     return Container(

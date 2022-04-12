@@ -44,7 +44,13 @@ class _BlogCardViewState extends State<BlogCardView> {
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
           ),
           ListTile(
-            title: Text(blog.title, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(
+              blog.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.normal),
+              textScaleFactor: 1.0,
+            ),
             subtitle: Padding(
               padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Row(
@@ -99,10 +105,6 @@ class _BlogItemViewState extends State<BlogItemView> {
         Expanded(
           child: Column(
             children: [
-              // Text(
-              //   widget.blog.title + widget.blog.content,
-              //   maxLines: 5,
-              // ),
               Text.rich(
                 TextSpan(children: [
                   TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -110,6 +112,7 @@ class _BlogItemViewState extends State<BlogItemView> {
                   TextSpan(text: widget.blog.content),
                 ]),
                 maxLines: 5,
+                overflow: TextOverflow.ellipsis,
               ),
               _nineGrid(),
               Row(

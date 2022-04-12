@@ -27,7 +27,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
   @override
   void initState() {
     super.initState();
-    updatePage();
+    // updatePage();
     bus.on('discover_page_update', (arg) => updatePage());
   }
 
