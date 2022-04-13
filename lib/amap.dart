@@ -9,6 +9,7 @@ import 'package:amap_flutter_location/amap_location_option.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:silu/event_bus.dart';
+import 'package:silu/utils.dart';
 
 class AMap {
   static getInstance() => _instance;
@@ -27,17 +28,24 @@ class AMap {
     _locationListener = _locationPlugin.onLocationChanged().listen((Map<String, dynamic> result) {
       location = result;
       lastLatLng = LatLng(result['latitude'], result['longitude']);
-      if (result['accuracy'] < 200) {
+      print(_cnt);
+      if (result['accuracy'] < 200 || _cnt++ > 1) {
+        isLocated = true;
         bus.emit('discover_page_update');
+        u.sharedPreferences.setDouble('latitude', lastLatLng.latitude);
+        u.sharedPreferences.setDouble('longitude', lastLatLng.longitude);
         stopLocation();
       }
     });
+    print('AMap prepare ready.');
   }
 
   StreamSubscription<Map<String, Object>>? _locationListener;
   final _locationPlugin = AMapFlutterLocation();
   Map<String, dynamic> location = {};
-  LatLng lastLatLng = const LatLng(39.909187, 116.397451);
+  int _cnt = 0;
+  bool isLocated = false;
+  LatLng lastLatLng = LatLng(u.sharedPreferences.getDouble('latitude') ?? 39.909187, u.sharedPreferences.getDouble('longitude') ?? 116.397451);
   final androidKey = "0f85c261d48608ece2b180d7778d6861";
   final iosKey = '';
 
@@ -131,3 +139,5 @@ class AMap {
     }
   }
 }
+
+var amap = AMap();

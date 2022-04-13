@@ -2,6 +2,7 @@
 
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:silu/amap.dart';
 
 class Utils {
   static getInstance() => _instance;
@@ -15,8 +16,9 @@ class Utils {
   SharedPreferences? _sharedPreferences;
 
   _initAsync() async {
-    _cachePath = (await getTemporaryDirectory()).path;
     _sharedPreferences = await SharedPreferences.getInstance();
+    AMap(); // AMap启动需要依赖sharedPreferences
+    _cachePath = (await getTemporaryDirectory()).path;
     print('Utils prepare ready.');
   }
 

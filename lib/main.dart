@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'package:silu/amap.dart';
 import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
 import 'package:silu/pages/user_page.dart';
@@ -22,7 +21,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 顶部状态栏透明
+    Utils();
     SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
     return MaterialApp(
       title: '思路', // 在任务管理器中显示的标题
@@ -56,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const DiscoverPage(),
     const Text('Favourite Page.'),
     const Text('Message Page.'),
-    const UserPage(),
+    const UserPage(true),
   ];
 
   @override
@@ -171,9 +170,7 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    AMap();
-    Utils();
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
     });
     return Container(

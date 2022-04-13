@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     var rsp = await SiluRequest().post('login_phone_step1', {'phone_number': _phoneNumController.text});
 
-                    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+                    if (rsp.statusCode == HttpStatus.ok) {
                       Fluttertoast.showToast(msg: '短信验证码已发送，请注意查收');
                       _countdownTime = _maxCountdownTime;
                       _timer = Timer.periodic(
@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 var rsp = await SiluRequest().post('login_phone_step2', {'phone_number': _phoneNumController.text, 'validate_code': _verifyController.text});
 
-                if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+                if (rsp.statusCode == HttpStatus.ok) {
                   Fluttertoast.showToast(msg: '登录成功');
                   var sp = u.sharedPreferences;
                   sp.setBool('is_login', true);

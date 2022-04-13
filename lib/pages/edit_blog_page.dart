@@ -7,21 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:crop_your_image/crop_your_image.dart';
-import 'package:image/image.dart' as tpimg;
 
 import 'package:silu/amap.dart';
-import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/widgets/amap_view.dart';
-
-class UserImg {
-  UserImg(
-    this.imageByte,
-  ) : thumbImg = Image.memory(imageByte, fit: BoxFit.cover, width: 100);
-  final Uint8List imageByte;
-  final Image thumbImg;
-}
 
 class EditBlogPage extends StatefulWidget {
   const EditBlogPage({Key? key}) : super(key: key);
@@ -34,7 +24,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contextController = TextEditingController();
   static const _maxImgNum = 9;
-  final _userImgList = <UserImg>[];
+  final _imgList = <Uint8List>[];
   var _isBlogLongTime = false;
   var _blogAccessTime = '';
   var _address = AMap().location['address'].toString();
@@ -58,11 +48,11 @@ class _EditBlogPageState extends State<EditBlogPage> {
           SizedBox(
             height: 100,
             child: ListView.builder(
-              itemCount: _userImgList.length + 1,
+              itemCount: _imgList.length + 1,
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
-                return (index == _userImgList.length) ? _addImgCard() : _imgCard(index);
+                return (index == _imgList.length) ? _addImgCard() : _imgCard(index);
               },
             ),
           ),
@@ -98,7 +88,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
             subtitle: Text(_address),
             onTap: () async {
               var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
-              if (result[0] != null) {
+              if (result?[0] != null) {
                 setState(() {
                   _latLng = result[0];
                   _address = result[1];
@@ -178,40 +168,39 @@ class _EditBlogPageState extends State<EditBlogPage> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
       clipBehavior: Clip.antiAlias,
       child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SimpleDialog(
-              children: [
-                SimpleDialogOption(
-                  child: const Text(
-                    '预览图片',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-                    return Image.memory(_userImgList[index].imageByte);
-                  })),
-                ),
-                const Divider(),
-                SimpleDialogOption(
-                  child: const Text(
-                    '删除图片',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    setState(() => _userImgList.removeAt(index));
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        ),
-        child: _userImgList[index].thumbImg,
-      ),
+          behavior: HitTestBehavior.opaque,
+          onTap: () => showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return SimpleDialog(
+                    children: [
+                      SimpleDialogOption(
+                        child: const Text(
+                          '预览图片',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
+                          return Image.memory(_imgList[index]);
+                        })),
+                      ),
+                      const Divider(),
+                      SimpleDialogOption(
+                        child: const Text(
+                          '删除图片',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                        onPressed: () {
+                          setState(() => _imgList.removeAt(index));
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+          child: Image.memory(_imgList[index], fit: BoxFit.cover, width: 100)),
     );
   }
 
@@ -221,7 +210,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () async {
-          if (_userImgList.length >= _maxImgNum) {
+          if (_imgList.length >= _maxImgNum) {
             Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
             return;
           }
@@ -236,7 +225,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                       image: imageByte,
                       controller: _controller,
                       onCropped: (image) {
-                        Navigator.of(context).pop(UserImg(image));
+                        Navigator.of(context).pop(image);
                       },
                       withCircleUi: false,
                       baseColor: Colors.black,
@@ -252,7 +241,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
               );
             }));
             if (img != null) {
-              setState(() => _userImgList.add(img));
+              setState(() => _imgList.add(img));
             }
           }
         },
@@ -270,24 +259,20 @@ class _EditBlogPageState extends State<EditBlogPage> {
     if (sp.getString('user_id')?.isEmpty ?? false) {
       Fluttertoast.showToast(msg: '获取用户信息失败');
       return;
-    } else if (_titleController.text.isEmpty || _contextController.text.isEmpty || _userImgList.isEmpty) {
+    } else if (_titleController.text.isEmpty || _contextController.text.isEmpty || _imgList.isEmpty) {
       Fluttertoast.showToast(msg: '内容不能为空哦');
       return;
     }
 
     // 图片上传OSS
     final userId = sp.getString('user_id') ?? '';
-    final cachePath = u.cachePath;
     final imgInfoList = <Map<String, dynamic>>[];
-    for (var elm in _userImgList) {
-      final img = tpimg.decodeImage(elm.imageByte)!;
-      final key = '${DateTime.now().toIso8601String()}-$userId.jpg';
-      File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(img));
-      final rsp = await Bucket().postObject('images/$key', '$cachePath/$key');
-      if (rsp.statusCode == HttpStatus.ok) {
-        imgInfoList.add({'key': key, 'width': img.width, 'height': img.height});
+    for (var elm in _imgList) {
+      var result = await SiluRequest().uploadImgToOss(OssImgCategory.images, elm);
+      if (result != null) {
+        imgInfoList.add(result);
       } else {
-        print('OSS上传$key失败');
+        print('OSS上传失败');
       }
     }
 
@@ -306,7 +291,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       'access_time': _blogAccessTime,
     };
     var rsp = await SiluRequest().post('upload_activity', data);
-    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+    if (rsp.statusCode == HttpStatus.ok) {
       Fluttertoast.showToast(msg: '上传成功');
       Navigator.of(context).pop();
     } else {

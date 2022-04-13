@@ -28,7 +28,7 @@ class _BlogCardViewState extends State<BlogCardView> {
     if (blog.latitude < 0 || blog.longtitude < 0) {
       distance = -1;
     } else {
-      distance = AMapTools.distanceBetween(LatLng(blog.latitude, blog.longtitude), AMap().lastLatLng).round() / 1000;
+      distance = AMapTools.distanceBetween(LatLng(blog.latitude, blog.longtitude), amap.lastLatLng).round() / 1000;
     }
 
     return Card(
@@ -81,9 +81,10 @@ class _BlogCardViewState extends State<BlogCardView> {
 }
 
 class BlogItemView extends StatefulWidget {
-  const BlogItemView(this.blog, {Key? key}) : super(key: key);
+  const BlogItemView(this.blog, this.isSelf, {Key? key}) : super(key: key);
 
   final Blog blog;
+  final bool isSelf;
 
   @override
   State<BlogItemView> createState() => _BlogItemViewState();
@@ -99,41 +100,39 @@ class _BlogItemViewState extends State<BlogItemView> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        const SizedBox(width: 80, child: Icon(Icons.account_circle_outlined, size: 50)),
-        Expanded(
-          child: Column(
-            children: [
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  const TextSpan(text: '  '),
-                  TextSpan(text: widget.blog.content),
-                ]),
-                maxLines: 5,
-                overflow: TextOverflow.ellipsis,
-              ),
-              _nineGrid(),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () async {
-                      var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
-                      if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
-                        Fluttertoast.showToast(msg: '删除成功');
-                        bus.emit('user_page_update');
-                      } else {
-                        Fluttertoast.showToast(msg: '删除失败');
-                      }
-                    },
-                    icon: const Icon(Icons.delete),
-                  ),
-                ],
-              )
-            ],
-          ),
+        Row(
+          children: const [
+            SizedBox(width: 80, child: Icon(Icons.account_circle_outlined, size: 50)),
+          ],
         ),
+        Text.rich(
+          TextSpan(children: [
+            TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            const TextSpan(text: '  '),
+            TextSpan(text: widget.blog.content),
+          ]),
+          maxLines: 5,
+          overflow: TextOverflow.ellipsis,
+        ),
+        _nineGrid(),
+        Row(
+          children: [
+            IconButton(
+              onPressed: () async {
+                var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
+                if (rsp.statusCode == HttpStatus.ok) {
+                  Fluttertoast.showToast(msg: '删除成功');
+                  bus.emit('user_page_update');
+                } else {
+                  Fluttertoast.showToast(msg: '删除失败');
+                }
+              },
+              icon: const Icon(Icons.delete),
+            ),
+          ],
+        )
       ],
     );
   }

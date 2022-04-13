@@ -5,27 +5,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:silu/blog.dart';
+import 'package:silu/image_cache.dart';
+import 'package:silu/pages/edit_user_info_page.dart';
 import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
 
-editUserInfo() async {
-  var form = {
-    'user_id': u.sharedPreferences.getString('user_id'),
-    'new_username': '思路官方账号1',
-  };
-  var rsp = await SiluRequest().post('edit_user_info', form);
-  print(rsp.data);
-}
-
-getUserInfo() async {
-  var rsp = await SiluRequest().post('get_user_info', {'user_id': u.sharedPreferences.getString('user_id')});
-  print(rsp.data);
-}
-
 class UserPage extends StatefulWidget {
-  const UserPage({Key? key}) : super(key: key);
+  const UserPage(this.isSelf, {Key? key}) : super(key: key);
+
+  final bool isSelf;
 
   @override
   State<UserPage> createState() => _UserPageState();
@@ -33,6 +23,9 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin {
   final _blogItems = <Widget>[];
+  var _userName = '';
+  var _introduction = '';
+  var _iconKey = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -47,20 +40,44 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return ListView.separated(
-      itemCount: _blogItems.length + 1,
-      itemBuilder: (context, index) {
-        if (index == 0) {
-          return const UserAccountsDrawerHeader(
-            accountName: Text('3'),
-            accountEmail: Text('4'),
-            currentAccountPicture: CircleAvatar(child: FlutterLogo(size: 42.0)),
-          );
-        } else {
-          return _blogItems[index - 1];
-        }
+    return RefreshIndicator(
+      child: ListView.separated(
+        itemCount: _blogItems.length + 1,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return UserAccountsDrawerHeader(
+              accountName: Text(_userName),
+              accountEmail: Text(_introduction != 'None' ? _introduction : '暂无简介'),
+              currentAccountPicture: _iconKey.isEmpty ? const CircleAvatar(child: FlutterLogo(size: 42.0)) : Image(image: OssImage(_iconKey)),
+              otherAccountsPictures: widget.isSelf
+                  ? [
+                      OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditUserInfoPage()));
+                        },
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                        child: const Text(
+                          '编辑资料',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ]
+                  : null,
+              otherAccountsPicturesSize: const Size(100, 40),
+            );
+          } else {
+            return index - 1 < _blogItems.length ? _blogItems[index - 1] : Container();
+          }
+        },
+        separatorBuilder: (context, index) => const Divider(),
+      ),
+      onRefresh: () async {
+        updatePage();
       },
-      separatorBuilder: (context, index) => const Divider(),
     );
   }
 
@@ -73,10 +90,10 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
       'search_user_id': sp.getString('user_id'),
     };
     var rsp = await SiluRequest().post('get_user_activity_list', data);
-    if (rsp.statusCode == HttpStatus.ok && rsp.data['status']) {
+    if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _blogItems.add(BlogItemView(Blog(elm)));
+        _blogItems.add(BlogItemView(Blog(elm), widget.isSelf));
       }
     }
     setState(() {});
@@ -84,6 +101,19 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
 
   updatePage() {
     _blogItems.clear();
+    _getUserInfo();
     _getMyBlogs();
+  }
+
+  _getUserInfo() async {
+    var rsp = await SiluRequest().post('get_user_info', {'user_id': u.sharedPreferences.getString('user_id')});
+    if (rsp.statusCode == HttpStatus.ok) {
+      print(rsp.data);
+      setState(() {
+        _userName = rsp.data['userInfo']['username'];
+        _introduction = rsp.data['userInfo']['introduction'];
+        _iconKey = rsp.data['userInfo']['icon_key'];
+      });
+    }
   }
 }
