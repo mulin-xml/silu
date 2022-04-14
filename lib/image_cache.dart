@@ -9,13 +9,19 @@ import 'package:flutter/foundation.dart';
 import 'utils.dart';
 import 'oss.dart';
 
+abstract class OssImgCategory {
+  static const icons = 'icons';
+  static const images = 'images';
+}
+
 class OssImage extends ImageProvider<OssImage> {
   /// Creates an object that decodes a [File] as an image.
   ///
   /// The arguments must not be null.
-  OssImage(this.filename, {this.scale = 1.0});
+  OssImage(this.category, this.filename, {this.scale = 1.0});
 
   /// The file to decode into an image.
+  final String category;
   final String filename;
 
   /// The scale to place in the [ImageInfo] object of the image.
@@ -45,7 +51,7 @@ class OssImage extends ImageProvider<OssImage> {
     assert(key == this);
 
     if (!isFileExist) {
-      isFileExist = await _loadImg(filename);
+      isFileExist = await _loadImg(category, filename);
     }
     var cachePath = u.cachePath;
     final Uint8List bytes = await File('$cachePath/$filename').readAsBytes();
@@ -71,12 +77,12 @@ class OssImage extends ImageProvider<OssImage> {
   String toString() => '${objectRuntimeType(this, 'OssImage')}("$filename", scale: $scale)';
 }
 
-Future<bool> _loadImg(String ossImgKey) async {
+Future<bool> _loadImg(String category, String ossImgKey) async {
   var cachePath = u.cachePath;
   if (File('$cachePath/$ossImgKey').existsSync()) {
     return true;
   } else {
-    var rsp = await Bucket().getObject('images/$ossImgKey', '$cachePath/$ossImgKey');
+    var rsp = await Bucket().getObject('$category/$ossImgKey', '$cachePath/$ossImgKey');
     return rsp.statusCode == HttpStatus.ok;
   }
 }

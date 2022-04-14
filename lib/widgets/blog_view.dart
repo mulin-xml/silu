@@ -38,7 +38,7 @@ class _BlogCardViewState extends State<BlogCardView> {
         children: [
           GestureDetector(
             child: AspectRatio(
-              child: Image(image: OssImage(blog.imagesInfo[0]['key'])),
+              child: Image(image: OssImage(OssImgCategory.images, blog.imagesInfo[0]['key'])),
               aspectRatio: blog.imagesInfo[0]['width'] / blog.imagesInfo[0]['height'],
             ),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
@@ -148,7 +148,7 @@ class _BlogItemViewState extends State<BlogItemView> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        return Image(image: OssImage(widget.blog.imagesInfo[index]['key']), fit: BoxFit.cover);
+        return Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key']), fit: BoxFit.cover);
       },
       itemCount: widget.blog.imagesInfo.length,
     );

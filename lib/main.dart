@@ -62,12 +62,12 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
-      // appBar: AppBar(toolbarHeight: 0, backgroundColor: Colors.white, elevation: 0),
       appBar: AppBar(
         toolbarHeight: 45,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         title: const Text('思路'),
+        centerTitle: true,
         elevation: 0,
       ),
       body: PageView.builder(

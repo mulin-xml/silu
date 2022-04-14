@@ -5,13 +5,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:crop_your_image/crop_your_image.dart';
 
 import 'package:silu/amap.dart';
+import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/widgets/amap_view.dart';
+import 'package:silu/widgets/img_cropper.dart';
 
 class EditBlogPage extends StatefulWidget {
   const EditBlogPage({Key? key}) : super(key: key);
@@ -29,6 +29,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   var _blogAccessTime = '';
   var _address = AMap().location['address'].toString();
   var _latLng = AMap().lastLatLng;
+  var _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,91 +43,89 @@ class _EditBlogPageState extends State<EditBlogPage> {
         foregroundColor: Colors.brown,
         elevation: 0,
       ),
-      body: ListView(
-        children: [
-          // 图片列表
-          SizedBox(
-            height: 100,
-            child: ListView.builder(
-              itemCount: _imgList.length + 1,
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) {
-                return (index == _imgList.length) ? _addImgCard() : _imgCard(index);
-              },
-            ),
+      body: ListView(children: [
+        // 图片列表
+        SizedBox(
+          height: 100,
+          child: ListView.builder(
+            itemCount: _imgList.length + 1,
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              return (index == _imgList.length) ? _addImgCard() : _imgCard(index);
+            },
           ),
-          // 标题栏
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+        ),
+        // 标题栏
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+          child: TextField(
+            controller: _titleController,
+            maxLength: 40,
+            decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
+          ),
+        ),
+        // 内容栏
+        Container(
+          padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
+          child: Scrollbar(
+            controller: scrollController,
             child: TextField(
-              controller: _titleController,
-              maxLength: 40,
-              decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
+              controller: _contextController,
+              scrollController: scrollController,
+              maxLines: 10,
+              minLines: 5,
+              decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),
             ),
           ),
-          // 内容栏
-          Container(
-            padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
-            child: Scrollbar(
-              controller: scrollController,
-              child: TextField(
-                controller: _contextController,
-                scrollController: scrollController,
-                maxLines: 10,
-                minLines: 5,
-                decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),
-              ),
-            ),
-          ),
-          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-          // 位置选择
-          ListTile(
-            leading: const Icon(Icons.location_on_outlined),
-            title: const Text('位置选择'),
-            trailing: const Icon(Icons.chevron_right),
-            subtitle: Text(_address),
-            onTap: () async {
-              var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
-              if (result?[0] != null) {
-                setState(() {
-                  _latLng = result[0];
-                  _address = result[1];
-                });
-              }
-            },
-          ),
-          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-          // 日期选择器
-          ListTile(
-            leading: const Icon(Icons.access_time),
-            title: const Text('动态有效时间'),
-            subtitle: Text(_blogAccessTime),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Checkbox(
-                  value: _isBlogLongTime,
-                  onChanged: (value) => setState(() {
-                    _isBlogLongTime = !_isBlogLongTime;
-                    _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
-                  }),
-                ),
-                const Text('长期', style: TextStyle(color: Colors.brown)),
-                const Icon(Icons.chevron_right),
-              ],
-            ),
-            onTap: () async {
-              var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
+        ),
+        const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+        // 位置选择
+        ListTile(
+          leading: const Icon(Icons.location_on_outlined),
+          title: const Text('位置选择'),
+          trailing: const Icon(Icons.chevron_right),
+          subtitle: Text(_address),
+          onTap: () async {
+            var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
+            if (result?[0] != null) {
               setState(() {
-                _blogAccessTime = date?.toString().substring(0, 10) ?? '';
-                _isBlogLongTime = date == null;
+                _latLng = result[0];
+                _address = result[1];
               });
-            },
+            }
+          },
+        ),
+        const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+        // 日期选择器
+        ListTile(
+          leading: const Icon(Icons.access_time),
+          title: const Text('动态有效时间'),
+          subtitle: Text(_blogAccessTime),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: _isBlogLongTime,
+                onChanged: (value) => setState(() {
+                  _isBlogLongTime = !_isBlogLongTime;
+                  _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
+                }),
+              ),
+              const Text('长期', style: TextStyle(color: Colors.brown)),
+              const Icon(Icons.chevron_right),
+            ],
           ),
-          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-        ],
-      ),
+          onTap: () async {
+            var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
+            setState(() {
+              _blogAccessTime = date?.toString().substring(0, 10) ?? '';
+              _isBlogLongTime = date == null;
+            });
+          },
+        ),
+        const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+      ]),
       // 底部发布按钮
       bottomNavigationBar: SizedBox(
         height: 80,
@@ -214,35 +213,9 @@ class _EditBlogPageState extends State<EditBlogPage> {
             Fluttertoast.showToast(msg: "最多只能有" + _maxImgNum.toString() + "张图哦");
             return;
           }
-          Uint8List? imageByte = await (await ImagePicker().pickImage(source: ImageSource.gallery))?.readAsBytes();
-          if (imageByte != null) {
-            var img = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-              final _controller = CropController();
-              return Column(
-                children: [
-                  Expanded(
-                    child: Crop(
-                      image: imageByte,
-                      controller: _controller,
-                      onCropped: (image) {
-                        Navigator.of(context).pop(image);
-                      },
-                      withCircleUi: false,
-                      baseColor: Colors.black,
-                      maskColor: Colors.black.withAlpha(150),
-                      cornerDotBuilder: (size, edgeAlignment) => const DotControl(color: Colors.white54),
-                    ),
-                  ),
-                  ElevatedButton(
-                    child: const Text("选择图片"),
-                    onPressed: () => _controller.crop(),
-                  ),
-                ],
-              );
-            }));
-            if (img != null) {
-              setState(() => _imgList.add(img));
-            }
+          var img = await imgCropper(context);
+          if (img != null) {
+            setState(() => _imgList.add(img));
           }
         },
         child: const SizedBox(
@@ -254,6 +227,12 @@ class _EditBlogPageState extends State<EditBlogPage> {
   }
 
   uploadBlog() async {
+    if (_isUploading) {
+      Fluttertoast.showToast(msg: '上传中，请稍后');
+      return;
+    }
+    Fluttertoast.showToast(msg: '开始上传，请稍后');
+    _isUploading = true;
     final sp = u.sharedPreferences;
     // 检查内容是否合法
     if (sp.getString('user_id')?.isEmpty ?? false) {
@@ -297,5 +276,6 @@ class _EditBlogPageState extends State<EditBlogPage> {
     } else {
       Fluttertoast.showToast(msg: '上传失败，请检查网络');
     }
+    _isUploading = false;
   }
 }

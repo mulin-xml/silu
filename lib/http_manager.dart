@@ -16,11 +16,6 @@ class SiluResponse {
   dynamic data;
 }
 
-abstract class OssImgCategory {
-  static const icons = 'icons';
-  static const images = 'images';
-}
-
 class SiluRequest {
   static getInstance() => _instance;
   static final _instance = SiluRequest._internal();

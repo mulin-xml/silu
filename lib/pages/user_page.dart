@@ -48,12 +48,16 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
             return UserAccountsDrawerHeader(
               accountName: Text(_userName),
               accountEmail: Text(_introduction != 'None' ? _introduction : '暂无简介'),
-              currentAccountPicture: _iconKey.isEmpty ? const CircleAvatar(child: FlutterLogo(size: 42.0)) : Image(image: OssImage(_iconKey)),
+              currentAccountPicture: Container(
+                clipBehavior: Clip.antiAlias,
+                decoration: const BoxDecoration(shape: BoxShape.circle),
+                child: _iconKey.isEmpty ? const FlutterLogo() : Image(image: OssImage(OssImgCategory.icons, _iconKey), fit: BoxFit.cover),
+              ),
               otherAccountsPictures: widget.isSelf
                   ? [
                       OutlinedButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditUserInfoPage()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(_iconKey)));
                         },
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -85,7 +89,7 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
     final sp = u.sharedPreferences;
     var data = {
       'offset': 0,
-      'limit': 50,
+      'limit': 500,
       'login_user_id': sp.getString('user_id'),
       'search_user_id': sp.getString('user_id'),
     };

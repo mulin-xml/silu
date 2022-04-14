@@ -58,7 +58,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
     final sp = u.sharedPreferences;
     var data = {
       'offset': 0,
-      'limit': 100,
+      'limit': 500,
       'login_user_id': (sp.getBool('is_login') ?? false) ? sp.getString('user_id') : '-1',
     };
     var rsp = await SiluRequest().post('get_activity_list', data);

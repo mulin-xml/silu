@@ -36,7 +36,7 @@ class _BlogViewPageState extends State<BlogViewPage> {
           // 图片列表
           AspectRatio(
             child: Swiper(
-              itemBuilder: (BuildContext context, int index) => Image(image: OssImage(widget.blog.imagesInfo[index]['key'])),
+              itemBuilder: (BuildContext context, int index) => Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key'])),
               loop: false,
               itemCount: widget.blog.imagesInfo.length,
               pagination: widget.blog.imagesInfo.length > 1 ? const SwiperPagination() : null,
