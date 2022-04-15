@@ -35,7 +35,6 @@ class _EditBlogPageState extends State<EditBlogPage> {
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
         toolbarHeight: 45,
@@ -61,6 +60,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
           padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
           child: TextField(
             controller: _titleController,
+            textCapitalization: TextCapitalization.words,
             maxLength: 40,
             decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
           ),
@@ -73,6 +73,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
             child: TextField(
               controller: _contextController,
               scrollController: scrollController,
+              textCapitalization: TextCapitalization.words,
               maxLines: 10,
               minLines: 5,
               decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),

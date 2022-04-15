@@ -52,6 +52,7 @@ class _AMapViewState extends State<AMapView> {
         tiltGesturesEnabled: false,
         onLocationChanged: _onLocationChanged,
         onPoiTouched: _onMapPoiTouched,
+        onTap: _onMapTap,
         markers: _mark,
         myLocationStyleOptions: MyLocationStyleOptions(
           true,
@@ -63,6 +64,20 @@ class _AMapViewState extends State<AMapView> {
     );
   }
 
+  void _onMapTap(LatLng? latLng) {
+    if (latLng != null) {
+      _mark.clear();
+      _address = '地图选点';
+      _pos = latLng;
+      setState(() {
+        _mark.add(Marker(
+          position: latLng,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ));
+      });
+    }
+  }
+
   void _onMapPoiTouched(AMapPoi? poi) {
     if (poi != null) {
       _mark.clear();
@@ -71,7 +86,7 @@ class _AMapViewState extends State<AMapView> {
       setState(() {
         _mark.add(Marker(
           position: poi.latLng!,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
         ));
       });
     }

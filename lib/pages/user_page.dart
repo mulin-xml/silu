@@ -57,7 +57,7 @@ class _UserPageState extends State<UserPage> with AutomaticKeepAliveClientMixin 
                   ? [
                       OutlinedButton(
                         onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(_iconKey)));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(_iconKey, _userName, _introduction)));
                         },
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
