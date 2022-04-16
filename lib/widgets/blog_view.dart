@@ -10,6 +10,7 @@ import 'package:silu/http_manager.dart';
 import 'package:silu/pages/blog_view_page.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/amap.dart';
+import 'package:silu/widgets/user_topbar.dart';
 
 class BlogCardView extends StatefulWidget {
   const BlogCardView(this.blog, {Key? key}) : super(key: key);
@@ -91,56 +92,61 @@ class BlogItemView extends StatefulWidget {
 }
 
 class _BlogItemViewState extends State<BlogItemView> {
-  final imgs = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: const [
-            SizedBox(width: 80, child: Icon(Icons.account_circle_outlined, size: 50)),
-          ],
-        ),
-        Text.rich(
-          TextSpan(children: [
-            TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            const TextSpan(text: '  '),
-            TextSpan(text: widget.blog.content),
-          ]),
-          maxLines: 5,
-          overflow: TextOverflow.ellipsis,
-        ),
-        _nineGrid(),
-        Row(
-          children: [
-            IconButton(
-              onPressed: () async {
-                var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
-                if (rsp.statusCode == HttpStatus.ok) {
-                  Fluttertoast.showToast(msg: '删除成功');
-                  bus.emit('user_page_update');
-                } else {
-                  Fluttertoast.showToast(msg: '删除失败');
-                }
-              },
-              icon: const Icon(Icons.delete),
+    const sizedBoxSpace = SizedBox(height: 10);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Container(
+            height: 50,
+            alignment: Alignment.centerLeft,
+            child: UserTopbar(widget.blog.authorId),
+          ),
+          sizedBoxSpace,
+          Container(
+            child: Text.rich(
+              TextSpan(children: [
+                TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                const TextSpan(text: '  '),
+                TextSpan(text: widget.blog.content.replaceAll('\\n', '\n')),
+              ]),
+              maxLines: 5,
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        )
-      ],
+            alignment: Alignment.centerLeft,
+          ),
+          sizedBoxSpace,
+          _nineGrid(),
+          widget.isSelf
+              ? Row(
+                  children: [
+                    IconButton(
+                      onPressed: () async {
+                        var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
+                        if (rsp.statusCode == HttpStatus.ok) {
+                          Fluttertoast.showToast(msg: '删除成功');
+                          bus.emit('self_page_update');
+                        } else {
+                          Fluttertoast.showToast(msg: '删除失败');
+                        }
+                      },
+                      icon: const Icon(Icons.delete),
+                    ),
+                  ],
+                )
+              : Container(),
+        ],
+      ),
     );
   }
 
   _nineGrid() {
     return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3, //每行三列
+      padding: EdgeInsets.zero,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: widget.blog.imagesInfo.length <= 4 ? 2 : 3, //每行三列
         childAspectRatio: 1.0, //显示区域宽高相等
         crossAxisSpacing: 5,
         mainAxisSpacing: 5,

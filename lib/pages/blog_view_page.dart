@@ -7,6 +7,7 @@ import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 import 'package:silu/blog.dart';
 import 'package:silu/image_cache.dart';
+import 'package:silu/widgets/user_topbar.dart';
 
 class BlogViewPage extends StatefulWidget {
   const BlogViewPage(this.blog, {Key? key}) : super(key: key);
@@ -18,18 +19,31 @@ class BlogViewPage extends StatefulWidget {
 }
 
 class _BlogViewPageState extends State<BlogViewPage> {
+  double _minAspectRatio = double.maxFinite;
+
+  @override
+  void initState() {
+    super.initState();
+    for (var img in widget.blog.imagesInfo) {
+      _minAspectRatio = min(_minAspectRatio, img['width'] / img['height']);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    double minAspectRatio = double.maxFinite;
-    for (var img in widget.blog.imagesInfo) {
-      minAspectRatio = min(minAspectRatio, img['width'] / img['height']);
-    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        leadingWidth: 40,
+        titleSpacing: 0,
+        toolbarHeight: 50,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,
+        title: SizedBox(
+          height: 40,
+          child: UserTopbar(widget.blog.authorId),
+        ),
       ),
       body: ListView(
         children: [
@@ -41,7 +55,7 @@ class _BlogViewPageState extends State<BlogViewPage> {
               itemCount: widget.blog.imagesInfo.length,
               pagination: widget.blog.imagesInfo.length > 1 ? const SwiperPagination() : null,
             ),
-            aspectRatio: minAspectRatio,
+            aspectRatio: _minAspectRatio,
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),

@@ -5,14 +5,15 @@ class Blog {
         content = map['content'],
         imagesInfo = map['images_info'],
         latitude = map['latitude'] ?? -1,
-        longtitude = map['longitude'] ?? -1;
+        longtitude = map['longitude'] ?? -1,
+        authorId = map['author_id'].toString();
 
   bool isSaved = false;
   final int activityId;
   final String title;
   final String content;
   final List<dynamic> imagesInfo;
-  final String authorName = "Author Name";
+  final String authorId;
   final double latitude;
   final double longtitude;
 }

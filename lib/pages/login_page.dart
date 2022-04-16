@@ -10,6 +10,14 @@ import 'package:silu/event_bus.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 
+signOut() {
+  var sp = u.sharedPreferences;
+  sp.setBool('is_login', false);
+  sp.setString('user_id', '-1');
+  bus.emit('discover_page_update');
+  bus.emit('self_page_update');
+}
+
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
 
@@ -140,8 +148,9 @@ class _LoginPageState extends State<LoginPage> {
                   Fluttertoast.showToast(msg: '登录成功');
                   var sp = u.sharedPreferences;
                   sp.setBool('is_login', true);
-                  sp.setString('user_id', rsp.data['user_id'] ?? '');
+                  sp.setString('user_id', rsp.data['user_id'] ?? '-1');
                   bus.emit('discover_page_update');
+                  bus.emit('self_page_update');
                   Navigator.of(context).pop();
                 } else {
                   Fluttertoast.showToast(msg: '验证码错误');

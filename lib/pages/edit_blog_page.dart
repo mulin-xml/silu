@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:silu/amap.dart';
+import 'package:silu/event_bus.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
@@ -273,6 +274,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     var rsp = await SiluRequest().post('upload_activity', data);
     if (rsp.statusCode == HttpStatus.ok) {
       Fluttertoast.showToast(msg: '上传成功');
+      bus.emit('self_page_update');
       Navigator.of(context).pop();
     } else {
       Fluttertoast.showToast(msg: '上传失败，请检查网络');

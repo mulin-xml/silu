@@ -8,14 +8,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
+import 'package:silu/widgets/user_topbar.dart';
 import 'package:silu/widgets/img_cropper.dart';
 
 class EditUserInfoPage extends StatefulWidget {
-  const EditUserInfoPage(this.iconKey, this.username, this.introduction, {Key? key}) : super(key: key);
+  const EditUserInfoPage(this.userId, {Key? key}) : super(key: key);
 
-  final String iconKey;
-  final String username;
-  final String introduction;
+  final String userId;
 
   @override
   State<EditUserInfoPage> createState() => _EditUserInfoPageState();
@@ -24,12 +23,21 @@ class EditUserInfoPage extends StatefulWidget {
 class _EditUserInfoPageState extends State<EditUserInfoPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _introductionController = TextEditingController();
+  String _username = '';
+  String _introduction = '';
+  String _iconKey = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getInfo();
+  }
 
   @override
   Widget build(BuildContext context) {
     const sizedBoxSpace = SizedBox(height: 24);
-    _nameController.text = widget.username;
-    _introductionController.text = widget.introduction;
+    _nameController.text = _username;
+    _introductionController.text = _introduction;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -66,14 +74,8 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
               }
             },
             child: Stack(children: [
-              Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: const BoxDecoration(shape: BoxShape.circle),
-                child: widget.iconKey.isEmpty ? const FlutterLogo() : Image(image: OssImage(OssImgCategory.images, widget.iconKey), fit: BoxFit.cover),
-                width: 150,
-                height: 150,
-              ),
-              const Positioned(child: CircleAvatar(child: Icon(Icons.edit)), right: 0, bottom: 0)
+              SizedBox(width: 150, height: 150, child: iconView(_iconKey)),
+              const Positioned(child: CircleAvatar(child: Icon(Icons.edit)), right: 0, bottom: 0),
             ]),
           ),
         ),
@@ -113,14 +115,23 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
           child: ElevatedButton(
             style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
             child: const Text('更新资料'),
-            onPressed: editUserInfo,
+            onPressed: _editUserInfo,
           ),
         ),
       ),
     );
   }
 
-  editUserInfo() async {
+  _getInfo() async {
+    var userInfo = await getUserInfo(widget.userId);
+    setState(() {
+      _username = userInfo?['username'];
+      _introduction = userInfo?['introduction'];
+      _iconKey = userInfo?['icon_key'];
+    });
+  }
+
+  _editUserInfo() async {
     if (_nameController.text.isEmpty) {
       Fluttertoast.showToast(msg: '名字不能为空哦');
       return;
