@@ -20,38 +20,59 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
     final sp = u.sharedPreferences;
-    final bool isLogin = sp.getBool('is_login') ?? false;
+    final isLogin = sp.getBool('is_login') ?? false;
     return Scaffold(
-      appBar: AppBar(),
-      body: ListView(children: [
-        ListTile(
-          title: Text(isLogin ? '编辑资料' : '未登录'),
-          onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => isLogin ? EditUserInfoPage(sp.getString('user_id') ?? '-1') : const LoginPage()));
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('清除缓存'),
-          onTap: () async {
-            Directory tempDir = await getTemporaryDirectory();
-            final List<FileSystemEntity> children = tempDir.listSync();
-            for (final FileSystemEntity child in children) {
-              print(child.path);
-              await child.delete();
-            }
-            Fluttertoast.showToast(msg: '已清除');
-          },
-        ),
-        const Divider(),
-        ListTile(
-          title: const Text('退出登录'),
-          onTap: () {
-            Navigator.pop(context);
-            signOut();
-          },
-        ),
-      ]),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        toolbarHeight: 45,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.brown,
+        title: const Text('设置'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        children: [
+          commonItem(
+            title: '账号与资料',
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => isLogin ? EditUserInfoPage(sp.getString('user_id') ?? '-1') : const LoginPage()));
+            },
+          ),
+          const Divider(),
+          commonItem(
+            title: '清除缓存',
+            onTap: () async {
+              Directory tempDir = await getTemporaryDirectory();
+              final List<FileSystemEntity> children = tempDir.listSync();
+              Fluttertoast.showToast(msg: '已清除${children.length}项缓存文件');
+              for (final FileSystemEntity child in children) {
+                print(child.path);
+                await child.delete();
+              }
+            },
+          ),
+          const Divider(),
+          commonItem(title: '关于思路'),
+          const SizedBox(height: 50),
+          isLogin
+              ? ElevatedButton(
+                  style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+                  child: const Text('退出登录'),
+                  onPressed: () {},
+                )
+              : Container(),
+        ],
+      ),
+    );
+  }
+
+  Widget commonItem({String? title, onTap}) {
+    return ListTile(
+      title: Text(title ?? ''),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 }

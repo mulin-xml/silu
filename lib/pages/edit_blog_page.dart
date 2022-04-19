@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -26,6 +27,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
   final TextEditingController _contextController = TextEditingController();
   static const _maxImgNum = 9;
   final _imgList = <Uint8List>[];
+
   var _isBlogLongTime = false;
   var _blogAccessTime = '';
   var _address = AMap().location['address'].toString();
@@ -33,135 +35,194 @@ class _EditBlogPageState extends State<EditBlogPage> {
   var _isUploading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadTempBlog();
+  }
+
+  @override
   Widget build(BuildContext context) {
     ScrollController scrollController = ScrollController();
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        toolbarHeight: 45,
+    return WillPopScope(
+      child: Scaffold(
         backgroundColor: Colors.white,
-        foregroundColor: Colors.brown,
-        elevation: 0,
-      ),
-      body: ListView(children: [
-        // 图片列表
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            itemCount: _imgList.length + 1,
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              return (index == _imgList.length) ? _addImgCard() : _imgCard(index);
+        appBar: AppBar(
+          toolbarHeight: 45,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.brown,
+          elevation: 0,
+        ),
+        body: ListView(children: [
+          // 图片列表
+          SizedBox(
+            height: 100,
+            child: ListView.builder(
+              itemCount: _imgList.length + 1,
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                return (index == _imgList.length) ? _addImgCard() : _imgCard(index);
+              },
+            ),
+          ),
+          // 标题栏
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+            child: TextField(
+              controller: _titleController,
+              textCapitalization: TextCapitalization.words,
+              maxLength: 40,
+              decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
+            ),
+          ),
+          // 内容栏
+          Container(
+            padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
+            child: Scrollbar(
+              controller: scrollController,
+              child: TextField(
+                controller: _contextController,
+                scrollController: scrollController,
+                textCapitalization: TextCapitalization.words,
+                maxLines: 10,
+                minLines: 5,
+                decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),
+              ),
+            ),
+          ),
+          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+          // 位置选择
+          ListTile(
+            leading: const Icon(Icons.location_on_outlined),
+            title: const Text('位置选择'),
+            trailing: const Icon(Icons.chevron_right),
+            subtitle: Text(_address),
+            onTap: () async {
+              var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
+              if (result?[0] != null) {
+                setState(() {
+                  _latLng = result[0];
+                  _address = result[1];
+                });
+              }
             },
           ),
-        ),
-        // 标题栏
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-          child: TextField(
-            controller: _titleController,
-            textCapitalization: TextCapitalization.words,
-            maxLength: 40,
-            decoration: const InputDecoration(hintText: "标题有趣会有更多赞哦", counterText: ""),
-          ),
-        ),
-        // 内容栏
-        Container(
-          padding: const EdgeInsets.fromLTRB(10, 20, 10, 5),
-          child: Scrollbar(
-            controller: scrollController,
-            child: TextField(
-              controller: _contextController,
-              scrollController: scrollController,
-              textCapitalization: TextCapitalization.words,
-              maxLines: 10,
-              minLines: 5,
-              decoration: const InputDecoration.collapsed(hintText: "说说此刻的心情吧"),
+          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+          // 日期选择器
+          ListTile(
+            leading: const Icon(Icons.access_time),
+            title: const Text('动态有效时间'),
+            subtitle: Text(_blogAccessTime),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Checkbox(
+                  value: _isBlogLongTime,
+                  onChanged: (value) => setState(() {
+                    _isBlogLongTime = !_isBlogLongTime;
+                    _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
+                  }),
+                ),
+                const Text('长期', style: TextStyle(color: Colors.brown)),
+                const Icon(Icons.chevron_right),
+              ],
             ),
-          ),
-        ),
-        const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-        // 位置选择
-        ListTile(
-          leading: const Icon(Icons.location_on_outlined),
-          title: const Text('位置选择'),
-          trailing: const Icon(Icons.chevron_right),
-          subtitle: Text(_address),
-          onTap: () async {
-            var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
-            if (result?[0] != null) {
+            onTap: () async {
+              var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
               setState(() {
-                _latLng = result[0];
-                _address = result[1];
+                _blogAccessTime = date?.toString().substring(0, 10) ?? '';
+                _isBlogLongTime = date == null;
               });
-            }
-          },
-        ),
-        const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-        // 日期选择器
-        ListTile(
-          leading: const Icon(Icons.access_time),
-          title: const Text('动态有效时间'),
-          subtitle: Text(_blogAccessTime),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Checkbox(
-                value: _isBlogLongTime,
-                onChanged: (value) => setState(() {
-                  _isBlogLongTime = !_isBlogLongTime;
-                  _blogAccessTime = _isBlogLongTime ? '' : _blogAccessTime;
-                }),
-              ),
-              const Text('长期', style: TextStyle(color: Colors.brown)),
-              const Icon(Icons.chevron_right),
-            ],
+            },
           ),
-          onTap: () async {
-            var date = await showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now(), lastDate: DateTime(2100), locale: const Locale('zh'));
-            setState(() {
-              _blogAccessTime = date?.toString().substring(0, 10) ?? '';
-              _isBlogLongTime = date == null;
-            });
-          },
-        ),
-        const Divider(indent: 10, endIndent: 10, thickness: 0.1),
-      ]),
-      // 底部发布按钮
-      bottomNavigationBar: SizedBox(
-        height: 80,
-        child: Row(
-          children: [
-            Expanded(
-              flex: 2,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(shape: const CircleBorder()),
-                    onPressed: () {},
-                    child: const Icon(Icons.storefront),
-                  ),
-                  const Text("存草稿", style: TextStyle(color: Colors.brown)),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 7,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
-                child: ElevatedButton(
-                  style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-                  child: const Text('发布动态'),
-                  onPressed: uploadBlog,
+          const Divider(indent: 10, endIndent: 10, thickness: 0.1),
+        ]),
+        // 底部发布按钮
+        bottomNavigationBar: SizedBox(
+          height: 80,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OutlinedButton(
+                      style: OutlinedButton.styleFrom(shape: const CircleBorder()),
+                      onPressed: _saveTempBlog,
+                      child: const Icon(Icons.storefront),
+                    ),
+                    const Text("存草稿", style: TextStyle(color: Colors.brown)),
+                  ],
                 ),
               ),
-            ),
-          ],
+              Expanded(
+                flex: 7,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
+                  child: ElevatedButton(
+                    style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+                    child: const Text('发布动态'),
+                    onPressed: _uploadBlog,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
+      onWillPop: _onWillPop,
     );
+  }
+
+  Future<bool> _onWillPop() async {
+    return Future.value(await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('提示'),
+            content: const Text('您有未保存的修改，要返回编辑吗？'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('返回编辑')),
+              TextButton(
+                  onPressed: () {
+                    _saveTempBlog();
+                    Navigator.of(context).pop(true);
+                  },
+                  child: const Text('保存并退出')),
+            ],
+          ),
+        ) ??
+        false);
+  }
+
+  _loadTempBlog() {
+    final sp = u.sharedPreferences;
+    if (sp.getBool('exist_temp_blog') ?? false) {
+      var strList = sp.getStringList('temp_blog_imgs') ?? <String>[];
+      for (var str in strList) {
+        _imgList.add(base64Decode(str));
+      }
+      _titleController.text = sp.getString('temp_blog_title') ?? '';
+      _contextController.text = sp.getString('temp_blog_context') ?? '';
+    }
+    setState(() {});
+  }
+
+  _saveTempBlog() {
+    final sp = u.sharedPreferences;
+    var strList = <String>[];
+    for (var img in _imgList) {
+      strList.add(base64Encode(img));
+    }
+    sp.setBool('exist_temp_blog', true);
+    sp.setStringList('temp_blog_imgs', strList);
+    sp.setString('temp_blog_title', _titleController.text);
+    sp.setString('temp_blog_context', _contextController.text);
+    Fluttertoast.showToast(msg: '草稿已保存');
   }
 
   _imgCard(int index) {
@@ -228,7 +289,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     );
   }
 
-  uploadBlog() async {
+  _uploadBlog() async {
     if (_isUploading) {
       Fluttertoast.showToast(msg: '上传中，请稍后');
       return;
@@ -274,6 +335,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     var rsp = await SiluRequest().post('upload_activity', data);
     if (rsp.statusCode == HttpStatus.ok) {
       Fluttertoast.showToast(msg: '上传成功');
+      sp.setBool('exist_temp_blog', false);
       bus.emit('self_page_update');
       Navigator.of(context).pop();
     } else {
