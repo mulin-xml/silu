@@ -10,6 +10,7 @@ import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
 import 'package:silu/pages/homepage_self.dart';
 import 'package:silu/pages/login_page.dart';
+import 'package:silu/pages/homepage_follow.dart';
 import 'package:silu/utils.dart';
 
 void main() => runApp(const MyApp());
@@ -51,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final sp = u.sharedPreferences;
   final pages = [
     const DiscoverPage(),
-    const Text('Favourite Page.'),
+    const FollowPage(),
     const Text('Message Page.'),
     const SelfPage(),
   ];

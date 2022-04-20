@@ -16,7 +16,7 @@ Future<Uint8List?> imgCropper(context, {double? aspectRatio}) async {
     var isCropping = false;
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 45,
+        toolbarHeight: 44,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,

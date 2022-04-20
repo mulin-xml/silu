@@ -41,7 +41,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 45,
+        toolbarHeight: 44,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         title: const Text('编辑资料'),

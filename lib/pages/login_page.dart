@@ -45,7 +45,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 45,
+        toolbarHeight: 44,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,

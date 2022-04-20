@@ -29,7 +29,7 @@ class _AMapViewState extends State<AMapView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 45,
+        toolbarHeight: 44,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,

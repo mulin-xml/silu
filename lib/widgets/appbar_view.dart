@@ -14,7 +14,7 @@ _selectView(IconData icon, String text, String id) {
 
 appBarView(String name) {
   return AppBar(
-    toolbarHeight: 45,
+    toolbarHeight: 44,
     backgroundColor: Colors.white,
     foregroundColor: Colors.brown,
     title: Text(name),
@@ -22,6 +22,7 @@ appBarView(String name) {
     elevation: 0,
     actions: [
       PopupMenuButton<String>(
+        icon: const Icon(Icons.add_circle_outline),
         itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
           _selectView(Icons.message, '发起群聊', 'A'),
           _selectView(Icons.group_add, '添加服务', 'B'),

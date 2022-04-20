@@ -24,7 +24,7 @@ class _ConfigPageState extends State<ConfigPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        toolbarHeight: 45,
+        toolbarHeight: 44,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         title: const Text('设置'),

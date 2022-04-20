@@ -32,7 +32,7 @@ class _SelfPageState extends State<SelfPage> with AutomaticKeepAliveClientMixin 
     final sp = u.sharedPreferences;
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 40,
+        toolbarHeight: 44,
         centerTitle: true,
         elevation: 0,
         actions: [

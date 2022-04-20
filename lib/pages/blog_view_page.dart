@@ -7,6 +7,7 @@ import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 import 'package:silu/blog.dart';
 import 'package:silu/image_cache.dart';
+import 'package:silu/widgets/follow_button.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class BlogViewPage extends StatefulWidget {
@@ -34,15 +35,21 @@ class _BlogViewPageState extends State<BlogViewPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leadingWidth: 40,
+        leadingWidth: 40, //返回键宽度稍微收窄一些
         titleSpacing: 0,
-        toolbarHeight: 50,
+        toolbarHeight: 44,
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,
         title: SizedBox(
           height: 40,
-          child: UserTopbar(widget.blog.authorId),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              UserTopbar(widget.blog.authorId),
+              const FollowButton(),
+            ],
+          ),
         ),
       ),
       body: ListView(

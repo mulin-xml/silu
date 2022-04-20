@@ -6,7 +6,8 @@ class Blog {
         imagesInfo = map['images_info'],
         latitude = map['latitude'] ?? -1,
         longtitude = map['longitude'] ?? -1,
-        authorId = map['author_id'].toString();
+        authorId = map['author_id'].toString(),
+        createTime = map['create_time'];
 
   bool isSaved = false;
   final int activityId;
@@ -16,4 +17,5 @@ class Blog {
   final String authorId;
   final double latitude;
   final double longtitude;
+  final String createTime;
 }

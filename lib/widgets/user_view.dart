@@ -70,7 +70,7 @@ class UserView extends StatefulWidget {
 }
 
 class _UserViewState extends State<UserView> {
-  final _blogItems = <Widget>[];
+  final _viewItems = <Widget>[];
 
   @override
   void initState() {
@@ -89,13 +89,9 @@ class _UserViewState extends State<UserView> {
     return RefreshIndicator(
       child: ListView.separated(
         padding: EdgeInsets.zero,
-        itemCount: _blogItems.length + 1,
+        itemCount: _viewItems.length,
         itemBuilder: (context, index) {
-          if (index == 0) {
-            return UserViewHeader(widget.authorId);
-          } else {
-            return index - 1 < _blogItems.length ? _blogItems[index - 1] : Container();
-          }
+          return index < _viewItems.length ? _viewItems[index] : Container();
         },
         separatorBuilder: (context, index) => const Divider(),
       ),
@@ -106,7 +102,8 @@ class _UserViewState extends State<UserView> {
   }
 
   updatePage() async {
-    _blogItems.clear();
+    _viewItems.clear();
+    _viewItems.add(UserViewHeader(widget.authorId));
     final sp = u.sharedPreferences;
     var data = {
       'offset': 0,
@@ -118,8 +115,11 @@ class _UserViewState extends State<UserView> {
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _blogItems.add(BlogItemView(Blog(elm), widget.isSelf));
+        _viewItems.add(BlogItemView(Blog(elm), widget.isSelf));
       }
+    }
+    if (_viewItems.length <= 1) {
+      _viewItems.add(const Center(child: Text('作者还没有发布内容哦', textScaleFactor: 1.2)));
     }
     setState(() {});
   }
