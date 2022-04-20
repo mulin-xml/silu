@@ -31,8 +31,12 @@ class Utils {
 
 var u = Utils();
 
-Future<Map<String, dynamic>?> getUserInfo(String userId) async {
-  var rsp = await SiluRequest().post('get_user_info', {'user_id': userId});
+Future<Map<String, dynamic>?> getUserInfo(String targetUserId) async {
+  final data = {
+    'target_user_id': targetUserId,
+    'login_user_id': u.sharedPreferences.getString('user_id') ?? '-1',
+  };
+  var rsp = await SiluRequest().post('get_user_info', data);
   if (rsp.statusCode == HttpStatus.ok) {
     return rsp.data['userInfo'];
   } else {

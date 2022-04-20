@@ -7,7 +7,7 @@ import 'package:amap_flutter_base/amap_flutter_base.dart';
 import 'package:silu/blog.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
-import 'package:silu/pages/blog_view_page.dart';
+import 'package:silu/pages/blog_detail_page.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/amap.dart';
 import 'package:silu/widgets/user_topbar.dart';
@@ -42,38 +42,35 @@ class _BlogCardViewState extends State<BlogCardView> {
               child: Image(image: OssImage(OssImgCategory.images, blog.imagesInfo[0]['key'])),
               aspectRatio: blog.imagesInfo[0]['width'] / blog.imagesInfo[0]['height'],
             ),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogViewPage(blog))),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogDetailPage(blog))),
           ),
-          ListTile(
-            title: Text(
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.all(5),
+            child: Text(
               blog.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.normal),
-              textScaleFactor: 1.0,
+              style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 16, height: 1.4),
             ),
-            subtitle: Padding(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.location_on_outlined),
-                      Text(distance.toString() + 'km'),
-                    ],
-                  ),
-                  Icon(
-                    blog.isSaved ? Icons.favorite : Icons.favorite_border,
-                    color: blog.isSaved ? Colors.red : null,
-                  ),
-                ],
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined),
+                    Text(distance.toString() + 'km'),
+                  ],
+                ),
+                Icon(
+                  blog.isSaved ? Icons.favorite : Icons.favorite_border,
+                  color: blog.isSaved ? Colors.red : null,
+                ),
+              ],
             ),
-            onTap: () {
-              // 如果不使用setState的话，红心状态不会立刻刷新
-              setState(() => blog.isSaved = !blog.isSaved);
-            },
           ),
         ],
       ),
@@ -118,11 +115,31 @@ class _BlogItemViewState extends State<BlogItemView> {
             alignment: Alignment.centerLeft,
           ),
           sizedBoxSpace,
-          _nineGrid(),
-          widget.isSelf
-              ? Row(
-                  children: [
-                    IconButton(
+          GridView.builder(
+            padding: EdgeInsets.zero,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: widget.blog.imagesInfo.length <= 4 ? 2 : 3, //每行三列
+              childAspectRatio: 1.0,
+              crossAxisSpacing: 5,
+              mainAxisSpacing: 5,
+            ),
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key']), fit: BoxFit.cover);
+            },
+            itemCount: widget.blog.imagesInfo.length,
+          ),
+          sizedBoxSpace,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '编辑于 ' + widget.blog.createTime,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              widget.isSelf
+                  ? IconButton(
                       onPressed: () async {
                         var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
                         if (rsp.statusCode == HttpStatus.ok) {
@@ -133,30 +150,12 @@ class _BlogItemViewState extends State<BlogItemView> {
                         }
                       },
                       icon: const Icon(Icons.delete),
-                    ),
-                  ],
-                )
-              : Container(),
+                    )
+                  : Container(),
+            ],
+          ),
         ],
       ),
-    );
-  }
-
-  _nineGrid() {
-    return GridView.builder(
-      padding: EdgeInsets.zero,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: widget.blog.imagesInfo.length <= 4 ? 2 : 3, //每行三列
-        childAspectRatio: 1.0, //显示区域宽高相等
-        crossAxisSpacing: 5,
-        mainAxisSpacing: 5,
-      ),
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        return Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key']), fit: BoxFit.cover);
-      },
-      itemCount: widget.blog.imagesInfo.length,
     );
   }
 }

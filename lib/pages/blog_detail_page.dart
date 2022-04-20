@@ -10,16 +10,16 @@ import 'package:silu/image_cache.dart';
 import 'package:silu/widgets/follow_button.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
-class BlogViewPage extends StatefulWidget {
-  const BlogViewPage(this.blog, {Key? key}) : super(key: key);
+class BlogDetailPage extends StatefulWidget {
+  const BlogDetailPage(this.blog, {Key? key}) : super(key: key);
 
   final Blog blog;
 
   @override
-  State<BlogViewPage> createState() => _BlogViewPageState();
+  State<BlogDetailPage> createState() => _BlogDetailPageState();
 }
 
-class _BlogViewPageState extends State<BlogViewPage> {
+class _BlogDetailPageState extends State<BlogDetailPage> {
   double _minAspectRatio = double.maxFinite;
 
   @override
@@ -47,7 +47,7 @@ class _BlogViewPageState extends State<BlogViewPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               UserTopbar(widget.blog.authorId),
-              const FollowButton(),
+              FollowButton(widget.blog.authorId),
             ],
           ),
         ),
@@ -64,20 +64,30 @@ class _BlogViewPageState extends State<BlogViewPage> {
             ),
             aspectRatio: _minAspectRatio,
           ),
+          const SizedBox(height: 10),
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Text(
               widget.blog.title,
               textScaleFactor: 1.4,
               style: const TextStyle(wordSpacing: -3),
             ),
           ),
+          const SizedBox(height: 10),
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 50),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Text(
               widget.blog.content.replaceAll('\\n', '\n'),
               textScaleFactor: 1.2,
               style: const TextStyle(height: 1.5),
+            ),
+          ),
+          const SizedBox(height: 50),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Text(
+              '编辑于 ' + widget.blog.createTime,
+              style: const TextStyle(color: Colors.grey),
             ),
           ),
           const Divider(),

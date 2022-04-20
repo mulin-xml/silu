@@ -124,11 +124,13 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
 
   _getInfo() async {
     var userInfo = await getUserInfo(widget.userId);
-    setState(() {
-      _username = userInfo?['username'];
-      _introduction = userInfo?['introduction'];
-      _iconKey = userInfo?['icon_key'];
-    });
+    if (userInfo != null) {
+      setState(() {
+        _username = userInfo['username'];
+        _introduction = userInfo['introduction'];
+        _iconKey = userInfo['icon_key'];
+      });
+    }
   }
 
   _editUserInfo() async {

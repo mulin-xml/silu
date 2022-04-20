@@ -32,7 +32,6 @@ class _ConfigPageState extends State<ConfigPage> {
         elevation: 0,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
           commonItem(
             title: '账号与资料',
@@ -56,17 +55,20 @@ class _ConfigPageState extends State<ConfigPage> {
           const Divider(),
           commonItem(title: '关于思路'),
           const SizedBox(height: 50),
-          isLogin
-              ? ElevatedButton(
-                  style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-                  child: const Text('退出登录'),
-                  onPressed: () {},
-                )
-              : Container(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: isLogin ? signOutButton : Container(),
+          )
         ],
       ),
     );
   }
+
+  final signOutButton = ElevatedButton(
+    style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+    child: const Text('退出登录'),
+    onPressed: signOut,
+  );
 
   Widget commonItem({String? title, onTap}) {
     return ListTile(

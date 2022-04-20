@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
+import 'package:silu/pages/homepage_message.dart';
 import 'package:silu/pages/homepage_self.dart';
 import 'package:silu/pages/login_page.dart';
 import 'package:silu/pages/homepage_follow.dart';
@@ -53,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final pages = [
     const DiscoverPage(),
     const FollowPage(),
-    const Text('Message Page.'),
+    const MessagePage(),
     const SelfPage(),
   ];
 

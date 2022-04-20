@@ -58,14 +58,17 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
     var data = {
       'offset': 0,
       'limit': 500,
-      'login_user_id': (sp.getBool('is_login') ?? false) ? sp.getString('user_id') : '-1',
+      'login_user_id': sp.getString('user_id') ?? '-1',
     };
-    var rsp = await SiluRequest().post('get_activity_list', data);
+    var rsp = await SiluRequest().post('get_follow_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (Map<String, dynamic> elm in activityList) {
         _viewItems.add(BlogItemView(Blog(elm), false));
       }
+    }
+    if (_viewItems.isEmpty) {
+      _viewItems.add(const Center(child: Text('还没有关注的内容哦', textScaleFactor: 1.2)));
     }
     setState(() {});
   }

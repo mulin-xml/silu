@@ -75,7 +75,6 @@ class _SelfPageState extends State<SelfPage> with AutomaticKeepAliveClientMixin 
   }
 
   updatePage() {
-    print('update');
     setState(() {});
   }
 }

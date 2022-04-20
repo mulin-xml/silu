@@ -38,12 +38,28 @@ class _UserViewHeaderState extends State<UserViewHeader> {
 
   @override
   Widget build(BuildContext context) {
-    return UserAccountsDrawerHeader(
-      accountName: Text(_userName),
-      accountEmail: Text(_introduction),
-      currentAccountPicture: iconView(_iconKey),
-      otherAccountsPictures: null,
-      otherAccountsPicturesSize: const Size(100, 40),
+    return Container(
+      height: 160,
+      color: Colors.brown,
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        height: 100,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            iconView(_iconKey),
+            const SizedBox(width: 10),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 30)),
+                Text(_introduction, style: const TextStyle(color: Colors.white)),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -88,7 +104,7 @@ class _UserViewState extends State<UserView> {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       child: ListView.separated(
-        padding: EdgeInsets.zero,
+        // padding: EdgeInsets.zero,
         itemCount: _viewItems.length,
         itemBuilder: (context, index) {
           return index < _viewItems.length ? _viewItems[index] : Container();

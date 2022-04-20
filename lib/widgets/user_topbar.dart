@@ -27,15 +27,23 @@ class _UserTopbarState extends State<UserTopbar> {
 
   _getAuthorInfo() async {
     var userInfo = await getUserInfo(widget.authorId);
-    setState(() {
-      _authorName = userInfo?['username'];
-      _authorIconKey = userInfo?['icon_key'];
-    });
+    if (mounted) {
+      setState(() {
+        _authorName = userInfo?['username'] ?? '';
+        _authorIconKey = userInfo?['icon_key'] ?? '';
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
+    _getAuthorInfo();
+  }
+
+  @override
+  void didUpdateWidget(covariant UserTopbar oldWidget) {
+    super.didUpdateWidget(oldWidget);
     _getAuthorInfo();
   }
 
@@ -47,16 +55,11 @@ class _UserTopbarState extends State<UserTopbar> {
         children: [
           iconView(_authorIconKey),
           const SizedBox(width: 10),
-          Text(
-            _authorName,
-            style: const TextStyle(inherit: false, color: Colors.brown),
-          ),
+          Text(_authorName, style: const TextStyle(inherit: false, color: Colors.brown)),
         ],
       ),
       onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-        return Scaffold(
-          body: UserView(widget.authorId),
-        );
+        return Scaffold(body: UserView(widget.authorId));
       })),
     );
   }
