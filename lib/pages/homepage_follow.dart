@@ -54,11 +54,10 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
 
   updatePage() async {
     _viewItems.clear();
-    final sp = u.sharedPreferences;
     var data = {
       'offset': 0,
       'limit': 500,
-      'login_user_id': sp.getString('user_id') ?? '-1',
+      'login_user_id': u.uid,
     };
     var rsp = await SiluRequest().post('get_follow_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {

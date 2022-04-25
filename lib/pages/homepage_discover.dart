@@ -60,11 +60,10 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
   }
 
   _getBatchBlogs() async {
-    final sp = u.sharedPreferences;
     var data = {
       'offset': 0,
       'limit': 500,
-      'login_user_id': (sp.getBool('is_login') ?? false) ? sp.getString('user_id') : '-1',
+      'login_user_id': u.uid,
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {

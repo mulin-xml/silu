@@ -27,6 +27,7 @@ class Utils {
 
   SharedPreferences get sharedPreferences => _sharedPreferences!;
   String get cachePath => _cachePath!;
+  String get uid => sharedPreferences.getString('user_id') ?? '-1';
 }
 
 var u = Utils();
@@ -34,7 +35,7 @@ var u = Utils();
 Future<Map<String, dynamic>?> getUserInfo(String targetUserId) async {
   final data = {
     'target_user_id': targetUserId,
-    'login_user_id': u.sharedPreferences.getString('user_id') ?? '-1',
+    'login_user_id': u.uid,
   };
   var rsp = await SiluRequest().post('get_user_info', data);
   if (rsp.statusCode == HttpStatus.ok) {

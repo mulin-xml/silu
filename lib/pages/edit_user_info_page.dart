@@ -59,7 +59,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
                 final result = await SiluRequest().uploadImgToOss(OssImgCategory.icons, imageByte);
                 if (result != null) {
                   var data = {
-                    'user_id': u.sharedPreferences.getString('user_id'),
+                    'user_id': u.uid,
                     'new_icon_key': result['key'],
                   };
                   final rsp = await SiluRequest().post('edit_user_info', data);
@@ -139,7 +139,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
       return;
     }
     var data = {
-      'user_id': u.sharedPreferences.getString('user_id'),
+      'user_id': u.uid,
       'new_username': _nameController.text,
       'new_introduction': _introductionController.text,
     };

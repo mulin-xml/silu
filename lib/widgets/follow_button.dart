@@ -25,7 +25,7 @@ class _FollowButtonState extends State<FollowButton> {
 
   @override
   Widget build(BuildContext context) {
-    if (u.sharedPreferences.getString('user_id') == widget.userId) {
+    if (u.uid == widget.userId) {
       return Container();
     }
     return Padding(padding: const EdgeInsets.all(5), child: isFollowed ? _followedButton() : _unFollowedButton());
@@ -55,7 +55,7 @@ class _FollowButtonState extends State<FollowButton> {
 
   _followOperation() async {
     final data = {
-      'fan_id': u.sharedPreferences.getString('user_id') ?? '-1',
+      'fan_id': u.uid,
       'followed_user_id': widget.userId,
       'action': isFollowed ? 1 : 0,
     };

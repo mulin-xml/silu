@@ -11,9 +11,10 @@ import 'package:silu/utils.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class UserViewHeader extends StatefulWidget {
-  const UserViewHeader(this.authorId, {Key? key}) : super(key: key);
+  const UserViewHeader(this.authorId, this.isSelf, {Key? key}) : super(key: key);
 
   final String authorId;
+  final bool isSelf;
 
   @override
   State<UserViewHeader> createState() => _UserViewHeaderState();
@@ -39,8 +40,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 160,
-      color: Colors.brown,
+      color: Colors.red,
       alignment: Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -85,13 +85,21 @@ class UserView extends StatefulWidget {
   State<UserView> createState() => _UserViewState();
 }
 
-class _UserViewState extends State<UserView> {
+class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin {
   final _viewItems = <Widget>[];
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(vsync: this, length: 2);
     updatePage();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -103,13 +111,34 @@ class _UserViewState extends State<UserView> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      child: ListView.separated(
-        // padding: EdgeInsets.zero,
-        itemCount: _viewItems.length,
-        itemBuilder: (context, index) {
-          return index < _viewItems.length ? _viewItems[index] : Container();
+      notificationPredicate: (notifation) => true,
+      child: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return [
+            SliverAppBar(
+              toolbarHeight: 0,
+              expandedHeight: 220,
+              flexibleSpace: FlexibleSpaceBar(
+                background: UserViewHeader(widget.authorId, widget.isSelf),
+                collapseMode: CollapseMode.pin,
+              ),
+              // bottom: TabBar(
+              //   controller: _tabController,
+              //   tabs: const [
+              //     Tab(text: '动态'),
+              //     Tab(text: '收藏'),
+              //   ],
+              // ),
+            ),
+          ];
         },
-        separatorBuilder: (context, index) => const Divider(),
+        body: ListView.separated(
+          itemCount: _viewItems.length,
+          itemBuilder: (context, index) {
+            return index < _viewItems.length ? _viewItems[index] : Container();
+          },
+          separatorBuilder: (context, index) => const Divider(),
+        ),
       ),
       onRefresh: () async {
         updatePage();
@@ -119,12 +148,10 @@ class _UserViewState extends State<UserView> {
 
   updatePage() async {
     _viewItems.clear();
-    _viewItems.add(UserViewHeader(widget.authorId));
-    final sp = u.sharedPreferences;
     var data = {
       'offset': 0,
       'limit': 500,
-      'login_user_id': (sp.getBool('is_login') ?? false) ? (sp.getString('user_id') ?? '-1') : '-1',
+      'login_user_id': u.uid,
       'search_user_id': widget.authorId,
     };
     var rsp = await SiluRequest().post('get_user_activity_list', data);
@@ -134,7 +161,7 @@ class _UserViewState extends State<UserView> {
         _viewItems.add(BlogItemView(Blog(elm), widget.isSelf));
       }
     }
-    if (_viewItems.length <= 1) {
+    if (_viewItems.isEmpty) {
       _viewItems.add(const Center(child: Text('作者还没有发布内容哦', textScaleFactor: 1.2)));
     }
     setState(() {});

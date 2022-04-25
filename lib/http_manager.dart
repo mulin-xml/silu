@@ -34,13 +34,11 @@ class SiluRequest {
   }
 
   Future<Map<String, dynamic>?> uploadImgToOss(String category, Uint8List imageByte) async {
-    final sp = u.sharedPreferences;
-    final userId = sp.getString('user_id') ?? '0';
     final cachePath = u.cachePath;
     final srcImg = tpimg.decodeImage(imageByte)!;
     // 上传前池化
     var dstImg = srcImg.width > srcImg.height ? tpimg.copyResize(srcImg, width: 1280) : tpimg.copyResize(srcImg, height: 1280);
-    final key = '${DateTime.now().toIso8601String()}-$userId.jpg';
+    final key = '${DateTime.now().toIso8601String()}-${u.uid}.jpg';
     // 本地写文件，避免日后下载缓存
     File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(dstImg));
     var rsp = await Bucket().postObject('$category/$key', '$cachePath/$key');

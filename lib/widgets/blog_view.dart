@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -32,48 +33,81 @@ class _BlogCardViewState extends State<BlogCardView> {
       distance = AMapTools.distanceBetween(LatLng(blog.latitude, blog.longtitude), amap.lastLatLng).round() / 1000;
     }
 
-    return Card(
-      elevation: 0,
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        children: [
-          GestureDetector(
-            child: AspectRatio(
-              child: Image(image: OssImage(OssImgCategory.images, blog.imagesInfo[0]['key'])),
+    return GestureDetector(
+      child: Card(
+        elevation: 0,
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            // 图片
+            AspectRatio(
+              child: Stack(
+                alignment: AlignmentDirectional.bottomCenter,
+                children: [
+                  Image(image: OssImage(OssImgCategory.images, blog.imagesInfo[0]['key'])),
+                  Container(
+                    color: Colors.black.withOpacity(0.3),
+                    height: 20,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        blog.latitude.isNegative || blog.longtitude.isNegative
+                            ? Container()
+                            : Row(
+                                children: [
+                                  const Icon(Icons.location_on, size: 20, color: Colors.white),
+                                  Text(
+                                    distance.toStringAsFixed(2) + 'km',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                        Row(
+                          children: [
+                            const Icon(Icons.remove_red_eye, size: 20, color: Colors.white),
+                            Text(
+                              blog.isSaved ? '' : '',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               aspectRatio: blog.imagesInfo[0]['width'] / blog.imagesInfo[0]['height'],
             ),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogDetailPage(blog))),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.all(5),
-            child: Text(
-              blog.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 16, height: 1.4),
+            // 标题
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.all(5),
+              child: Text(
+                blog.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 16, height: 1.4),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.location_on_outlined),
-                    Text(distance.toString() + 'km'),
-                  ],
-                ),
-                Icon(
-                  blog.isSaved ? Icons.favorite : Icons.favorite_border,
-                  color: blog.isSaved ? Colors.red : null,
-                ),
-              ],
+            // 副标题
+            Padding(
+              padding: const EdgeInsets.all(5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(height: 20, child: UserTopbar(blog.authorId)),
+                  Icon(
+                    blog.isSaved ? Icons.favorite : Icons.favorite_border,
+                    color: blog.isSaved ? Colors.red : null,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => BlogDetailPage(blog))),
     );
   }
 }
@@ -93,7 +127,7 @@ class _BlogItemViewState extends State<BlogItemView> {
   Widget build(BuildContext context) {
     const sizedBoxSpace = SizedBox(height: 10);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           Container(
@@ -118,7 +152,7 @@ class _BlogItemViewState extends State<BlogItemView> {
           GridView.builder(
             padding: EdgeInsets.zero,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: widget.blog.imagesInfo.length <= 4 ? 2 : 3, //每行三列
+              crossAxisCount: sqrt(widget.blog.imagesInfo.length).ceil(),
               childAspectRatio: 1.0,
               crossAxisSpacing: 5,
               mainAxisSpacing: 5,

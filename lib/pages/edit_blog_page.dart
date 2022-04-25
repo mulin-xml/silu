@@ -293,21 +293,16 @@ class _EditBlogPageState extends State<EditBlogPage> {
     if (_isUploading) {
       Fluttertoast.showToast(msg: '上传中，请稍后');
       return;
-    }
-    Fluttertoast.showToast(msg: '开始上传，请稍后');
-    _isUploading = true;
-    final sp = u.sharedPreferences;
-    // 检查内容是否合法
-    if (sp.getString('user_id')?.isEmpty ?? false) {
-      Fluttertoast.showToast(msg: '获取用户信息失败');
-      return;
     } else if (_titleController.text.isEmpty || _contextController.text.isEmpty || _imgList.isEmpty) {
       Fluttertoast.showToast(msg: '内容不能为空哦');
       return;
     }
 
+    Fluttertoast.showToast(msg: '开始上传，请稍后');
+    _isUploading = true;
+    final sp = u.sharedPreferences;
+
     // 图片上传OSS
-    final userId = sp.getString('user_id') ?? '';
     final imgInfoList = <Map<String, dynamic>>[];
     for (var elm in _imgList) {
       var result = await SiluRequest().uploadImgToOss(OssImgCategory.images, elm);
@@ -320,7 +315,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
 
     // 表单上传后端
     var data = {
-      'user_id': userId,
+      'user_id': u.uid,
       'title': _titleController.text,
       'context': _contextController.text.replaceAll('\n', '\\n'),
       'oss_img_list': imgInfoList,

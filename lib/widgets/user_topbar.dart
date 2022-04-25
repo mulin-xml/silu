@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:silu/image_cache.dart';
-import 'package:silu/widgets/user_view.dart';
+import 'package:silu/pages/user_page.dart';
 import 'package:silu/utils.dart';
 
 Widget iconView(String iconKey) {
@@ -58,9 +58,7 @@ class _UserTopbarState extends State<UserTopbar> {
           Text(_authorName, style: const TextStyle(inherit: false, color: Colors.brown)),
         ],
       ),
-      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) {
-        return Scaffold(body: UserView(widget.authorId));
-      })),
+      onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => userPage(widget.authorId))),
     );
   }
 }

@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:silu/pages/edit_user_info_page.dart';
-import 'package:silu/pages/login_page.dart';
 import 'package:silu/utils.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -19,8 +18,6 @@ class ConfigPage extends StatefulWidget {
 class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
-    final sp = u.sharedPreferences;
-    final isLogin = sp.getBool('is_login') ?? false;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -36,7 +33,7 @@ class _ConfigPageState extends State<ConfigPage> {
           commonItem(
             title: '账号与资料',
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => isLogin ? EditUserInfoPage(sp.getString('user_id') ?? '-1') : const LoginPage()));
+              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(u.uid)));
             },
           ),
           const Divider(),
@@ -57,18 +54,21 @@ class _ConfigPageState extends State<ConfigPage> {
           const SizedBox(height: 50),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: isLogin ? signOutButton : Container(),
+            child: ElevatedButton(
+              style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+              child: const Text('退出登录'),
+              onPressed: () {
+                var sp = u.sharedPreferences;
+                sp.setBool('is_login', false);
+                sp.setString('user_id', '-1');
+                Navigator.of(context).pushNamedAndRemoveUntil('/login_page', (route) => false);
+              },
+            ),
           )
         ],
       ),
     );
   }
-
-  final signOutButton = ElevatedButton(
-    style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-    child: const Text('退出登录'),
-    onPressed: signOut,
-  );
 
   Widget commonItem({String? title, onTap}) {
     return ListTile(

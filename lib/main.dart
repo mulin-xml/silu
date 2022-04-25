@@ -9,7 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:silu/pages/edit_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
 import 'package:silu/pages/homepage_message.dart';
-import 'package:silu/pages/homepage_self.dart';
+import 'package:silu/pages/user_page.dart';
 import 'package:silu/pages/login_page.dart';
 import 'package:silu/pages/homepage_follow.dart';
 import 'package:silu/utils.dart';
@@ -26,6 +26,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: '思路', // 在任务管理器中显示的标题
       home: const SplashPage(),
+      routes: {
+        '/login_page': (BuildContext context) => const LoginPage(),
+      },
       theme: ThemeData(primarySwatch: Colors.brown),
       color: Colors.brown,
       localizationsDelegates: const [
@@ -66,9 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
         controller: _pageController,
         itemCount: pages.length,
         physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return pages[index];
-        },
+        itemBuilder: (context, index) => pages[index],
         onPageChanged: (index) {
           setState(() {
             _currentIndex = index;
@@ -76,13 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          if (sp.getBool('is_login') ?? false) {
-            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage()));
-          } else {
-            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));
-          }
-        },
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage())),
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -94,13 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: '我'),
         ],
         currentIndex: _currentIndex,
-        onTap: (index) async {
-          if (index == 0 || index == 3 || (sp.getBool('is_login') ?? false)) {
-            _pageController.jumpToPage(index);
-          } else {
-            Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));
-          }
-        },
+        onTap: (index) => _pageController.jumpToPage(index),
       ),
     );
   }
@@ -112,7 +101,11 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 1), () {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
+      if (u.sharedPreferences.getBool('is_login') ?? false) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
+      } else {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));
+      }
     });
     return Container(
       child: const FlutterLogo(),
