@@ -12,9 +12,11 @@ import 'package:silu/widgets/user_topbar.dart';
 import 'package:silu/widgets/img_cropper.dart';
 
 class EditUserInfoPage extends StatefulWidget {
-  const EditUserInfoPage(this.userId, {Key? key}) : super(key: key);
+  const EditUserInfoPage(this.username, this.introduction, this.iconKey, {Key? key}) : super(key: key);
 
-  final String userId;
+  final String username;
+  final String introduction;
+  final String iconKey;
 
   @override
   State<EditUserInfoPage> createState() => _EditUserInfoPageState();
@@ -23,21 +25,12 @@ class EditUserInfoPage extends StatefulWidget {
 class _EditUserInfoPageState extends State<EditUserInfoPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _introductionController = TextEditingController();
-  String _username = '';
-  String _introduction = '';
-  String _iconKey = '';
-
-  @override
-  void initState() {
-    super.initState();
-    _getInfo();
-  }
 
   @override
   Widget build(BuildContext context) {
     const sizedBoxSpace = SizedBox(height: 24);
-    _nameController.text = _username;
-    _introductionController.text = _introduction;
+    _nameController.text = widget.username;
+    _introductionController.text = widget.introduction;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -74,7 +67,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
               }
             },
             child: Stack(children: [
-              SizedBox(width: 150, height: 150, child: iconView(_iconKey)),
+              SizedBox(width: 150, height: 150, child: iconView(widget.iconKey)),
               const Positioned(child: CircleAvatar(child: Icon(Icons.edit)), right: 0, bottom: 0),
             ]),
           ),
@@ -98,7 +91,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
         TextFormField(
           controller: _introductionController,
           textCapitalization: TextCapitalization.words,
-          maxLength: 500,
+          maxLength: 100,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             hintText: '有趣的简介可以吸引粉丝',
@@ -113,24 +106,13 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
         child: Container(
           padding: const EdgeInsets.fromLTRB(30, 0, 30, 20),
           child: ElevatedButton(
-            style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+            style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
             child: const Text('更新资料'),
             onPressed: _editUserInfo,
           ),
         ),
       ),
     );
-  }
-
-  _getInfo() async {
-    var userInfo = await getUserInfo(widget.userId);
-    if (userInfo != null) {
-      setState(() {
-        _username = userInfo['username'];
-        _introduction = userInfo['introduction'];
-        _iconKey = userInfo['icon_key'];
-      });
-    }
   }
 
   _editUserInfo() async {
@@ -141,7 +123,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
     var data = {
       'user_id': u.uid,
       'new_username': _nameController.text,
-      'new_introduction': _introductionController.text,
+      'new_introduction': _introductionController.text.replaceAll('\n', '\\n'),
     };
     final rsp = await SiluRequest().post('edit_user_info', data);
     if (rsp.statusCode == HttpStatus.ok) {

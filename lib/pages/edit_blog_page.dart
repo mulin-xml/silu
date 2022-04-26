@@ -161,7 +161,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(0, 0, 30, 0),
                   child: ElevatedButton(
-                    style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+                    style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
                     child: const Text('发布动态'),
                     onPressed: _uploadBlog,
                   ),

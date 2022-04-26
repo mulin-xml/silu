@@ -5,9 +5,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import 'package:silu/blog.dart';
+import 'package:silu/pages/config_page.dart';
+import 'package:silu/pages/edit_user_info_page.dart';
 import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
+import 'package:silu/widgets/follow_button.dart';
+import 'package:silu/widgets/follow_info_bar.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class UserViewHeader extends StatefulWidget {
@@ -39,27 +43,75 @@ class _UserViewHeaderState extends State<UserViewHeader> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.red,
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        height: 100,
-        child: Row(
+    return Stack(children: [
+      Container(color: Colors.brown),
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            iconView(_iconKey),
-            const SizedBox(width: 10),
-            Column(
+            Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                iconView(_iconKey, size: 80),
+                const SizedBox(width: 20),
                 Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 30)),
-                Text(_introduction, style: const TextStyle(color: Colors.white)),
               ],
             ),
+            const SizedBox(height: 10),
+            Text(_introduction, style: const TextStyle(color: Colors.white)),
+            const SizedBox(height: 10),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              // 左侧用于显示关注和粉丝数量
+              FollowInfoBar(widget.authorId),
+              // 右侧用于显示自己和别人的操作栏
+              widget.isSelf ? selfOpBar() : otherOpBar(),
+            ]),
           ],
         ),
-      ),
+      )
+    ]);
+  }
+
+  final buttonStyle = OutlinedButton.styleFrom(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(30),
+    ),
+    side: const BorderSide(color: Colors.white, width: 0.5),
+  );
+
+  Widget selfOpBar() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(_userName, _introduction, _iconKey))),
+          child: const Text('编辑资料', style: TextStyle(color: Colors.white)),
+          style: buttonStyle,
+        ),
+        const SizedBox(width: 10),
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const ConfigPage())),
+          child: const Icon(Icons.settings, color: Colors.white),
+          style: buttonStyle,
+        ),
+      ],
+    );
+  }
+
+  Widget otherOpBar() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        FollowButton(widget.authorId),
+        const SizedBox(width: 10),
+        OutlinedButton(
+          onPressed: () {},
+          child: const Icon(Icons.message, color: Colors.white),
+          style: buttonStyle,
+        ),
+      ],
     );
   }
 
@@ -68,7 +120,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
     if (userInfo != null) {
       setState(() {
         _userName = userInfo['username'];
-        _introduction = userInfo['introduction'];
+        _introduction = userInfo['introduction'].replaceAll('\\n', '\n');
         _iconKey = userInfo['icon_key'];
       });
     }
@@ -130,6 +182,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
               //   ],
               // ),
             ),
+            // 此处缺一个TabBar
           ];
         },
         body: ListView.separated(

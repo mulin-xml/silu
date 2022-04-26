@@ -34,10 +34,11 @@ class _FollowButtonState extends State<FollowButton> {
   Widget _unFollowedButton() {
     return ElevatedButton(
       onPressed: _followOperation,
-      child: const Text('关注'),
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-        elevation: MaterialStateProperty.all(0),
+      child: const Text('关注', style: TextStyle(color: Colors.white)),
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        elevation: 0,
+        side: const BorderSide(width: 0.5, color: Colors.white),
       ),
     );
   }
@@ -45,10 +46,12 @@ class _FollowButtonState extends State<FollowButton> {
   Widget _followedButton() {
     return OutlinedButton(
       onPressed: _followOperation,
-      child: const Text('已关注'),
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-        elevation: MaterialStateProperty.all(0),
+      child: const Text('已关注', style: TextStyle(color: Colors.white)),
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        elevation: 0,
+        backgroundColor: Colors.grey.withOpacity(0.5),
+        side: const BorderSide(width: 0.5, color: Colors.white),
       ),
     );
   }

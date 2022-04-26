@@ -4,8 +4,10 @@ import 'package:silu/image_cache.dart';
 import 'package:silu/pages/user_page.dart';
 import 'package:silu/utils.dart';
 
-Widget iconView(String iconKey) {
+Widget iconView(String iconKey, {double? size}) {
   return Container(
+    height: size,
+    width: size,
     clipBehavior: Clip.antiAlias,
     decoration: const BoxDecoration(shape: BoxShape.circle),
     child: iconKey.isEmpty ? const FlutterLogo() : Image(image: OssImage(OssImgCategory.icons, iconKey), fit: BoxFit.cover),

@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:silu/pages/edit_user_info_page.dart';
 import 'package:silu/utils.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -31,13 +30,6 @@ class _ConfigPageState extends State<ConfigPage> {
       body: ListView(
         children: [
           commonItem(
-            title: '账号与资料',
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(u.uid)));
-            },
-          ),
-          const Divider(),
-          commonItem(
             title: '清除缓存',
             onTap: () async {
               Directory tempDir = await getTemporaryDirectory();
@@ -55,7 +47,7 @@ class _ConfigPageState extends State<ConfigPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ElevatedButton(
-              style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
               child: const Text('退出登录'),
               onPressed: () {
                 var sp = u.sharedPreferences;

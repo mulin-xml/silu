@@ -126,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(50, 10, 50, 0),
             child: ElevatedButton(
-              style: ButtonStyle(shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+              style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
               child: const Text('登录', textScaleFactor: 1.5),
               onPressed: () async {
                 if (!_isReadProtocol || _phoneNumController.text.length < 11 || _verifyController.text.isEmpty) {
