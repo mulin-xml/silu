@@ -138,7 +138,8 @@ class UserView extends StatefulWidget {
 }
 
 class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin {
-  final _viewItems = <Widget>[];
+  final _releaseBlogs = <Widget>[];
+  final _collectBlogs = <Widget>[];
   late TabController _tabController;
 
   @override
@@ -174,23 +175,27 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
                 background: UserViewHeader(widget.authorId, widget.isSelf),
                 collapseMode: CollapseMode.pin,
               ),
-              // bottom: TabBar(
-              //   controller: _tabController,
-              //   tabs: const [
-              //     Tab(text: '动态'),
-              //     Tab(text: '收藏'),
-              //   ],
-              // ),
             ),
-            // 此处缺一个TabBar
+            SliverAppBar(
+              toolbarHeight: 0,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.brown,
+              pinned: true,
+              bottom: TabBar(
+                controller: _tabController,
+                labelColor: Colors.brown,
+                indicatorWeight: 4,
+                tabs: const [
+                  Tab(text: '动态'),
+                  Tab(text: '收藏'),
+                ],
+              ),
+            ),
           ];
         },
-        body: ListView.separated(
-          itemCount: _viewItems.length,
-          itemBuilder: (context, index) {
-            return index < _viewItems.length ? _viewItems[index] : Container();
-          },
-          separatorBuilder: (context, index) => const Divider(),
+        body: TabBarView(
+          children: [separatedListView(_releaseBlogs), separatedListView(_collectBlogs)],
+          controller: _tabController,
         ),
       ),
       onRefresh: () async {
@@ -199,24 +204,61 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
     );
   }
 
+  Widget separatedListView(List<Widget> list) {
+    return ListView.separated(
+      itemCount: list.length,
+      itemBuilder: (context, index) {
+        return index < list.length ? list[index] : Container();
+      },
+      separatorBuilder: (context, index) => const Divider(),
+    );
+  }
+
   updatePage() async {
-    _viewItems.clear();
+    _releaseBlogs.clear();
     var data = {
       'offset': 0,
       'limit': 500,
       'login_user_id': u.uid,
+      'search_type': 1,
       'search_user_id': widget.authorId,
     };
-    var rsp = await SiluRequest().post('get_user_activity_list', data);
+    var rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _viewItems.add(BlogItemView(Blog(elm), widget.isSelf));
+        _releaseBlogs.add(BlogItemView(Blog(elm), widget.isSelf));
       }
     }
-    if (_viewItems.isEmpty) {
-      _viewItems.add(const Center(child: Text('作者还没有发布内容哦', textScaleFactor: 1.2)));
+    if (_releaseBlogs.isEmpty) {
+      _releaseBlogs.add(noContentWidget);
     }
+
+    _collectBlogs.clear();
+    data = {
+      'offset': 0,
+      'limit': 500,
+      'login_user_id': u.uid,
+      'search_type': 4,
+      'search_user_id': widget.authorId,
+    };
+    rsp = await SiluRequest().post('get_activity_list', data);
+    if (rsp.statusCode == HttpStatus.ok) {
+      List activityList = rsp.data['activityList'];
+      for (var elm in activityList) {
+        _collectBlogs.add(BlogItemView(Blog(elm), widget.isSelf));
+      }
+    }
+    if (_collectBlogs.isEmpty) {
+      _collectBlogs.add(noContentWidget);
+    }
+
     setState(() {});
   }
+
+  final noContentWidget = Container(
+    alignment: Alignment.center,
+    child: const Text('暂无内容', textScaleFactor: 1.5),
+    padding: const EdgeInsets.symmetric(vertical: 50),
+  );
 }

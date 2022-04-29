@@ -64,6 +64,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
       'offset': 0,
       'limit': 500,
       'login_user_id': u.uid,
+      'search_type': 0,
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {

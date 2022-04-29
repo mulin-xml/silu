@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:silu/pages/address_selector.dart';
 import 'package:silu/utils.dart';
 
 class ConfigPage extends StatefulWidget {
@@ -30,6 +31,11 @@ class _ConfigPageState extends State<ConfigPage> {
       body: ListView(
         children: [
           commonItem(
+            title: '地址管理',
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AddressSelector())),
+          ),
+          const Divider(),
+          commonItem(
             title: '清除缓存',
             onTap: () async {
               Directory tempDir = await getTemporaryDirectory();
@@ -41,6 +47,8 @@ class _ConfigPageState extends State<ConfigPage> {
               }
             },
           ),
+          const Divider(),
+          commonItem(title: '商务合作'),
           const Divider(),
           commonItem(title: '关于思路'),
           const SizedBox(height: 50),

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'dart:math';
 
@@ -11,6 +13,7 @@ import 'package:silu/http_manager.dart';
 import 'package:silu/pages/blog_detail_page.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/amap.dart';
+import 'package:silu/utils.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class BlogCardView extends StatefulWidget {
@@ -52,22 +55,23 @@ class _BlogCardViewState extends State<BlogCardView> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        blog.latitude.isNegative || blog.longtitude.isNegative
-                            ? Container()
-                            : Row(
-                                children: [
-                                  const Icon(Icons.location_on, size: 20, color: Colors.white),
-                                  Text(
-                                    distance.toStringAsFixed(2) + 'km',
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                ],
+                        Visibility(
+                          visible: blog.latitude.isNegative || blog.longtitude.isNegative,
+                          child: Row(
+                            children: [
+                              const Icon(Icons.location_on, size: 20, color: Colors.white),
+                              Text(
+                                distance.toStringAsFixed(2) + 'km',
+                                style: const TextStyle(color: Colors.white),
                               ),
+                            ],
+                          ),
+                        ),
                         Row(
                           children: [
                             const Icon(Icons.remove_red_eye, size: 20, color: Colors.white),
                             Text(
-                              blog.isSaved ? '' : '',
+                              widget.blog.visitCount.toString(),
                               style: const TextStyle(color: Colors.white),
                             ),
                           ],
@@ -97,10 +101,23 @@ class _BlogCardViewState extends State<BlogCardView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(height: 20, child: UserTopbar(blog.authorId)),
-                  Icon(
-                    blog.isSaved ? Icons.favorite : Icons.favorite_border,
-                    color: blog.isSaved ? Colors.red : null,
-                  ),
+                  IconButton(
+                      onPressed: () async {
+                        var data = {
+                          'user_id': u.uid,
+                          'activity_id': widget.blog.activityId,
+                          'mark_type': 2,
+                          'action': 0,
+                        };
+                        var rsp = await SiluRequest().post('mark_activity', data);
+                        if (rsp.statusCode == HttpStatus.ok) {
+                          print(rsp.data);
+                        }
+                      },
+                      icon: Icon(
+                        blog.isSaved ? Icons.favorite : Icons.favorite_border,
+                        color: blog.isSaved ? Colors.red : null,
+                      )),
                 ],
               ),
             ),

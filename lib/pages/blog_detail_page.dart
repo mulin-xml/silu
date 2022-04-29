@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 import 'package:silu/blog.dart';
+import 'package:silu/http_manager.dart';
 import 'package:silu/image_cache.dart';
+import 'package:silu/utils.dart';
 import 'package:silu/widgets/follow_button.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
@@ -28,6 +30,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
     for (var img in widget.blog.imagesInfo) {
       _minAspectRatio = min(_minAspectRatio, img['width'] / img['height']);
     }
+    addVisitNum();
   }
 
   @override
@@ -94,5 +97,14 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
         ],
       ),
     );
+  }
+
+  addVisitNum() {
+    var data = {
+      'user_id': u.uid,
+      'activity_id': widget.blog.activityId,
+      'mark_type': 0,
+    };
+    SiluRequest().post('mark_activity', data);
   }
 }

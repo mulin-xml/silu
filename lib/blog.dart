@@ -7,7 +7,8 @@ class Blog {
         latitude = map['latitude'] ?? -1,
         longtitude = map['longitude'] ?? -1,
         authorId = map['author_id'].toString(),
-        createTime = map['create_time'];
+        createTime = map['create_time'],
+        visitCount = map['visit_count'];
 
   bool isSaved = false;
   final int activityId;
@@ -18,4 +19,5 @@ class Blog {
   final double latitude;
   final double longtitude;
   final String createTime;
+  final int visitCount;
 }

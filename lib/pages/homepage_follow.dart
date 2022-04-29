@@ -58,8 +58,9 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
       'offset': 0,
       'limit': 500,
       'login_user_id': u.uid,
+      'search_type': 2,
     };
-    var rsp = await SiluRequest().post('get_follow_activity_list', data);
+    var rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (Map<String, dynamic> elm in activityList) {
