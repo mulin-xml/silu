@@ -26,7 +26,6 @@ class AMap {
     }
     // 注册定位结果监听
     _locationListener = _locationPlugin.onLocationChanged().listen((Map<String, dynamic> result) {
-      location = result;
       lastLatLng = LatLng(result['latitude'], result['longitude']);
       print(_cnt);
       if (result['accuracy'] < 200 || _cnt++ > 1) {
@@ -42,7 +41,6 @@ class AMap {
 
   StreamSubscription<Map<String, Object>>? _locationListener;
   final _locationPlugin = AMapFlutterLocation();
-  Map<String, dynamic> location = {};
   int _cnt = 0;
   bool isLocated = false;
   LatLng lastLatLng = LatLng(u.sharedPreferences.getDouble('latitude') ?? 39.909187, u.sharedPreferences.getDouble('longitude') ?? 116.397451);

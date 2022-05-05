@@ -4,10 +4,11 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:amap_flutter_base/amap_flutter_base.dart';
 
-import 'package:silu/blog.dart';
+import 'package:silu/global_declare.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/pages/blog_detail_page.dart';
@@ -56,7 +57,7 @@ class _BlogCardViewState extends State<BlogCardView> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Visibility(
-                          visible: blog.latitude.isNegative || blog.longtitude.isNegative,
+                          visible: !(blog.latitude.isNegative || blog.longtitude.isNegative),
                           child: Row(
                             children: [
                               const Icon(Icons.location_on, size: 20, color: Colors.white),
@@ -114,10 +115,7 @@ class _BlogCardViewState extends State<BlogCardView> {
                           print(rsp.data);
                         }
                       },
-                      icon: Icon(
-                        blog.isSaved ? Icons.favorite : Icons.favorite_border,
-                        color: blog.isSaved ? Colors.red : null,
-                      )),
+                      icon: const Icon(Icons.favorite_border)),
                 ],
               ),
             ),
@@ -209,4 +207,41 @@ class _BlogItemViewState extends State<BlogItemView> {
       ),
     );
   }
+}
+
+Widget separatedListView(List<Blog> list, bool isSelf) {
+  if (list.isEmpty) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('暂无内容', textScaleFactor: 1.5),
+      padding: const EdgeInsets.symmetric(vertical: 50),
+    );
+  }
+  return ListView.separated(
+    itemCount: list.length,
+    itemBuilder: (context, index) {
+      return index < list.length ? BlogItemView(list[index], isSelf) : Container();
+    },
+    separatorBuilder: (context, index) => const Divider(),
+  );
+}
+
+Widget countMasonryGridView(List<Blog> list) {
+  if (list.isEmpty) {
+    return Container(
+      alignment: Alignment.center,
+      child: const Text('暂无内容', textScaleFactor: 1.5),
+      padding: const EdgeInsets.symmetric(vertical: 50),
+    );
+  }
+  return MasonryGridView.count(
+    padding: EdgeInsets.zero,
+    crossAxisCount: 2,
+    itemCount: list.length,
+    addAutomaticKeepAlives: true,
+    physics: const BouncingScrollPhysics(),
+    itemBuilder: (BuildContext context, int index) {
+      return index < list.length ? BlogCardView(list[index]) : Container();
+    },
+  );
 }

@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:silu/blog.dart';
+import 'package:silu/global_declare.dart';
 import 'package:silu/pages/config_page.dart';
 import 'package:silu/pages/edit_user_info_page.dart';
 import 'package:silu/widgets/blog_view.dart';
@@ -138,8 +138,8 @@ class UserView extends StatefulWidget {
 }
 
 class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin {
-  final _releaseBlogs = <Widget>[];
-  final _collectBlogs = <Widget>[];
+  final _releaseBlogs = <Blog>[];
+  final _collectBlogs = <Blog>[];
   late TabController _tabController;
 
   @override
@@ -194,23 +194,13 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
           ];
         },
         body: TabBarView(
-          children: [separatedListView(_releaseBlogs), separatedListView(_collectBlogs)],
+          children: [separatedListView(_releaseBlogs, widget.isSelf), countMasonryGridView(_collectBlogs)],
           controller: _tabController,
         ),
       ),
       onRefresh: () async {
         updatePage();
       },
-    );
-  }
-
-  Widget separatedListView(List<Widget> list) {
-    return ListView.separated(
-      itemCount: list.length,
-      itemBuilder: (context, index) {
-        return index < list.length ? list[index] : Container();
-      },
-      separatorBuilder: (context, index) => const Divider(),
     );
   }
 
@@ -227,11 +217,8 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _releaseBlogs.add(BlogItemView(Blog(elm), widget.isSelf));
+        _releaseBlogs.add(Blog(elm));
       }
-    }
-    if (_releaseBlogs.isEmpty) {
-      _releaseBlogs.add(noContentWidget);
     }
 
     _collectBlogs.clear();
@@ -246,19 +233,10 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (var elm in activityList) {
-        _collectBlogs.add(BlogItemView(Blog(elm), widget.isSelf));
+        _collectBlogs.add(Blog(elm));
       }
-    }
-    if (_collectBlogs.isEmpty) {
-      _collectBlogs.add(noContentWidget);
     }
 
     setState(() {});
   }
-
-  final noContentWidget = Container(
-    alignment: Alignment.center,
-    child: const Text('暂无内容', textScaleFactor: 1.5),
-    padding: const EdgeInsets.symmetric(vertical: 50),
-  );
 }

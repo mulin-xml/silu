@@ -10,7 +10,6 @@ class Blog {
         createTime = map['create_time'],
         visitCount = map['visit_count'];
 
-  bool isSaved = false;
   final int activityId;
   final String title;
   final String content;
@@ -20,4 +19,19 @@ class Blog {
   final double longtitude;
   final String createTime;
   final int visitCount;
+}
+
+class Address {
+  Address.fromMap(Map<String, dynamic> map)
+      : addressId = map['id'] ?? -1,
+        addressName = map['address_name'] ?? '',
+        latitude = map['latitude'] ?? -1,
+        longtitude = map['longitude'] ?? -1;
+
+  Address(this.addressName, this.latitude, this.longtitude) : addressId = -1;
+
+  final int addressId;
+  final String addressName;
+  final double latitude;
+  final double longtitude;
 }

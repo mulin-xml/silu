@@ -6,9 +6,12 @@ import 'package:amap_flutter_map/amap_flutter_map.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import 'package:silu/amap.dart';
+import 'package:silu/global_declare.dart';
 
 class AMapView extends StatefulWidget {
-  const AMapView({Key? key}) : super(key: key);
+  const AMapView(this.onSelected, {Key? key}) : super(key: key);
+
+  final Function(Address addr) onSelected;
 
   @override
   State<AMapView> createState() => _AMapViewState();
@@ -37,7 +40,10 @@ class _AMapViewState extends State<AMapView> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop([_pos, _address]);
+              if (_pos != null) {
+                widget.onSelected(Address(_address, _pos!.latitude, _pos!.longitude));
+              }
+              Navigator.of(context).pop();
             },
             child: const Text('选择该位置'),
           ),
@@ -54,12 +60,12 @@ class _AMapViewState extends State<AMapView> {
         onPoiTouched: _onMapPoiTouched,
         onTap: _onMapTap,
         markers: _mark,
-        myLocationStyleOptions: MyLocationStyleOptions(
-          true,
-          circleFillColor: Colors.lightBlue,
-          circleStrokeColor: Colors.blue,
-          circleStrokeWidth: 1,
-        ),
+        // myLocationStyleOptions: MyLocationStyleOptions(
+        //   true,
+        //   circleFillColor: Colors.lightBlue,
+        //   circleStrokeColor: Colors.blue,
+        //   circleStrokeWidth: 1,
+        // ),
       ),
     );
   }

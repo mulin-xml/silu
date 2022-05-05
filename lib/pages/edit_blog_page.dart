@@ -6,13 +6,15 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:amap_flutter_base/amap_flutter_base.dart';
 
 import 'package:silu/amap.dart';
 import 'package:silu/event_bus.dart';
+import 'package:silu/global_declare.dart';
 import 'package:silu/image_cache.dart';
+import 'package:silu/pages/address_selector.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
-import 'package:silu/widgets/amap_view.dart';
 import 'package:silu/widgets/img_cropper.dart';
 
 class EditBlogPage extends StatefulWidget {
@@ -30,7 +32,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
 
   var _isBlogLongTime = false;
   var _blogAccessTime = '';
-  var _address = AMap().location['address'].toString();
+  var _address = '';
   var _latLng = AMap().lastLatLng;
   var _isUploading = false;
 
@@ -97,14 +99,15 @@ class _EditBlogPageState extends State<EditBlogPage> {
             title: const Text('位置选择'),
             trailing: const Icon(Icons.chevron_right),
             subtitle: Text(_address),
-            onTap: () async {
-              var result = await Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const AMapView()));
-              if (result?[0] != null) {
-                setState(() {
-                  _latLng = result[0];
-                  _address = result[1];
-                });
-              }
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => AddressSelector(onTapReturn: (Address addr) {
+                  setState(() {
+                    _latLng = LatLng(addr.latitude, addr.longtitude);
+                    _address = addr.addressName;
+                  });
+                }),
+              ));
             },
           ),
           const Divider(indent: 10, endIndent: 10, thickness: 0.1),

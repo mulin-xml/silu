@@ -3,10 +3,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:silu/amap.dart';
 
-import 'package:silu/blog.dart';
+import 'package:silu/global_declare.dart';
 import 'package:silu/widgets/appbar_view.dart';
 import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/event_bus.dart';
@@ -42,16 +41,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
     return Scaffold(
       appBar: appBarView('思路'),
       body: RefreshIndicator(
-        child: MasonryGridView.count(
-          padding: EdgeInsets.zero,
-          crossAxisCount: 2,
-          itemCount: _blogs.length,
-          addAutomaticKeepAlives: true,
-          physics: const BouncingScrollPhysics(),
-          itemBuilder: (BuildContext context, int index) {
-            return index < _blogs.length ? BlogCardView(_blogs[index]) : Container();
-          },
-        ),
+        child: countMasonryGridView(_blogs),
         onRefresh: () async {
           updatePage();
         },

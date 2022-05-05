@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:silu/blog.dart';
+import 'package:silu/global_declare.dart';
 import 'package:silu/widgets/appbar_view.dart';
 import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/event_bus.dart';
@@ -19,7 +19,7 @@ class FollowPage extends StatefulWidget {
 }
 
 class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMixin {
-  final _viewItems = <Widget>[];
+  final _viewItems = <Blog>[];
 
   @override
   bool get wantKeepAlive => true;
@@ -37,14 +37,7 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
     return Scaffold(
       appBar: appBarView('关注'),
       body: RefreshIndicator(
-        child: ListView.separated(
-          padding: EdgeInsets.zero,
-          itemCount: _viewItems.length,
-          itemBuilder: (context, index) {
-            return index < _viewItems.length ? _viewItems[index] : Container();
-          },
-          separatorBuilder: (context, index) => const Divider(),
-        ),
+        child: separatedListView(_viewItems, false),
         onRefresh: () async {
           updatePage();
         },
@@ -64,12 +57,10 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
     if (rsp.statusCode == HttpStatus.ok) {
       List activityList = rsp.data['activityList'];
       for (Map<String, dynamic> elm in activityList) {
-        _viewItems.add(BlogItemView(Blog(elm), false));
+        _viewItems.add(Blog(elm));
       }
     }
-    if (_viewItems.isEmpty) {
-      _viewItems.add(const Center(child: Text('还没有关注的内容哦', textScaleFactor: 1.2)));
-    }
+
     setState(() {});
   }
 }
