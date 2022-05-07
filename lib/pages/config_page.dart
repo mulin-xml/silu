@@ -8,14 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:silu/pages/address_selector.dart';
 import 'package:silu/utils.dart';
 
-class ConfigPage extends StatefulWidget {
+class ConfigPage extends StatelessWidget {
   const ConfigPage({Key? key}) : super(key: key);
 
-  @override
-  State<ConfigPage> createState() => _ConfigPageState();
-}
-
-class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

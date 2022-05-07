@@ -41,7 +41,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
     return Scaffold(
       appBar: appBarView('思路'),
       body: RefreshIndicator(
-        child: countMasonryGridView(_blogs),
+        child: waterfallListView(_blogs),
         onRefresh: () async {
           updatePage();
         },

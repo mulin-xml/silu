@@ -194,7 +194,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
           ];
         },
         body: TabBarView(
-          children: [separatedListView(_releaseBlogs, widget.isSelf), countMasonryGridView(_collectBlogs)],
+          children: [separatedListView(_releaseBlogs, widget.isSelf), waterfallListView(_collectBlogs)],
           controller: _tabController,
         ),
       ),

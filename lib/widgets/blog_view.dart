@@ -17,19 +17,13 @@ import 'package:silu/amap.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
-class BlogCardView extends StatefulWidget {
-  const BlogCardView(this.blog, {Key? key}) : super(key: key);
+class _BlogCard extends StatelessWidget {
+  const _BlogCard(this.blog, {Key? key}) : super(key: key);
 
   final Blog blog;
 
   @override
-  State<BlogCardView> createState() => _BlogCardViewState();
-}
-
-class _BlogCardViewState extends State<BlogCardView> {
-  @override
   Widget build(BuildContext context) {
-    final blog = widget.blog;
     double distance;
     if (blog.latitude < 0 || blog.longtitude < 0) {
       distance = -1;
@@ -48,7 +42,9 @@ class _BlogCardViewState extends State<BlogCardView> {
               child: Stack(
                 alignment: AlignmentDirectional.bottomCenter,
                 children: [
+                  // 图片本体
                   Image(image: OssImage(OssImgCategory.images, blog.imagesInfo[0]['key'])),
+                  // 图片下方嵌入式信息栏
                   Container(
                     color: Colors.black.withOpacity(0.3),
                     height: 20,
@@ -56,6 +52,7 @@ class _BlogCardViewState extends State<BlogCardView> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        // 距离
                         Visibility(
                           visible: !(blog.latitude.isNegative || blog.longtitude.isNegative),
                           child: Row(
@@ -68,11 +65,12 @@ class _BlogCardViewState extends State<BlogCardView> {
                             ],
                           ),
                         ),
+                        // 浏览量
                         Row(
                           children: [
                             const Icon(Icons.remove_red_eye, size: 20, color: Colors.white),
                             Text(
-                              widget.blog.visitCount.toString(),
+                              blog.visitCount.toString(),
                               style: const TextStyle(color: Colors.white),
                             ),
                           ],
@@ -84,10 +82,11 @@ class _BlogCardViewState extends State<BlogCardView> {
               ),
               aspectRatio: blog.imagesInfo[0]['width'] / blog.imagesInfo[0]['height'],
             ),
+            const SizedBox(height: 5),
             // 标题
             Container(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Text(
                 blog.title,
                 maxLines: 2,
@@ -95,27 +94,18 @@ class _BlogCardViewState extends State<BlogCardView> {
                 style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 16, height: 1.4),
               ),
             ),
+            const SizedBox(height: 5),
             // 副标题
             Padding(
-              padding: const EdgeInsets.all(5),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(height: 20, child: UserTopbar(blog.authorId)),
-                  IconButton(
-                      onPressed: () async {
-                        var data = {
-                          'user_id': u.uid,
-                          'activity_id': widget.blog.activityId,
-                          'mark_type': 2,
-                          'action': 0,
-                        };
-                        var rsp = await SiluRequest().post('mark_activity', data);
-                        if (rsp.statusCode == HttpStatus.ok) {
-                          print(rsp.data);
-                        }
-                      },
-                      icon: const Icon(Icons.favorite_border)),
+                  GestureDetector(
+                    child: Icon(Icons.adaptive.more),
+                    onTap: () {},
+                  ),
                 ],
               ),
             ),
@@ -127,17 +117,12 @@ class _BlogCardViewState extends State<BlogCardView> {
   }
 }
 
-class BlogItemView extends StatefulWidget {
-  const BlogItemView(this.blog, this.isSelf, {Key? key}) : super(key: key);
+class _BlogItem extends StatelessWidget {
+  const _BlogItem(this.blog, this.isSelf, {Key? key}) : super(key: key);
 
   final Blog blog;
   final bool isSelf;
 
-  @override
-  State<BlogItemView> createState() => _BlogItemViewState();
-}
-
-class _BlogItemViewState extends State<BlogItemView> {
   @override
   Widget build(BuildContext context) {
     const sizedBoxSpace = SizedBox(height: 10);
@@ -148,15 +133,15 @@ class _BlogItemViewState extends State<BlogItemView> {
           Container(
             height: 50,
             alignment: Alignment.centerLeft,
-            child: UserTopbar(widget.blog.authorId),
+            child: UserTopbar(blog.authorId),
           ),
           sizedBoxSpace,
           Container(
             child: Text.rich(
               TextSpan(children: [
-                TextSpan(text: widget.blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                TextSpan(text: blog.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                 const TextSpan(text: '  '),
-                TextSpan(text: widget.blog.content.replaceAll('\\n', '\n')),
+                TextSpan(text: blog.content.replaceAll('\\n', '\n')),
               ]),
               maxLines: 5,
               overflow: TextOverflow.ellipsis,
@@ -167,7 +152,7 @@ class _BlogItemViewState extends State<BlogItemView> {
           GridView.builder(
             padding: EdgeInsets.zero,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: sqrt(widget.blog.imagesInfo.length).ceil(),
+              crossAxisCount: sqrt(blog.imagesInfo.length).ceil(),
               childAspectRatio: 1.0,
               crossAxisSpacing: 5,
               mainAxisSpacing: 5,
@@ -175,32 +160,33 @@ class _BlogItemViewState extends State<BlogItemView> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              return Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key']), fit: BoxFit.cover);
+              return Image(image: OssImage(OssImgCategory.images, blog.imagesInfo[index]['key']), fit: BoxFit.cover);
             },
-            itemCount: widget.blog.imagesInfo.length,
+            itemCount: blog.imagesInfo.length,
           ),
           sizedBoxSpace,
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '编辑于 ' + widget.blog.createTime,
+                '编辑于 ' + blog.createTime,
                 style: const TextStyle(color: Colors.grey),
               ),
-              widget.isSelf
-                  ? IconButton(
-                      onPressed: () async {
-                        var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': widget.blog.activityId});
-                        if (rsp.statusCode == HttpStatus.ok) {
-                          Fluttertoast.showToast(msg: '删除成功');
-                          bus.emit('self_page_update');
-                        } else {
-                          Fluttertoast.showToast(msg: '删除失败');
-                        }
-                      },
-                      icon: const Icon(Icons.delete),
-                    )
-                  : Container(),
+              Visibility(
+                visible: isSelf,
+                child: IconButton(
+                  onPressed: () async {
+                    var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': blog.activityId});
+                    if (rsp.statusCode == HttpStatus.ok) {
+                      Fluttertoast.showToast(msg: '删除成功');
+                      bus.emit('self_page_update');
+                    } else {
+                      Fluttertoast.showToast(msg: '删除失败');
+                    }
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
+              ),
             ],
           ),
         ],
@@ -220,13 +206,13 @@ Widget separatedListView(List<Blog> list, bool isSelf) {
   return ListView.separated(
     itemCount: list.length,
     itemBuilder: (context, index) {
-      return index < list.length ? BlogItemView(list[index], isSelf) : Container();
+      return index < list.length ? _BlogItem(list[index], isSelf) : Container();
     },
     separatorBuilder: (context, index) => const Divider(),
   );
 }
 
-Widget countMasonryGridView(List<Blog> list) {
+Widget waterfallListView(List<Blog> list) {
   if (list.isEmpty) {
     return Container(
       alignment: Alignment.center,
@@ -241,7 +227,7 @@ Widget countMasonryGridView(List<Blog> list) {
     addAutomaticKeepAlives: true,
     physics: const BouncingScrollPhysics(),
     itemBuilder: (BuildContext context, int index) {
-      return index < list.length ? BlogCardView(list[index]) : Container();
+      return index < list.length ? _BlogCard(list[index]) : Container();
     },
   );
 }
