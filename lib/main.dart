@@ -100,7 +100,7 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 3), () {
       if (u.sharedPreferences.getBool('is_login') ?? false) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
       } else {
@@ -108,7 +108,14 @@ class SplashPage extends StatelessWidget {
       }
     });
     return Container(
-      child: const FlutterLogo(),
+      child: Image.asset(
+        'images/silu_logo.png',
+        height: 150,
+        fit: BoxFit.cover,
+        width: 400,
+        color: Colors.brown,
+      ),
+      alignment: Alignment.bottomCenter,
       color: Colors.white,
     );
   }
