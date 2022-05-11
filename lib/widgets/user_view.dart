@@ -215,7 +215,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {
-      List activityList = rsp.data['activityList'];
+      List activityList = rsp.data['activity_list'];
       for (var elm in activityList) {
         _releaseBlogs.add(Blog(elm));
       }
@@ -231,7 +231,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
     };
     rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {
-      List activityList = rsp.data['activityList'];
+      List activityList = rsp.data['activity_list'];
       for (var elm in activityList) {
         _collectBlogs.add(Blog(elm));
       }

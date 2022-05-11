@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:silu/http_manager.dart';
 import 'package:silu/pages/user_page.dart';
+import 'package:silu/utils.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class FollowInfoBar extends StatefulWidget {
@@ -60,13 +61,13 @@ class _FollowInfoBarState extends State<FollowInfoBar> {
   }
 
   updateState() async {
-    var rsp = await SiluRequest().post('get_follow_list', {'user_id': widget.userId, 'search_type': 0});
+    var rsp = await SiluRequest().post('get_follow_list', {'target_user_id': widget.userId, 'login_user_id': u.uid, 'search_type': 0});
     if (rsp.statusCode == HttpStatus.ok) {
-      _fanList = rsp.data['userInfo'];
+      _fanList = rsp.data['user_info_list'];
     }
-    rsp = await SiluRequest().post('get_follow_list', {'user_id': widget.userId, 'search_type': 1});
+    rsp = await SiluRequest().post('get_follow_list', {'target_user_id': widget.userId, 'login_user_id': u.uid, 'search_type': 1});
     if (rsp.statusCode == HttpStatus.ok) {
-      _followList = rsp.data['userInfo'];
+      _followList = rsp.data['user_info_list'];
     }
     setState(() {});
   }

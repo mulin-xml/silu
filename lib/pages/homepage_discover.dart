@@ -58,7 +58,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
     if (rsp.statusCode == HttpStatus.ok) {
-      List activityList = rsp.data['activityList'];
+      List activityList = rsp.data['activity_list'];
       for (Map<String, dynamic> elm in activityList) {
         _blogs.add(Blog(elm));
       }

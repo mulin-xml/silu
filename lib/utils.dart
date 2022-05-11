@@ -39,7 +39,7 @@ Future<Map<String, dynamic>?> getUserInfo(String targetUserId) async {
   };
   var rsp = await SiluRequest().post('get_user_info', data);
   if (rsp.statusCode == HttpStatus.ok) {
-    return rsp.data['userInfo'];
+    return rsp.data['user_info'];
   } else {
     return null;
   }

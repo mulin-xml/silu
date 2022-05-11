@@ -162,12 +162,13 @@
 - status
       
 # get_follow_list
-- 获取用户的关注和粉丝列表
+- 获取目标用户的关注和粉丝列表
 ## 请求信息
 |参数名|类型|说明|
 |:-:|:-:|-|
-|user_id|int|目标用户ID|
-|search_type|int|查询类型<br>0：查询粉丝列表<br>1：查询关注列表|
+|login_user_id|int|登录用户ID|
+|target_user_id|int|目标用户ID|
+|search_type|int|查询类型<br>0：查询目标用户的粉丝列表<br>1：查询目标用户的关注列表|
 
 ## 响应信息
 - status
@@ -180,7 +181,7 @@
       |user_type|int|用户类型|
       |introduction|string|个人简介|
       |icon_key|string|头像key|
-      |follow_status|bool|登录用户对目标用户的关注状态（改接口应该不存在这一项）|
+      |follow_status|bool|登录用户对于该用户的关注状态|
 
 # delete_activity_admin
 - 删除动态
@@ -215,3 +216,31 @@
 |:-:|:-:|-|
 |status|bool|状态|
 |user_id|int|登录用户ID|
+
+# comment_activity
+- 对指定动态进行评论
+## 请求信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|activity_id|int|动态ID|
+|comment_id|int|评论ID，对评论进行评论时使用<br>-1表示对动态进行评论|
+|content|string|评论内容|
+
+## 响应信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|status|bool|状态|
+
+# get_activity_comments
+- 获取目标动态的所有评论
+## 请求信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|activity_id|int|动态ID|
+
+## 响应信息
+HttpResCode=200时，响应信息为一个List，其中每一项为一个Map
+|参数名|类型|说明|
+|:-:|:-:|-|
+|content|string|评论内容|
+|sub_comment|list|次级评论列表|
