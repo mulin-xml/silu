@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 
 import 'package:silu/image_cache.dart';
@@ -28,6 +30,7 @@ class _UserTopbarState extends State<UserTopbar> {
   String _authorIconKey = '';
 
   _getAuthorInfo() async {
+    print('[State] UserTopBar update.');
     var userInfo = await getUserInfo(widget.authorId);
     if (mounted) {
       setState(() {

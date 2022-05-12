@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:silu/event_bus.dart';
 
 import 'package:silu/http_manager.dart';
 import 'package:silu/pages/user_page.dart';
@@ -26,12 +27,11 @@ class _FollowInfoBarState extends State<FollowInfoBar> {
   void initState() {
     super.initState();
     updateState();
-  }
-
-  @override
-  void didUpdateWidget(covariant FollowInfoBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    updateState();
+    bus.on('user_view_update', (arg) {
+      if (arg == widget.userId) {
+        updateState();
+      }
+    });
   }
 
   @override
@@ -61,6 +61,7 @@ class _FollowInfoBarState extends State<FollowInfoBar> {
   }
 
   updateState() async {
+    print('[State] FollowInfoBar update.');
     var rsp = await SiluRequest().post('get_follow_list', {'target_user_id': widget.userId, 'login_user_id': u.uid, 'search_type': 0});
     if (rsp.statusCode == HttpStatus.ok) {
       _fanList = rsp.data['user_info_list'];

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:silu/global_declare.dart';
 import 'package:silu/widgets/appbar_view.dart';
 import 'package:silu/widgets/blog_view.dart';
-import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
 
@@ -28,7 +27,6 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
   void initState() {
     super.initState();
     updatePage();
-    bus.on('follow_page_update', (arg) => updatePage());
   }
 
   @override

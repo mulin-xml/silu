@@ -28,7 +28,7 @@ class SiluRequest {
       var response = await _dio.post(api, data: map);
       return SiluResponse(response.statusCode ?? 0, jsonDecode(response.data));
     } on DioError catch (e) {
-      print(e.response.toString());
+      print('[Post Error] API($api) CODE(${e.response?.statusCode}) RSP(${e.response})');
       return SiluResponse(e.response?.statusCode ?? -1, e.response?.data);
     }
   }

@@ -10,6 +10,7 @@ import 'package:silu/global_declare.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
+import 'package:silu/widgets/bottom_input_field.dart';
 import 'package:silu/widgets/follow_button.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
@@ -25,13 +26,19 @@ class BlogDetailPage extends StatefulWidget {
 class _BlogDetailPageState extends State<BlogDetailPage> {
   double _minAspectRatio = double.maxFinite;
 
+  bool isLiked = false;
+  bool isCollected = false;
+  int likeNum = 0;
+  int collectNum = 0;
+  String _tmpComment = '';
+
   @override
   void initState() {
     super.initState();
+    updateState();
     for (var img in widget.blog.imagesInfo) {
       _minAspectRatio = min(_minAspectRatio, img['width'] / img['height']);
     }
-    _addVisitNum();
   }
 
   @override
@@ -97,47 +104,19 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
           const Divider(),
         ],
       ),
-      bottomNavigationBar: Container(
-        height: 60,
-        child: _BottomBar(widget.blog.activityId),
-        alignment: Alignment.center,
+      bottomNavigationBar: Material(
+        color: Colors.white,
+        elevation: 10,
+        child: Container(
+          height: 60,
+          child: _bottomBar(),
+          alignment: Alignment.center,
+        ),
       ),
     );
   }
 
-  _addVisitNum() {
-    var data = {
-      'user_id': u.uid,
-      'activity_id': widget.blog.activityId,
-      'mark_type': 0,
-    };
-    SiluRequest().post('mark_activity', data);
-  }
-}
-
-class _BottomBar extends StatefulWidget {
-  const _BottomBar(this.activityId, {Key? key}) : super(key: key);
-
-  final int activityId;
-
-  @override
-  State<_BottomBar> createState() => __BottomBarState();
-}
-
-class __BottomBarState extends State<_BottomBar> {
-  bool isLiked = false;
-  bool isCollected = false;
-  int likeNum = 0;
-  int collectNum = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    updateState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _bottomBar() {
     return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
       _bottomButton(
         isLiked ? const Icon(Icons.favorite, color: Colors.red) : const Icon(Icons.favorite_border),
@@ -145,7 +124,7 @@ class __BottomBarState extends State<_BottomBar> {
         () async {
           var data = {
             'user_id': u.uid,
-            'activity_id': widget.activityId,
+            'activity_id': widget.blog.activityId,
             'mark_type': 1,
             'action': isLiked ? 1 : 0,
           };
@@ -162,7 +141,7 @@ class __BottomBarState extends State<_BottomBar> {
         () async {
           var data = {
             'user_id': u.uid,
-            'activity_id': widget.activityId,
+            'activity_id': widget.blog.activityId,
             'mark_type': 2,
             'action': isCollected ? 1 : 0,
           };
@@ -174,9 +153,15 @@ class __BottomBarState extends State<_BottomBar> {
       ),
       const SizedBox(width: 20),
       _bottomButton(
-        const Icon(Icons.comment_outlined),
+        const Icon(Icons.mode_comment_outlined),
         '0',
-        () {},
+        () => showBottomInputField(
+          context,
+          onCommit: (String text) {
+            _tmpComment = text;
+          },
+          text: _tmpComment,
+        ),
       ),
     ]);
   }
@@ -188,10 +173,19 @@ class __BottomBarState extends State<_BottomBar> {
     );
   }
 
+  _addVisitNum() {
+    var data = {
+      'user_id': u.uid,
+      'activity_id': widget.blog.activityId,
+      'mark_type': 0,
+    };
+    SiluRequest().post('mark_activity', data);
+  }
+
   updateState() async {
     var data = {
       'login_user_id': u.uid,
-      'activity_id': widget.activityId,
+      'activity_id': widget.blog.activityId,
     };
     var rsp = await SiluRequest().post('get_activity_info', data);
     likeNum = rsp.data['activity_info']['love_count'];
@@ -199,5 +193,6 @@ class __BottomBarState extends State<_BottomBar> {
     isLiked = rsp.data['activity_info']['love_status'];
     isCollected = rsp.data['activity_info']['collection_status'];
     setState(() {});
+    _addVisitNum();
   }
 }

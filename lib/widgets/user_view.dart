@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:silu/event_bus.dart';
 
 import 'package:silu/global_declare.dart';
 import 'package:silu/pages/config_page.dart';
@@ -33,12 +34,11 @@ class _UserViewHeaderState extends State<UserViewHeader> {
   void initState() {
     super.initState();
     _getUserInfo();
-  }
-
-  @override
-  void didUpdateWidget(covariant UserViewHeader oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _getUserInfo();
+    bus.on('user_view_update', (arg) {
+      if (arg == widget.authorId) {
+        _getUserInfo();
+      }
+    });
   }
 
   @override
@@ -116,6 +116,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
   }
 
   _getUserInfo() async {
+    print('[State] UserViewHeader update.');
     var userInfo = await getUserInfo(widget.authorId);
     if (userInfo != null) {
       setState(() {
@@ -147,18 +148,17 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
     updatePage();
+    bus.on('user_view_update', (arg) {
+      if (arg == widget.authorId) {
+        updatePage();
+      }
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(covariant UserView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    updatePage();
   }
 
   @override
@@ -199,12 +199,13 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
         ),
       ),
       onRefresh: () async {
-        updatePage();
+        bus.emit('user_view_update', widget.authorId);
       },
     );
   }
 
   updatePage() async {
+    print('[State] UserView update.');
     _releaseBlogs.clear();
     var data = {
       'offset': 0,

@@ -21,8 +21,7 @@ class _SelfPageState extends State<SelfPage> with AutomaticKeepAliveClientMixin 
   @override
   void initState() {
     super.initState();
-    updatePage();
-    bus.on('self_page_update', (arg) => updatePage());
+    bus.on('self_page_update', (arg) => setState(() {}));
   }
 
   @override
@@ -44,10 +43,6 @@ class _SelfPageState extends State<SelfPage> with AutomaticKeepAliveClientMixin 
       ),
       body: UserView(u.uid, isSelf: true),
     );
-  }
-
-  updatePage() {
-    setState(() {});
   }
 }
 
