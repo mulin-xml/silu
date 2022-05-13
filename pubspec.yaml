@@ -41,12 +41,11 @@ dependencies:
   image_picker: any
   cached_network_image: any
   image: any
-  crop_your_image: ^0.6.0+1
+  crop_your_image: any
   path_provider: any
   shared_preferences: any
   permission_handler: any
   flutter_staggered_grid_view: any
-  flutter_swiper_null_safety: any
   amap_flutter_location: any
   amap_flutter_map: any
   provider: any

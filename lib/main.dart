@@ -53,7 +53,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final _pageController = PageController();
-  final sp = u.sharedPreferences;
   final pages = [
     const DiscoverPage(),
     const FollowPage(),
@@ -68,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: PageView.builder(
         controller: _pageController,
         itemCount: pages.length,
-        physics: const NeverScrollableScrollPhysics(),
+        // physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) => pages[index],
         onPageChanged: (index) {
           setState(() {

@@ -14,6 +14,7 @@ import 'package:silu/http_manager.dart';
 import 'package:silu/pages/blog_detail_page.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/amap.dart';
+import 'package:silu/utils.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class _BlogCard extends StatelessWidget {
@@ -178,7 +179,7 @@ class _BlogItem extends StatelessWidget {
                     var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': blog.activityId});
                     if (rsp.statusCode == HttpStatus.ok) {
                       Fluttertoast.showToast(msg: '删除成功');
-                      bus.emit('self_page_update');
+                      bus.emit('user_view_update', u.uid);
                     } else {
                       Fluttertoast.showToast(msg: '删除失败');
                     }

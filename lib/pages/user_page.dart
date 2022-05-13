@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'package:silu/pages/config_page.dart';
 import 'package:silu/widgets/user_view.dart';
-import 'package:silu/event_bus.dart';
 import 'package:silu/utils.dart';
 
 class SelfPage extends StatefulWidget {
@@ -21,7 +20,6 @@ class _SelfPageState extends State<SelfPage> with AutomaticKeepAliveClientMixin 
   @override
   void initState() {
     super.initState();
-    bus.on('self_page_update', (arg) => setState(() {}));
   }
 
   @override

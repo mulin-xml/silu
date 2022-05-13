@@ -57,7 +57,7 @@ class OssImage extends ImageProvider<OssImage> {
     final Uint8List bytes = await File('$cachePath/$filename').readAsBytes(); // 这里经常出问题，要处理
     if (bytes.lengthInBytes == 0) {
       // The file may become available later.
-      PaintingBinding.instance!.imageCache!.evict(key);
+      PaintingBinding.instance.imageCache.evict(key);
       throw StateError('File is empty and cannot be loaded as an image.');
     }
 

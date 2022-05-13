@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:silu/global_declare.dart';
 import 'package:silu/http_manager.dart';
@@ -31,6 +31,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
   int likeNum = 0;
   int collectNum = 0;
   String _tmpComment = '';
+  var _commentList = [];
 
   @override
   void initState() {
@@ -67,11 +68,15 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
         children: [
           // 图片列表
           AspectRatio(
-            child: Swiper(
-              itemBuilder: (BuildContext context, int index) => Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key'])),
-              loop: false,
+            // child: Swiper(
+            //   itemBuilder: (BuildContext context, int index) => Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key'])),
+            //   loop: false,
+            //   itemCount: widget.blog.imagesInfo.length,
+            //   pagination: widget.blog.imagesInfo.length > 1 ? const SwiperPagination() : null,
+            // ),
+            child: PageView.builder(
               itemCount: widget.blog.imagesInfo.length,
-              pagination: widget.blog.imagesInfo.length > 1 ? const SwiperPagination() : null,
+              itemBuilder: (BuildContext context, int index) => Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key'])),
             ),
             aspectRatio: _minAspectRatio,
           ),
@@ -154,12 +159,25 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       const SizedBox(width: 20),
       _bottomButton(
         const Icon(Icons.mode_comment_outlined),
-        '0',
+        _commentList.length.toString(),
         () => showBottomInputField(
           context,
-          onCommit: (String text) {
-            _tmpComment = text;
+          onCommit: (String text) async {
+            _tmpComment = '';
+            final data = {
+              'user_id': u.uid,
+              'activity_id': widget.blog.activityId,
+              'father_comment_id': -1,
+              'content': text,
+            };
+            final rsp = await SiluRequest().post('upload_comment', data);
+            if (rsp.statusCode == HttpStatus.ok) {
+              updateState();
+            } else {
+              Fluttertoast.showToast(msg: '上传评论失败');
+            }
           },
+          onPop: (String text) => _tmpComment = text,
           text: _tmpComment,
         ),
       ),
@@ -173,15 +191,6 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
     );
   }
 
-  _addVisitNum() {
-    var data = {
-      'user_id': u.uid,
-      'activity_id': widget.blog.activityId,
-      'mark_type': 0,
-    };
-    SiluRequest().post('mark_activity', data);
-  }
-
   updateState() async {
     var data = {
       'login_user_id': u.uid,
@@ -192,7 +201,17 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
     collectNum = rsp.data['activity_info']['collection_count'];
     isLiked = rsp.data['activity_info']['love_status'];
     isCollected = rsp.data['activity_info']['collection_status'];
+
+    data = {
+      'offset': 0,
+      'limit': 500,
+      'activity_id': widget.blog.activityId,
+    };
+    rsp = await SiluRequest().post('get_comment_by_activity_id', data);
+    if (rsp.statusCode == HttpStatus.ok) {
+      _commentList = rsp.data['comment_list'];
+    }
+
     setState(() {});
-    _addVisitNum();
   }
 }

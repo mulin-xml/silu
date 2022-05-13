@@ -179,27 +179,27 @@ class _EditBlogPageState extends State<EditBlogPage> {
   }
 
   Future<bool> _onWillPop() async {
-    return Future.value(await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('提示'),
-            content: const Text('您有未保存的修改，要返回编辑吗？'),
-            actions: [
-              TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text('返回编辑')),
-              TextButton(
-                  onPressed: () {
-                    _saveTempBlog();
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text('保存并退出')),
-            ],
-          ),
-        ) ??
-        false);
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('提示'),
+        content: const Text('您有未保存的修改，要返回编辑吗？'),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('返回编辑')),
+          TextButton(
+              onPressed: () {
+                _saveTempBlog();
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('保存并退出')),
+        ],
+      ),
+    );
+    return Future.value(result ?? false);
   }
 
   _loadTempBlog() {
@@ -233,39 +233,40 @@ class _EditBlogPageState extends State<EditBlogPage> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
       clipBehavior: Clip.antiAlias,
       child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return SimpleDialog(
-                    children: [
-                      SimpleDialogOption(
-                        child: const Text(
-                          '预览图片',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-                          return Image.memory(_imgList[index]);
-                        })),
-                      ),
-                      const Divider(),
-                      SimpleDialogOption(
-                        child: const Text(
-                          '删除图片',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
-                        ),
-                        onPressed: () {
-                          setState(() => _imgList.removeAt(index));
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-          child: Image.memory(_imgList[index], fit: BoxFit.cover, width: 100)),
+        behavior: HitTestBehavior.opaque,
+        onTap: () => showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return SimpleDialog(
+              children: [
+                SimpleDialogOption(
+                  child: const Text(
+                    '预览图片',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
+                    return Image.memory(_imgList[index]);
+                  })),
+                ),
+                const Divider(),
+                SimpleDialogOption(
+                  child: const Text(
+                    '删除图片',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+                  ),
+                  onPressed: () {
+                    setState(() => _imgList.removeAt(index));
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        ),
+        child: Image.memory(_imgList[index], fit: BoxFit.cover, width: 100),
+      ),
     );
   }
 
@@ -334,7 +335,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
     if (rsp.statusCode == HttpStatus.ok) {
       Fluttertoast.showToast(msg: '上传成功');
       sp.setBool('exist_temp_blog', false);
-      bus.emit('self_page_update');
+      bus.emit('user_view_update', u.uid);
       Navigator.of(context).pop();
     } else {
       Fluttertoast.showToast(msg: '上传失败，请检查网络');
