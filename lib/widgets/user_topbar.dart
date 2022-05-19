@@ -47,12 +47,6 @@ class _UserTopbarState extends State<UserTopbar> {
   }
 
   @override
-  void didUpdateWidget(covariant UserTopbar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _getAuthorInfo();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       child: Row(

@@ -158,28 +158,41 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       _bottomButton(
         const Icon(Icons.mode_comment_outlined),
         _commentList.length.toString(),
-        () => showBottomInputField(
+        () => _showBottomInputField(),
+      ),
+    ]);
+  }
+
+  Future<String?> _showBottomInputField() {
+    return showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return bottomInputField(
           context,
-          onCommit: (String text) async {
-            _tmpComment = '';
+          text: _tmpComment,
+          autoFocus: true,
+          onPop: (String text) => _tmpComment = text,
+          onCommit: (TextEditingController controller) async {
             final data = {
               'user_id': u.uid,
               'activity_id': widget.blog.activityId,
               'father_comment_id': -1,
-              'content': text,
+              'content': controller.text,
             };
             final rsp = await SiluRequest().post('upload_comment', data);
             if (rsp.statusCode == HttpStatus.ok) {
               updateState();
+              _tmpComment = '';
+              Navigator.of(context).pop();
             } else {
               Fluttertoast.showToast(msg: '上传评论失败');
             }
           },
-          onPop: (String text) => _tmpComment = text,
-          text: _tmpComment,
-        ),
-      ),
-    ]);
+        );
+      },
+    );
   }
 
   Widget _bottomButton(Icon icon, String text, void Function() onTap) {

@@ -292,11 +292,9 @@
 
 ## 响应信息
 - status
-- comment_list
+- message_list
   - |参数名|类型|说明|
     |:-:|:-:|-|
-    |id|int|评论ID|
-    |author_id|int|评论发布者ID|
-    |content|string|评论内容|
-    |create_time|string|评论时间|
-    |sub_comments|list|子评论列表|
+    |author_id|int|消息发送者ID|
+    |content|string|消息内容|
+    |time|string|消息发送时间|

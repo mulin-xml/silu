@@ -133,7 +133,7 @@ class _BlogItem extends StatelessWidget {
           Container(
             height: 50,
             alignment: Alignment.centerLeft,
-            child: UserTopbar(blog.authorId),
+            child: UserTopbar(blog.authorId, key: ValueKey(blog.authorId)),
           ),
           sizedBoxSpace,
           Container(

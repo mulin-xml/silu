@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:silu/event_bus.dart';
 
 import 'package:silu/global_declare.dart';
+import 'package:silu/pages/chat_page.dart';
 import 'package:silu/pages/config_page.dart';
 import 'package:silu/pages/edit_user_info_page.dart';
 import 'package:silu/widgets/blog_view.dart';
@@ -107,7 +108,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
         FollowButton(widget.authorId),
         const SizedBox(width: 10),
         OutlinedButton(
-          onPressed: () {},
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => ChatPage(widget.authorId))),
           child: const Icon(Icons.message, color: Colors.white),
           style: buttonStyle,
         ),
