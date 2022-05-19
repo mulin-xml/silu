@@ -31,7 +31,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
   int likeNum = 0;
   int collectNum = 0;
   String _tmpComment = '';
-  var _commentList = [];
+  final _commentList = <Widget>[];
 
   @override
   void initState() {
@@ -68,19 +68,14 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
         children: [
           // 图片列表
           AspectRatio(
-            // child: Swiper(
-            //   itemBuilder: (BuildContext context, int index) => Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key'])),
-            //   loop: false,
-            //   itemCount: widget.blog.imagesInfo.length,
-            //   pagination: widget.blog.imagesInfo.length > 1 ? const SwiperPagination() : null,
-            // ),
+            aspectRatio: _minAspectRatio,
             child: PageView.builder(
               itemCount: widget.blog.imagesInfo.length,
               itemBuilder: (BuildContext context, int index) => Image(image: OssImage(OssImgCategory.images, widget.blog.imagesInfo[index]['key'])),
             ),
-            aspectRatio: _minAspectRatio,
           ),
           const SizedBox(height: 10),
+          // 标题
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Text(
@@ -90,6 +85,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
             ),
           ),
           const SizedBox(height: 10),
+          // 内容
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Text(
@@ -99,6 +95,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
             ),
           ),
           const SizedBox(height: 50),
+          // 文末信息
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: Text(
@@ -107,6 +104,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
             ),
           ),
           const Divider(),
+          Column(children: _commentList),
         ],
       ),
       bottomNavigationBar: Material(
@@ -191,27 +189,48 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
     );
   }
 
-  updateState() async {
-    var data = {
+  Widget _commentItem(Map<String, dynamic> map) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      alignment: Alignment.centerLeft,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        SizedBox(height: 20, child: UserTopbar(map['author_id'].toString())),
+        Text(map['content']),
+      ]),
+    );
+  }
+
+  _getActivityInfo() async {
+    final data = {
       'login_user_id': u.uid,
       'activity_id': widget.blog.activityId,
     };
-    var rsp = await SiluRequest().post('get_activity_info', data);
+    final rsp = await SiluRequest().post('get_activity_info', data);
     likeNum = rsp.data['activity_info']['love_count'];
     collectNum = rsp.data['activity_info']['collection_count'];
     isLiked = rsp.data['activity_info']['love_status'];
     isCollected = rsp.data['activity_info']['collection_status'];
+    setState(() {});
+  }
 
-    data = {
+  _getComments() async {
+    final data = {
       'offset': 0,
       'limit': 500,
       'activity_id': widget.blog.activityId,
     };
-    rsp = await SiluRequest().post('get_comment_by_activity_id', data);
+    final rsp = await SiluRequest().post('get_comment_by_activity_id', data);
     if (rsp.statusCode == HttpStatus.ok) {
-      _commentList = rsp.data['comment_list'];
+      _commentList.clear();
+      for (final elm in rsp.data['comment_list']) {
+        _commentList.add(_commentItem(elm));
+      }
     }
-
     setState(() {});
+  }
+
+  updateState() {
+    _getActivityInfo();
+    _getComments();
   }
 }

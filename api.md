@@ -10,7 +10,7 @@
 
 ## 响应信息
 - status
-- userInfo（命名需要改为user_info）
+- user_info
     - |参数名|类型|说明|
       |:-:|:-:|-|
       |id|int|目标用户ID|
@@ -98,7 +98,7 @@
 
 ## 响应信息
 - status
-- activityList（命名需要修改为activity_list)
+- activity_list
     - |参数名|类型|说明|
       |:-:|:-:|-|
       |id|int|动态ID|
@@ -172,7 +172,7 @@
 
 ## 响应信息
 - status
-- userInfo（命名需要改为user_info_list）
+- user_info_list
     - |参数名|类型|说明|
       |:-:|:-:|-|
       |id|int|目标用户ID|
@@ -217,13 +217,14 @@
 |status|bool|状态|
 |user_id|int|登录用户ID|
 
-# comment_activity
-- 对指定动态进行评论
+# upload_comment
+- 对指定动态进行评论（后端自动记录评论时间）
 ## 请求信息
 |参数名|类型|说明|
 |:-:|:-:|-|
+|user_id|int|登录用户ID|
 |activity_id|int|动态ID|
-|comment_id|int|评论ID，对评论进行评论时使用<br>-1表示对动态进行评论|
+|father_comment_id|int|评论ID，对评论进行评论时使用<br>-1表示对动态进行评论|
 |content|string|评论内容|
 
 ## 响应信息
@@ -231,16 +232,71 @@
 |:-:|:-:|-|
 |status|bool|状态|
 
-# get_activity_comments
+# get_comment_by_activity_id
 - 获取目标动态的所有评论
 ## 请求信息
 |参数名|类型|说明|
 |:-:|:-:|-|
+|offset|int|获取batch的偏移量|
+|limit|int|获取的batch size|
 |activity_id|int|动态ID|
 
 ## 响应信息
-HttpResCode=200时，响应信息为一个List，其中每一项为一个Map
+- status
+- comment_list
+  - |参数名|类型|说明|
+    |:-:|:-:|-|
+    |id|int|评论ID|
+    |author_id|int|评论发布者ID|
+    |content|string|评论内容|
+    |create_time|string|评论时间|
+    |sub_comments|list|子评论列表|
+
+# delete_comment
+- 删除指定评论
+## 请求信息
 |参数名|类型|说明|
 |:-:|:-:|-|
-|content|string|评论内容|
-|sub_comment|list|次级评论列表|
+|activity_id|int|动态ID|
+|comment_id|int|评论ID|
+
+## 响应信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|status|bool|状态|
+
+# send_message
+- 给目标用户发送私信
+- 后端自动记录消息时间
+- 后端需将该私信状态标记为未获取
+
+## 请求信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|login_user_id|int|登录用户ID|
+|target_user_id|int|目标用户ID|
+|content|string|消息内容|
+
+## 响应信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|status|bool|状态|
+
+# get_new_message_list
+- 获取新私信列表
+- 后端执行后需将所有未获取私信的状态标记为已获取
+## 请求信息
+|参数名|类型|说明|
+|:-:|:-:|-|
+|login_user_id|int|登录用户ID|
+
+## 响应信息
+- status
+- comment_list
+  - |参数名|类型|说明|
+    |:-:|:-:|-|
+    |id|int|评论ID|
+    |author_id|int|评论发布者ID|
+    |content|string|评论内容|
+    |create_time|string|评论时间|
+    |sub_comments|list|子评论列表|
