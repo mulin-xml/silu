@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -177,7 +176,7 @@ class _BlogItem extends StatelessWidget {
                 child: IconButton(
                   onPressed: () async {
                     var rsp = await SiluRequest().post('delete_activity_admin', {'activity_id': blog.activityId});
-                    if (rsp.statusCode == HttpStatus.ok) {
+                    if (rsp.statusCode == SiluResponse.ok) {
                       Fluttertoast.showToast(msg: '删除成功');
                       bus.emit('user_view_update', u.uid);
                     } else {

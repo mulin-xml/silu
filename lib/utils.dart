@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:silu/amap.dart';
@@ -38,7 +36,7 @@ Future<Map<String, dynamic>?> getUserInfo(String targetUserId) async {
     'login_user_id': u.uid,
   };
   var rsp = await SiluRequest().post('get_user_info', data);
-  if (rsp.statusCode == HttpStatus.ok) {
+  if (rsp.statusCode == SiluResponse.ok) {
     return rsp.data['user_info'];
   } else {
     return null;

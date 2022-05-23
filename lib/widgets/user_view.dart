@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:silu/event_bus.dart';
 
@@ -216,7 +214,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
       'search_user_id': widget.authorId,
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       List activityList = rsp.data['activity_list'];
       for (var elm in activityList) {
         _releaseBlogs.add(Blog(elm));
@@ -232,7 +230,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
       'search_user_id': widget.authorId,
     };
     rsp = await SiluRequest().post('get_activity_list', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       List activityList = rsp.data['activity_list'];
       for (var elm in activityList) {
         _collectBlogs.add(Blog(elm));

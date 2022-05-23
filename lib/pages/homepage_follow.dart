@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:silu/global_declare.dart';
@@ -52,7 +50,7 @@ class _FollowPageState extends State<FollowPage> with AutomaticKeepAliveClientMi
       'search_type': 2,
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       List activityList = rsp.data['activity_list'];
       for (Map<String, dynamic> elm in activityList) {
         _viewItems.add(Blog(elm));

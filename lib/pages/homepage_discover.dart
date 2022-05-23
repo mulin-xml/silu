@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:silu/amap.dart';
 
@@ -57,7 +55,7 @@ class _DiscoverPageState extends State<DiscoverPage> with AutomaticKeepAliveClie
       'search_type': 0,
     };
     var rsp = await SiluRequest().post('get_activity_list', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       List activityList = rsp.data['activity_list'];
       for (Map<String, dynamic> elm in activityList) {
         _blogs.add(Blog(elm));

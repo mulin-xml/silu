@@ -14,6 +14,8 @@ class SiluResponse {
   SiluResponse(this.statusCode, this.data);
   int statusCode;
   dynamic data;
+
+  static const ok = 200;
 }
 
 class SiluRequest {
@@ -42,6 +44,6 @@ class SiluRequest {
     // 本地写文件，避免日后下载缓存
     File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(dstImg));
     var rsp = await Bucket().postObject('$category/$key', '$cachePath/$key');
-    return rsp.statusCode == HttpStatus.ok ? {'key': key, 'width': dstImg.width, 'height': dstImg.height} : null;
+    return rsp.statusCode == SiluResponse.ok ? {'key': key, 'width': dstImg.width, 'height': dstImg.height} : null;
   }
 }

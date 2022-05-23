@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:silu/event_bus.dart';
 
@@ -63,11 +61,11 @@ class _FollowInfoBarState extends State<FollowInfoBar> {
   updateState() async {
     print('[State] FollowInfoBar update.');
     var rsp = await SiluRequest().post('get_follow_list', {'target_user_id': widget.userId, 'login_user_id': u.uid, 'search_type': 0});
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       _fanList = rsp.data['user_info_list'];
     }
     rsp = await SiluRequest().post('get_follow_list', {'target_user_id': widget.userId, 'login_user_id': u.uid, 'search_type': 1});
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       _followList = rsp.data['user_info_list'];
     }
     setState(() {});

@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:silu/global_declare.dart';
@@ -87,7 +85,7 @@ class _AddressSelectorState extends State<AddressSelector> {
   updateState() async {
     _addrList.clear();
     var rsp = await SiluRequest().post('get_address_list', {'user_id': u.uid});
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       List addressList = rsp.data['address_list'];
       for (var elm in addressList) {
         _addrList.add(Address.fromMap(elm));
@@ -188,7 +186,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
                 'longitude': _longitude,
               };
               var rsp = await SiluRequest().post('edit_address', data);
-              if (rsp.statusCode == HttpStatus.ok) {
+              if (rsp.statusCode == SiluResponse.ok) {
                 Navigator.of(context).pop(true);
               }
             },
@@ -205,7 +203,7 @@ class _EditAddressPageState extends State<EditAddressPage> {
       'address_id': widget.addr?.addressId ?? -1,
     };
     var rsp = await SiluRequest().post('edit_address', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       Navigator.of(context).pop(true);
     }
   }

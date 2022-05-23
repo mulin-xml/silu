@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -132,7 +131,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
             'action': isLiked ? 1 : 0,
           };
           var rsp = await SiluRequest().post('mark_activity', data);
-          if (rsp.statusCode == HttpStatus.ok) {
+          if (rsp.statusCode == SiluResponse.ok) {
             updateState();
           }
         },
@@ -149,7 +148,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
             'action': isCollected ? 1 : 0,
           };
           var rsp = await SiluRequest().post('mark_activity', data);
-          if (rsp.statusCode == HttpStatus.ok) {
+          if (rsp.statusCode == SiluResponse.ok) {
             updateState();
           }
         },
@@ -182,7 +181,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
               'content': controller.text,
             };
             final rsp = await SiluRequest().post('upload_comment', data);
-            if (rsp.statusCode == HttpStatus.ok) {
+            if (rsp.statusCode == SiluResponse.ok) {
               updateState();
               _tmpComment = '';
               Navigator.of(context).pop();
@@ -233,7 +232,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
       'activity_id': widget.blog.activityId,
     };
     final rsp = await SiluRequest().post('get_comment_by_activity_id', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       _commentList.clear();
       for (final elm in rsp.data['comment_list']) {
         _commentList.add(_commentItem(elm));

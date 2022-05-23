@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:silu/http_manager.dart';
+import 'package:silu/utils.dart';
 import 'package:silu/widgets/bottom_input_field.dart';
 
 class ChatPage extends StatefulWidget {
@@ -18,8 +20,16 @@ class _ChatPageState extends State<ChatPage> {
       body: Container(color: Colors.red),
       bottomNavigationBar: bottomInputField(
         context,
-        onCommit: (TextEditingController controller) {
-          controller.clear();
+        onCommit: (TextEditingController controller) async {
+          final data = {
+            'from_user_id': u.uid,
+            'to_user_id': widget.friendUserId,
+            'content': controller.text,
+          };
+          final rsp = await SiluRequest().post('send_message', data);
+          if (rsp.statusCode == SiluResponse.ok) {
+            controller.clear();
+          }
         },
       ),
     );

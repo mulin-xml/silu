@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -332,7 +331,7 @@ class _EditBlogPageState extends State<EditBlogPage> {
       'access_time': _blogAccessTime,
     };
     var rsp = await SiluRequest().post('upload_activity', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       Fluttertoast.showToast(msg: '上传成功');
       sp.setBool('exist_temp_blog', false);
       bus.emit('user_view_update', u.uid);

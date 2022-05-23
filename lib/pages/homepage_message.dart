@@ -27,7 +27,7 @@ class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClient
     return Scaffold(
       appBar: appBarView('消息'),
       body: RefreshIndicator(
-        child: Container(),
+        child: ListView(),
         onRefresh: () async {
           updatePage();
         },

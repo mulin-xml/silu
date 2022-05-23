@@ -1,7 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -56,7 +54,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
                     'new_icon_key': result['key'],
                   };
                   final rsp = await SiluRequest().post('edit_user_info', data);
-                  if (rsp.statusCode == HttpStatus.ok) {
+                  if (rsp.statusCode == SiluResponse.ok) {
                     Fluttertoast.showToast(msg: '头像更新成功');
                   } else {
                     Fluttertoast.showToast(msg: '头像更新失败');
@@ -126,7 +124,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
       'new_introduction': _introductionController.text.replaceAll('\n', '\\n'),
     };
     final rsp = await SiluRequest().post('edit_user_info', data);
-    if (rsp.statusCode == HttpStatus.ok) {
+    if (rsp.statusCode == SiluResponse.ok) {
       Fluttertoast.showToast(msg: '资料更新成功');
       Navigator.of(context).pop();
     } else {
