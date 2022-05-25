@@ -14,16 +14,17 @@ import 'package:silu/image_cache.dart';
 import 'package:silu/pages/address_selector.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
+import 'package:silu/widgets/bottom_widgets.dart';
 import 'package:silu/widgets/img_cropper.dart';
 
-class EditBlogPage extends StatefulWidget {
-  const EditBlogPage({Key? key}) : super(key: key);
+class UploadBlogPage extends StatefulWidget {
+  const UploadBlogPage({Key? key}) : super(key: key);
 
   @override
-  _EditBlogPageState createState() => _EditBlogPageState();
+  _UploadBlogPageState createState() => _UploadBlogPageState();
 }
 
-class _EditBlogPageState extends State<EditBlogPage> {
+class _UploadBlogPageState extends State<UploadBlogPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contextController = TextEditingController();
   static const _maxImgNum = 9;
@@ -229,41 +230,26 @@ class _EditBlogPageState extends State<EditBlogPage> {
 
   _imgCard(int index) {
     return Card(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
       clipBehavior: Clip.antiAlias,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return SimpleDialog(
-              children: [
-                SimpleDialogOption(
-                  child: const Text(
-                    '预览图片',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-                    return Image.memory(_imgList[index]);
-                  })),
-                ),
-                const Divider(),
-                SimpleDialogOption(
-                  child: const Text(
-                    '删除图片',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () {
-                    setState(() => _imgList.removeAt(index));
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        ),
+        onTap: () => showBottomButtons(context, children: [
+          TextButton(
+            child: const Text('预览图片', style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold)),
+            onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
+              return Image.memory(_imgList[index]);
+            })),
+          ),
+          const Divider(),
+          TextButton(
+            child: const Text('删除图片', style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold)),
+            onPressed: () {
+              setState(() => _imgList.removeAt(index));
+              Navigator.of(context).pop();
+            },
+          ),
+        ]),
         child: Image.memory(_imgList[index], fit: BoxFit.cover, width: 100),
       ),
     );

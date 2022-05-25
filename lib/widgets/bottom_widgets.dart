@@ -49,3 +49,16 @@ Widget bottomInputField(
     },
   );
 }
+
+Future<String?> showBottomButtons(context, {List<Widget> children = const <Widget>[]}) {
+  return showModalBottomSheet<String>(
+    context: context,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15))),
+    isScrollControlled: true,
+    builder: (BuildContext context) {
+      return SingleChildScrollView(
+        child: Column(children: children),
+      );
+    },
+  );
+}

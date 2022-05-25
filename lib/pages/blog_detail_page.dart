@@ -4,12 +4,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:silu/event_bus.dart';
 
 import 'package:silu/global_declare.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
-import 'package:silu/widgets/bottom_input_field.dart';
+import 'package:silu/widgets/bottom_widgets.dart';
 import 'package:silu/widgets/follow_button.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
@@ -36,6 +37,11 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
   void initState() {
     super.initState();
     updateState();
+    bus.on('blog_detail_update', (arg) {
+      if (arg == widget.blog.activityId) {
+        updateState();
+      }
+    });
     for (var img in widget.blog.imagesInfo) {
       _minAspectRatio = min(_minAspectRatio, img['width'] / img['height']);
     }
@@ -201,17 +207,6 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
     );
   }
 
-  Widget _commentItem(Map<String, dynamic> map) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      alignment: Alignment.centerLeft,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(height: 20, child: UserTopbar(map['author_id'].toString())),
-        Text(map['content']),
-      ]),
-    );
-  }
-
   _getActivityInfo() async {
     final data = {
       'login_user_id': u.uid,
@@ -235,7 +230,7 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
     if (rsp.statusCode == SiluResponse.ok) {
       _commentList.clear();
       for (final elm in rsp.data['comment_list']) {
-        _commentList.add(_commentItem(elm));
+        _commentList.add(CommentItem(widget.blog.activityId, elm['id'], elm['author_id'], elm['content']));
       }
     }
     setState(() {});
@@ -244,5 +239,63 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
   updateState() {
     _getActivityInfo();
     _getComments();
+  }
+}
+
+class CommentItem extends StatefulWidget {
+  const CommentItem(this.activityId, this.commentId, this.authorId, this.content, {Key? key}) : super(key: key);
+
+  final int activityId;
+  final int commentId;
+  final int authorId;
+  final String content;
+
+  @override
+  State<CommentItem> createState() => _CommentItemState();
+}
+
+class _CommentItemState extends State<CommentItem> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        alignment: Alignment.centerLeft,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(height: 20, child: UserTopbar(widget.authorId.toString())),
+          Text(widget.content),
+        ]),
+      ),
+      onLongPress: () {
+        showBottomButtons(context, children: [
+          Visibility(
+            visible: true,
+            child: TextButton(
+              child: const Text('回复此人', style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold)),
+              onPressed: () {},
+            ),
+          ),
+          TextButton(
+            child: const Text('举报', style: TextStyle(fontSize: 20, color: Colors.blue, fontWeight: FontWeight.bold)),
+            onPressed: () {},
+          ),
+          Visibility(
+            visible: u.uid == widget.authorId.toString(),
+            child: TextButton(
+              child: const Text('删除评论', style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold)),
+              onPressed: _deleteComment,
+            ),
+          ),
+        ]);
+      },
+    );
+  }
+
+  _deleteComment() async {
+    final rsp = await SiluRequest().post('delete_comment', {'comment_id': widget.commentId});
+    Fluttertoast.showToast(msg: rsp.statusCode == SiluResponse.ok ? '删除成功' : '删除失败');
+    bus.emit('blog_detail_update', widget.activityId);
+    Navigator.of(context).pop();
   }
 }

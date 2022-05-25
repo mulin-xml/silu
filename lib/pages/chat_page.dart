@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
-import 'package:silu/widgets/bottom_input_field.dart';
+import 'package:silu/widgets/bottom_widgets.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage(this.friendUserId, {Key? key}) : super(key: key);

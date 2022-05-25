@@ -257,7 +257,6 @@
 ## 请求信息
 |参数名|类型|说明|
 |:-:|:-:|-|
-|activity_id|int|动态ID|
 |comment_id|int|评论ID|
 
 ## 响应信息
@@ -273,8 +272,8 @@
 ## 请求信息
 |参数名|类型|说明|
 |:-:|:-:|-|
-|login_user_id|int|登录用户ID|
-|target_user_id|int|目标用户ID|
+|from_user_id|int|登录用户ID|
+|to_user_id|int|目标用户ID|
 |content|string|消息内容|
 
 ## 响应信息

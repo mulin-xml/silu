@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import 'package:silu/pages/edit_blog_page.dart';
+import 'package:silu/pages/upload_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
 import 'package:silu/pages/homepage_message.dart';
 import 'package:silu/pages/user_page.dart';
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
       ],
-      locale: const Locale('zh','CN'),
+      locale: const Locale('zh', 'CN'),
     );
   }
 }
@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const EditBlogPage())),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UploadBlogPage())),
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
