@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:silu/pages/force_update_page.dart';
 
 import 'package:silu/pages/upload_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
@@ -96,8 +97,10 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (u.sharedPreferences.getBool('is_login') ?? false) {
+    Future.delayed(const Duration(seconds: 3), () async {
+      if (await VersionCheck().isUpdateNecessary) {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const ForceUpdatePage()));
+      } else if (u.sharedPreferences.getBool('is_login') ?? false) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
       } else {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));

@@ -2,9 +2,14 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:crypto/crypto.dart';
 import 'package:dio/dio.dart';
-import 'http_manager.dart';
+import 'package:image/image.dart' as tpimg;
+
+import 'package:silu/http_manager.dart';
+import 'package:silu/utils.dart';
 
 class Auth {
   Auth(this.accessKeyId, this.accessKetSecret);
@@ -67,5 +72,16 @@ class Bucket {
     } on DioError catch (e) {
       return SiluResponse(e.response?.statusCode ?? -1, e.response?.data);
     }
+  }
+
+  Future<Map<String, dynamic>?> uploadImg(String category, Uint8List imageByte) async {
+    final cachePath = u.cachePath;
+    final srcImg = tpimg.decodeImage(imageByte)!;
+    final dstImg = srcImg.width > srcImg.height ? tpimg.copyResize(srcImg, width: 1280) : tpimg.copyResize(srcImg, height: 1280); // 上传前池化
+    final key = '${DateTime.now().toIso8601String()}-${u.uid}.jpg';
+
+    File('$cachePath/$key').writeAsBytesSync(tpimg.encodeJpg(dstImg)); // 本地写文件，避免日后下载缓存
+    var rsp = await Bucket().postObject('$category/$key', '$cachePath/$key');
+    return rsp.statusCode == SiluResponse.ok ? {'key': key, 'width': dstImg.width, 'height': dstImg.height} : null;
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:silu/image_cache.dart';
+import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/widgets/user_topbar.dart';
@@ -47,7 +48,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
             onTap: () async {
               var imageByte = await imgCropper(context, aspectRatio: 1);
               if (imageByte != null) {
-                final result = await SiluRequest().uploadImgToOss(OssImgCategory.icons, imageByte);
+                final result = await Bucket().uploadImg(OssImgCategory.icons, imageByte);
                 if (result != null) {
                   var data = {
                     'user_id': u.uid,

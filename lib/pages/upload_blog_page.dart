@@ -11,6 +11,7 @@ import 'package:silu/amap.dart';
 import 'package:silu/event_bus.dart';
 import 'package:silu/global_declare.dart';
 import 'package:silu/image_cache.dart';
+import 'package:silu/oss.dart';
 import 'package:silu/pages/address_selector.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
@@ -294,7 +295,7 @@ class _UploadBlogPageState extends State<UploadBlogPage> {
     // 图片上传OSS
     final imgInfoList = <Map<String, dynamic>>[];
     for (var elm in _imgList) {
-      var result = await SiluRequest().uploadImgToOss(OssImgCategory.images, elm);
+      var result = await Bucket().uploadImg(OssImgCategory.images, elm);
       if (result != null) {
         imgInfoList.add(result);
       } else {
