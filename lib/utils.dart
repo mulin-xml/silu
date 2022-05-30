@@ -15,6 +15,7 @@ class VersionCheck {
     _isUpdateNecessary = _versionCheck();
   }
 
+  String _latestVersion = '';
   String _downloadUrl = '';
   Future<bool>? _isUpdateNecessary;
 
@@ -23,16 +24,18 @@ class VersionCheck {
     if (rsp.statusCode != SiluResponse.ok) {
       return false; // 联网失败，不强制更新
     }
+    _latestVersion = rsp.data['version_info']['latest_version'];
     _downloadUrl = rsp.data['version_info']['download_url'];
     final String localVersion = (await PackageInfo.fromPlatform()).version;
     if (localVersion.compareTo(rsp.data['version_info']['support_min_version']).isNegative) {
-      return true;
+      return true; // 后端不支持当前版本，启动强制更新
     }
-    return false;
+    return false; // 当前版本合法，正常使用
   }
 
   Future<bool> get isUpdateNecessary => _isUpdateNecessary!;
   String get downloadUrl => _downloadUrl;
+  String get latestVersion => _latestVersion;
 }
 
 class Utils {
