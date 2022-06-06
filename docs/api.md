@@ -294,6 +294,6 @@
 - message_list
   - |参数名|类型|说明|
     |:-:|:-:|-|
-    |author_id|int|消息发送者ID|
+    |from_user_id|int|消息发送者ID|
     |content|string|消息内容|
-    |time|string|消息发送时间|
+    |create_time|string|消息发送时间|
