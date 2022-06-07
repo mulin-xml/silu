@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/widgets/appbar_view.dart';
+import 'package:silu/widgets/user_topbar.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class MessagePage extends StatefulWidget {
 class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClientMixin {
   Timer? _timer;
   final List<String> _msgFiles = u.sharedPreferences.getStringList('msg_files') ?? <String>[];
-  final List<Widget> _chatUserWidgets = <Widget>[];
+  final Map<int, Widget> _chatUserWidgets = {}; // 用Map实现新增消息气泡并且天然去重
 
   @override
   bool get wantKeepAlive => true;
@@ -46,9 +47,7 @@ class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClient
     return Scaffold(
       appBar: appBarView('消息'),
       body: RefreshIndicator(
-        child: ListView(
-          children: _chatUserWidgets,
-        ),
+        child: ListView(children: _chatUserWidgets.values.toList()),
         onRefresh: () async {
           _getMessages();
         },
@@ -58,14 +57,18 @@ class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClient
 
   // 定时任务
   _getMessages() async {
-    print(_chatUserWidgets.length);
     final rsp = await SiluRequest().post('get_new_message_list', {'login_user_id': u.uid});
     if (rsp.statusCode == SiluResponse.ok) {
       for (final elm in rsp.data['new_message_list']) {
         _procMsgFile(elm['create_time'], elm['from_user_id'], elm['content']);
-        _buildMsg(elm['create_time'], elm['from_user_id'], elm['content']);
+        _buildMsgItem(elm['create_time'], elm['from_user_id'], elm['content']);
       }
     }
+  }
+
+  _buildMsgItem(String time, int userId, String content) async {
+    _chatUserWidgets[userId] = _msgItem(userId, time, content);
+    setState(() {});
   }
 
   _procMsgFile(String time, int userId, String content) async {
@@ -78,35 +81,26 @@ class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClient
     if (!file.existsSync()) {
       file.createSync();
     }
-    final data = {'time': time, 'content': content};
+    final data = {'create_time': time, 'from_user_id': userId, 'content': content};
     file.writeAsStringSync('${jsonEncode(data)}\n', mode: FileMode.writeOnlyAppend);
   }
 
-  _buildMsg(String time, int userId, String content) async {
-    final filename = 'msg-$userId';
-    _chatUserWidgets.add(Text(
-      filename,
-      key: ValueKey(filename),
-    ));
-    setState(() {});
-  }
-
-  _loadMessages() {
+  _loadMessages() async {
     for (final filename in _msgFiles) {
       final file = File('${u.cachePath}/$filename');
       if (!file.existsSync()) {
         continue;
       }
-      final messages = file.readAsLinesSync();
-      _chatUserWidgets.add(Text(
-        filename,
-        key: ValueKey(filename),
-      ));
-      for (final msgInfo in messages) {
-        final a = jsonDecode(msgInfo);
-        print(a);
-      }
+      final lines = file.readAsLinesSync();
+      final elm = jsonDecode(lines.last);
+      _buildMsgItem(elm['create_time'], elm['from_user_id'], elm['content']);
     }
-    setState(() {});
+  }
+
+  Widget _msgItem(int userId, String time, String content) {
+    return ListTile(
+      title: SizedBox(height: 100, child: UserTopbar(userId.toString())),
+      subtitle: Text(content + time),
+    );
   }
 }

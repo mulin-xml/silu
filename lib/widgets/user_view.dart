@@ -15,10 +15,9 @@ import 'package:silu/widgets/follow_info_bar.dart';
 import 'package:silu/widgets/user_topbar.dart';
 
 class UserViewHeader extends StatefulWidget {
-  const UserViewHeader(this.authorId, this.isSelf, {Key? key}) : super(key: key);
+  const UserViewHeader(this.authorId, {Key? key}) : super(key: key);
 
   final String authorId;
-  final bool isSelf;
 
   @override
   State<UserViewHeader> createState() => _UserViewHeaderState();
@@ -50,14 +49,18 @@ class _UserViewHeaderState extends State<UserViewHeader> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                iconView(_iconKey, size: 80),
-                const SizedBox(width: 20),
-                Text(_userName, style: const TextStyle(color: Colors.white, fontSize: 30)),
-              ],
-            ),
+            Row(children: [
+              iconView(_iconKey, size: 80),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Text(
+                  _userName,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                  style: const TextStyle(color: Colors.white, fontSize: 30),
+                ),
+              ),
+            ]),
             const SizedBox(height: 10),
             Text(_introduction, style: const TextStyle(color: Colors.white)),
             const SizedBox(height: 10),
@@ -65,7 +68,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
               // 左侧用于显示关注和粉丝数量
               FollowInfoBar(widget.authorId),
               // 右侧用于显示自己和别人的操作栏
-              widget.isSelf ? selfOpBar() : otherOpBar(),
+              u.uid == widget.authorId ? selfOpBar() : otherOpBar(),
             ]),
           ],
         ),
@@ -169,7 +172,7 @@ class _UserViewState extends State<UserView> with SingleTickerProviderStateMixin
               toolbarHeight: 0,
               expandedHeight: 220,
               flexibleSpace: FlexibleSpaceBar(
-                background: UserViewHeader(widget.authorId, widget.isSelf),
+                background: UserViewHeader(widget.authorId),
                 collapseMode: CollapseMode.pin,
               ),
             ),
