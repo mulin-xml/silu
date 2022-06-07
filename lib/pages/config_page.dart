@@ -48,17 +48,20 @@ class ConfigPage extends StatelessWidget {
           const Divider(),
           commonItem(title: '关于思路'),
           const Divider(),
-          commonItem(
-            title: '思路实验室',
-            onTap: () async {
-              final data = {
-                'from_user_id': 6,
-                'to_user_id': 5,
-                'content': 'hello',
-              };
-              final rsp = await SiluRequest().post('send_message', data);
-              Fluttertoast.showToast(msg: rsp.statusCode == SiluResponse.ok ? '发送成功' : '发送失败');
-            },
+          Visibility(
+            visible: u.uid == '5',
+            child: commonItem(
+              title: '思路实验室',
+              onTap: () async {
+                final data = {
+                  'from_user_id': 6,
+                  'to_user_id': 5,
+                  'content': 'hello',
+                };
+                final rsp = await SiluRequest().post('send_message', data);
+                Fluttertoast.showToast(msg: rsp.statusCode == SiluResponse.ok ? '发送成功' : '发送失败');
+              },
+            ),
           ),
           const SizedBox(height: 50),
           Padding(

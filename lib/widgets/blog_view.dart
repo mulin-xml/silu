@@ -95,19 +95,19 @@ class _BlogCard extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             // 副标题
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(height: 20, child: UserTopbar(blog.authorId)),
-                  GestureDetector(
-                    child: Icon(Icons.adaptive.more),
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 5),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       SizedBox(height: 20, child: UserTopbar(blog.authorId)),
+            //       GestureDetector(
+            //         child: Icon(Icons.adaptive.more),
+            //         onTap: () {},
+            //       ),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),
