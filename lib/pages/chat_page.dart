@@ -17,7 +17,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: Container(color: Colors.red),
+      body: const Text('私信功能即将上线'),
       bottomNavigationBar: bottomInputField(
         context,
         onCommit: (TextEditingController controller) async {

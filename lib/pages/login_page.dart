@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                 final rsp = await SiluRequest().post('login_phone_step2', {'phone_number': _phoneNumController.text, 'validate_code': _verifyController.text});
                 if (rsp.statusCode == SiluResponse.ok) {
                   Fluttertoast.showToast(msg: '登录成功');
-                  u.sharedPreferences.setInt('login_user_id', int.parse(rsp.data['user_id'])); // 后端适配后此处需要修改
+                  u.sharedPreferences.setInt('login_user_id', rsp.data['user_id'] ?? -1);
                   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
                 } else {
                   Fluttertoast.showToast(msg: '验证码错误');
