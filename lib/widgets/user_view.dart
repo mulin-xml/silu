@@ -118,7 +118,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
 
   _getUserInfo() async {
     print('[State] UserViewHeader update.');
-    var userInfo = await UserInfoCache().cachedUserInfo(widget.authorId);
+    final userInfo = await UserInfoCache().cachedUserInfo(widget.authorId);
     setState(() {
       _userName = userInfo.userName;
       _introduction = userInfo.introduction.replaceAll('\\n', '\n');
