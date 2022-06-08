@@ -7,6 +7,7 @@ import 'package:silu/global_declare.dart';
 import 'package:silu/pages/chat_page.dart';
 import 'package:silu/pages/config_page.dart';
 import 'package:silu/pages/edit_user_info_page.dart';
+import 'package:silu/user_info_cache.dart';
 import 'package:silu/widgets/blog_view.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
@@ -17,7 +18,7 @@ import 'package:silu/widgets/user_topbar.dart';
 class UserViewHeader extends StatefulWidget {
   const UserViewHeader(this.authorId, {Key? key}) : super(key: key);
 
-  final String authorId;
+  final int authorId;
 
   @override
   State<UserViewHeader> createState() => _UserViewHeaderState();
@@ -117,21 +118,19 @@ class _UserViewHeaderState extends State<UserViewHeader> {
 
   _getUserInfo() async {
     print('[State] UserViewHeader update.');
-    var userInfo = await getUserInfo(widget.authorId);
-    if (userInfo != null) {
-      setState(() {
-        _userName = userInfo['username'];
-        _introduction = userInfo['introduction'].replaceAll('\\n', '\n');
-        _iconKey = userInfo['icon_key'];
-      });
-    }
+    var userInfo = await UserInfoCache().cachedUserInfo(widget.authorId);
+    setState(() {
+      _userName = userInfo.userName;
+      _introduction = userInfo.introduction.replaceAll('\\n', '\n');
+      _iconKey = userInfo.iconKey;
+    });
   }
 }
 
 class UserView extends StatefulWidget {
   const UserView(this.authorId, {Key? key, this.isSelf = false}) : super(key: key);
 
-  final String authorId;
+  final int authorId;
   final bool isSelf;
 
   @override

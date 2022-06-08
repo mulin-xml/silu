@@ -263,7 +263,7 @@ class _CommentItemState extends State<CommentItem> {
         padding: const EdgeInsets.all(10),
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(height: 20, child: UserTopbar(widget.authorId.toString())),
+          SizedBox(height: 20, child: UserTopbar(widget.authorId)),
           Text(widget.content),
         ]),
       ),
@@ -281,7 +281,7 @@ class _CommentItemState extends State<CommentItem> {
             onPressed: () {},
           ),
           Visibility(
-            visible: u.uid == widget.authorId.toString(),
+            visible: u.uid == widget.authorId,
             child: TextButton(
               child: const Text('删除评论', style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold)),
               onPressed: _deleteComment,

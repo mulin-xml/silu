@@ -6,7 +6,7 @@ import 'package:silu/widgets/bottom_widgets.dart';
 class ChatPage extends StatefulWidget {
   const ChatPage(this.friendUserId, {Key? key}) : super(key: key);
 
-  final String friendUserId;
+  final int friendUserId;
 
   @override
   State<ChatPage> createState() => _ChatPageState();

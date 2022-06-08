@@ -11,7 +11,7 @@ import 'package:silu/widgets/user_topbar.dart';
 class FollowInfoBar extends StatefulWidget {
   const FollowInfoBar(this.userId, {Key? key}) : super(key: key);
 
-  final String userId;
+  final int userId;
 
   @override
   State<FollowInfoBar> createState() => _FollowInfoBarState();

@@ -49,7 +49,7 @@ class ConfigPage extends StatelessWidget {
           commonItem(title: '关于思路'),
           const Divider(),
           Visibility(
-            visible: u.uid == '5',
+            visible: u.uid == 5,
             child: commonItem(
               title: '思路实验室',
               onTap: () async {
@@ -71,8 +71,7 @@ class ConfigPage extends StatelessWidget {
               child: const Text('退出登录'),
               onPressed: () {
                 var sp = u.sharedPreferences;
-                sp.setBool('is_login', false);
-                sp.setString('user_id', '-1');
+                sp.setInt('login_user_id', -1);
                 Navigator.of(context).pushNamedAndRemoveUntil('/login_page', (route) => false);
               },
             ),

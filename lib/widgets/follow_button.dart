@@ -3,12 +3,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:silu/http_manager.dart';
+import 'package:silu/user_info_cache.dart';
 import 'package:silu/utils.dart';
 
 class FollowButton extends StatefulWidget {
   const FollowButton(this.userId, {Key? key}) : super(key: key);
 
-  final String userId;
+  final int userId;
 
   @override
   State<FollowButton> createState() => _FollowButtonState();
@@ -67,9 +68,9 @@ class _FollowButtonState extends State<FollowButton> {
   }
 
   updateState() async {
-    var userInfo = await getUserInfo(widget.userId);
+    var userInfo = await UserInfoCache().latestUserInfo(widget.userId);
     setState(() {
-      isFollowed = userInfo?['follow_status'] ?? false;
+      isFollowed = userInfo.isFollowed;
     });
   }
 }

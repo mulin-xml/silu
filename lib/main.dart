@@ -100,7 +100,7 @@ class SplashPage extends StatelessWidget {
     Future.delayed(const Duration(seconds: 3), () async {
       if (await VersionCheck().isUpdateNecessary) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const ForceUpdatePage()));
-      } else if (u.sharedPreferences.getBool('is_login') ?? false) {
+      } else if (u.isLogin) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const MyHomePage()));
       } else {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (BuildContext context) => const LoginPage()));

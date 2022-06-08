@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'package:silu/image_cache.dart';
 import 'package:silu/pages/user_page.dart';
-import 'package:silu/utils.dart';
+import 'package:silu/user_info_cache.dart';
 
 Widget iconView(String iconKey, {double? size}) {
   return Container(
@@ -19,7 +19,7 @@ Widget iconView(String iconKey, {double? size}) {
 class UserTopbar extends StatefulWidget {
   const UserTopbar(this.authorId, {Key? key}) : super(key: key);
 
-  final String authorId;
+  final int authorId;
 
   @override
   State<UserTopbar> createState() => _UserTopbarState();
@@ -30,12 +30,11 @@ class _UserTopbarState extends State<UserTopbar> {
   String _authorIconKey = '';
 
   _getAuthorInfo() async {
-    print('[State] UserTopBar update.');
-    var userInfo = await getUserInfo(widget.authorId);
+    final userInfo = await UserInfoCache().cachedUserInfo(widget.authorId);
     if (mounted) {
       setState(() {
-        _authorName = userInfo?['username'] ?? '';
-        _authorIconKey = userInfo?['icon_key'] ?? '';
+        _authorName = userInfo.userName;
+        _authorIconKey = userInfo.iconKey;
       });
     }
   }
