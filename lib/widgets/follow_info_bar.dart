@@ -96,7 +96,7 @@ class ShowListPage extends StatelessWidget {
             leading: iconView(list[index]['icon_key']),
             title: Text(list[index]['username']),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => userPage(list[index]['id'].toString()))),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => userPage(list[index]['id']))),
           );
         },
         separatorBuilder: (BuildContext context, int index) => const Divider(),

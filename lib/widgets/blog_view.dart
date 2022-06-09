@@ -54,25 +54,27 @@ class _BlogCard extends StatelessWidget {
                         // 距离
                         Visibility(
                           visible: !(blog.latitude.isNegative || blog.longtitude.isNegative),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.location_on, size: 20, color: Colors.white),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(children: [
+                              const Icon(Icons.location_on, size: 12, color: Colors.white),
                               Text(
                                 distance.toStringAsFixed(2) + 'km',
-                                style: const TextStyle(color: Colors.white),
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
                               ),
-                            ],
+                            ]),
                           ),
                         ),
                         // 浏览量
-                        Row(
-                          children: [
-                            const Icon(Icons.remove_red_eye, size: 20, color: Colors.white),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(children: [
+                            const Icon(Icons.remove_red_eye, size: 12, color: Colors.white),
                             Text(
                               blog.visitCount.toString(),
-                              style: const TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white, fontSize: 12),
                             ),
-                          ],
+                          ]),
                         ),
                       ],
                     ),
@@ -90,7 +92,7 @@ class _BlogCard extends StatelessWidget {
                 blog.title,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 16, height: 1.4),
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, height: 1.4),
               ),
             ),
             const SizedBox(height: 5),

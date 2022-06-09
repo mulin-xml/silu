@@ -44,7 +44,7 @@ class _SelfPageState extends State<SelfPage> with AutomaticKeepAliveClientMixin 
   }
 }
 
-userPage(userId) {
+Widget userPage(int userId) {
   return Scaffold(
     appBar: AppBar(
       toolbarHeight: 44,

@@ -56,6 +56,7 @@ class _AMapViewState extends State<AMapView> {
         mapType: MapType.normal,
         rotateGesturesEnabled: false,
         tiltGesturesEnabled: false,
+        onMapCreated: _onMapCreated,
         onLocationChanged: _onLocationChanged,
         onPoiTouched: _onMapPoiTouched,
         onTap: _onMapTap,
@@ -68,6 +69,10 @@ class _AMapViewState extends State<AMapView> {
         // ),
       ),
     );
+  }
+
+  _onMapCreated(AMapController controller) {
+    getApprovalNumber(controller);
   }
 
   void _onMapTap(LatLng? latLng) {
@@ -105,5 +110,13 @@ class _AMapViewState extends State<AMapView> {
   }
 
   /// 获取审图号
-  void getApprovalNumber() async {}
+  void getApprovalNumber(AMapController mapController) async {
+    //普通地图审图号
+    String? mapContentApprovalNumber = await mapController.getMapContentApprovalNumber();
+    //卫星地图审图号
+    String? satelliteImageApprovalNumber = await mapController.getSatelliteImageApprovalNumber();
+
+    print('地图审图号（普通地图）: $mapContentApprovalNumber');
+    print('地图审图号（卫星地图): $satelliteImageApprovalNumber');
+  }
 }
