@@ -12,7 +12,7 @@ import 'package:silu/image_cache.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/widgets/bottom_widgets.dart';
 import 'package:silu/widgets/follow_button.dart';
-import 'package:silu/widgets/user_topbar.dart';
+import 'package:silu/widgets/user_info_widgets.dart';
 
 class BlogDetailPage extends StatefulWidget {
   const BlogDetailPage(this.blog, {Key? key}) : super(key: key);

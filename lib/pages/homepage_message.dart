@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/widgets/appbar_view.dart';
-import 'package:silu/widgets/user_topbar.dart';
+import 'package:silu/widgets/user_info_widgets.dart';
 
 class MessagePage extends StatefulWidget {
   const MessagePage({Key? key}) : super(key: key);

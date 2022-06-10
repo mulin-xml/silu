@@ -13,7 +13,7 @@ import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/widgets/follow_button.dart';
 import 'package:silu/widgets/follow_info_bar.dart';
-import 'package:silu/widgets/user_topbar.dart';
+import 'package:silu/widgets/user_info_widgets.dart';
 
 class UserViewHeader extends StatefulWidget {
   const UserViewHeader(this.authorId, {Key? key}) : super(key: key);
@@ -27,7 +27,6 @@ class UserViewHeader extends StatefulWidget {
 class _UserViewHeaderState extends State<UserViewHeader> {
   var _userName = '';
   var _introduction = '';
-  var _iconKey = '';
 
   @override
   void initState() {
@@ -51,7 +50,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              iconView(_iconKey, size: 80),
+              UserIcon(widget.authorId, size: 80),
               const SizedBox(width: 20),
               Expanded(
                 child: Text(
@@ -87,7 +86,7 @@ class _UserViewHeaderState extends State<UserViewHeader> {
       mainAxisSize: MainAxisSize.min,
       children: [
         OutlinedButton(
-          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(_userName, _introduction, _iconKey))),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => EditUserInfoPage(widget.authorId, _userName, _introduction))),
           child: const Text('编辑资料', style: TextStyle(color: Colors.white)),
           style: buttonStyle,
         ),
@@ -122,7 +121,6 @@ class _UserViewHeaderState extends State<UserViewHeader> {
     setState(() {
       _userName = userInfo.userName;
       _introduction = userInfo.introduction.replaceAll('\\n', '\n');
-      _iconKey = userInfo.iconKey;
     });
   }
 }

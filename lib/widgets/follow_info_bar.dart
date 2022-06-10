@@ -6,7 +6,7 @@ import 'package:silu/event_bus.dart';
 import 'package:silu/http_manager.dart';
 import 'package:silu/pages/user_page.dart';
 import 'package:silu/utils.dart';
-import 'package:silu/widgets/user_topbar.dart';
+import 'package:silu/widgets/user_info_widgets.dart';
 
 class FollowInfoBar extends StatefulWidget {
   const FollowInfoBar(this.userId, {Key? key}) : super(key: key);
@@ -93,7 +93,7 @@ class ShowListPage extends StatelessWidget {
         itemCount: list.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            leading: iconView(list[index]['icon_key']),
+            leading: UserIcon(list[index]['id']),
             title: Text(list[index]['username']),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => userPage(list[index]['id']))),

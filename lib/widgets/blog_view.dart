@@ -14,7 +14,7 @@ import 'package:silu/pages/blog_detail_page.dart';
 import 'package:silu/image_cache.dart';
 import 'package:silu/amap.dart';
 import 'package:silu/utils.dart';
-import 'package:silu/widgets/user_topbar.dart';
+import 'package:silu/widgets/user_info_widgets.dart';
 
 class _BlogCard extends StatelessWidget {
   const _BlogCard(this.blog, {Key? key}) : super(key: key);

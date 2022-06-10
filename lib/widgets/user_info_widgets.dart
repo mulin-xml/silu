@@ -6,14 +6,43 @@ import 'package:silu/image_cache.dart';
 import 'package:silu/pages/user_page.dart';
 import 'package:silu/user_info_cache.dart';
 
-Widget iconView(String iconKey, {double? size}) {
-  return Container(
-    height: size,
-    width: size,
-    clipBehavior: Clip.antiAlias,
-    decoration: const BoxDecoration(shape: BoxShape.circle),
-    child: iconKey.isEmpty ? const FlutterLogo() : Image(image: OssImage(OssImgCategory.icons, iconKey), fit: BoxFit.cover),
-  );
+class UserIcon extends StatelessWidget {
+  const UserIcon(this.userId, {Key? key, double? size}) : super(key: key);
+
+  final int userId;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<UserInfo>(
+      future: UserInfoCache().cachedUserInfo(userId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return _imgBox(snapshot.data?.iconKey ?? '');
+        }
+        return _imgBox('');
+      },
+    );
+  }
+
+  Widget _imgBox(String iconKey, {double? size}) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 500, maxWidth: 500),
+      child: FractionallySizedBox(
+        widthFactor: 0.9,
+        heightFactor: 0.9,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Container(
+            height: size,
+            width: size,
+            clipBehavior: Clip.antiAlias,
+            decoration: const BoxDecoration(shape: BoxShape.circle),
+            child: iconKey.isEmpty ? FlutterLogo(size: size) : Image(image: OssImage(OssImgCategory.icons, iconKey), fit: BoxFit.cover),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class UserTopbar extends StatefulWidget {
@@ -27,14 +56,12 @@ class UserTopbar extends StatefulWidget {
 
 class _UserTopbarState extends State<UserTopbar> {
   String _authorName = '';
-  String _authorIconKey = '';
 
   _getAuthorInfo() async {
     final userInfo = await UserInfoCache().cachedUserInfo(widget.authorId);
     if (mounted) {
       setState(() {
         _authorName = userInfo.userName;
-        _authorIconKey = userInfo.iconKey;
       });
     }
   }
@@ -51,7 +78,7 @@ class _UserTopbarState extends State<UserTopbar> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          iconView(_authorIconKey),
+          UserIcon(widget.authorId),
           const SizedBox(width: 10),
           Text(_authorName, style: const TextStyle(inherit: false, color: Colors.brown)),
         ],

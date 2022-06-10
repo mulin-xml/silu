@@ -16,20 +16,24 @@ class FollowButton extends StatefulWidget {
 }
 
 class _FollowButtonState extends State<FollowButton> {
-  var isFollowed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    updateState();
-  }
+  var _isFollowed = false;
 
   @override
   Widget build(BuildContext context) {
-    if (u.uid == widget.userId) {
-      return Container();
-    }
-    return Padding(padding: const EdgeInsets.all(5), child: isFollowed ? _followedButton() : _unFollowedButton());
+    if (u.uid == widget.userId) return Container();
+    return Padding(
+      padding: const EdgeInsets.all(5),
+      child: FutureBuilder<UserInfo>(
+        future: UserInfoCache().latestUserInfo(widget.userId),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            _isFollowed = snapshot.data?.isFollowed ?? false;
+            return _isFollowed ? _followedButton() : _unFollowedButton();
+          }
+          return _unFollowedButton();
+        },
+      ),
+    );
   }
 
   Widget _unFollowedButton() {
@@ -58,19 +62,7 @@ class _FollowButtonState extends State<FollowButton> {
   }
 
   _followOperation() async {
-    final data = {
-      'fan_id': u.uid,
-      'followed_user_id': widget.userId,
-      'action': isFollowed ? 1 : 0,
-    };
-    await SiluRequest().post('follow', data);
-    updateState();
-  }
-
-  updateState() async {
-    var userInfo = await UserInfoCache().latestUserInfo(widget.userId);
-    setState(() {
-      isFollowed = userInfo.isFollowed;
-    });
+    await SiluRequest().post('follow', {'fan_id': u.uid, 'followed_user_id': widget.userId, 'action': _isFollowed ? 1 : 0});
+    setState(() {});
   }
 }

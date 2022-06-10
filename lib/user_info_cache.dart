@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:silu/http_manager.dart';
 import 'package:silu/utils.dart';
 
@@ -14,7 +16,7 @@ class UserInfo {
   final bool isFollowed;
 }
 
-/// 用户信息内存级缓存
+/// 用户信息内存级缓存（连续获取未缓存的数据仍然会多次POST，后期可以改进）
 class UserInfoCache {
   static getInstance() => _instance;
   static final _instance = UserInfoCache._internal();

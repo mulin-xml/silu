@@ -7,15 +7,15 @@ import 'package:silu/image_cache.dart';
 import 'package:silu/oss.dart';
 import 'package:silu/utils.dart';
 import 'package:silu/http_manager.dart';
-import 'package:silu/widgets/user_topbar.dart';
+import 'package:silu/widgets/user_info_widgets.dart';
 import 'package:silu/widgets/img_cropper.dart';
 
 class EditUserInfoPage extends StatefulWidget {
-  const EditUserInfoPage(this.username, this.introduction, this.iconKey, {Key? key}) : super(key: key);
+  const EditUserInfoPage(this.userId, this.username, this.introduction, {Key? key}) : super(key: key);
 
+  final int userId;
   final String username;
   final String introduction;
-  final String iconKey;
 
   @override
   State<EditUserInfoPage> createState() => _EditUserInfoPageState();
@@ -66,7 +66,7 @@ class _EditUserInfoPageState extends State<EditUserInfoPage> {
               }
             },
             child: Stack(children: [
-              SizedBox(width: 150, height: 150, child: iconView(widget.iconKey)),
+              SizedBox(width: 150, height: 150, child: UserIcon(widget.userId)),
               const Positioned(child: CircleAvatar(child: Icon(Icons.edit)), right: 0, bottom: 0),
             ]),
           ),

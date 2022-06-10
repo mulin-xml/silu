@@ -65,12 +65,9 @@ class _ForceUpdatePageState extends State<ForceUpdatePage> {
 
   _downloadApk() async {
     _isDownloading = true;
-    if (!File(_localApkPath).existsSync()) {
-      final rsp = await Dio().download(
-        VersionCheck().downloadUrl,
-        _localApkPath,
-        onReceiveProgress: (int count, int total) => setState(() => _currentProgress = total.isNegative ? null : count / total),
-      );
+    final _url = VersionCheck().downloadUrl;
+    if (!File(_localApkPath).existsSync() && _url != null) {
+      final rsp = await Dio().download(_url, _localApkPath, onReceiveProgress: (int count, int total) => setState(() => _currentProgress = total.isNegative ? null : count / total));
       if (rsp.statusCode == SiluResponse.ok) {
         setState(() => _isApkExist = true);
         _installApk();

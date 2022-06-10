@@ -32,6 +32,7 @@ class SiluRequest {
   Future<SiluResponse> post(String api, dynamic map) async {
     try {
       final response = await _dio.post(api, data: map);
+      print('[Post] API($api)');
       return SiluResponse(response.statusCode ?? 0, jsonDecode(response.data));
     } on DioError catch (e) {
       print('[Post Error] API($api) CODE(${e.response?.statusCode}) RSP(${e.response})');
