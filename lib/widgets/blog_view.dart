@@ -131,10 +131,9 @@ class _BlogItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          Container(
-            height: 50,
+          Align(
             alignment: Alignment.centerLeft,
-            child: UserTopbar(blog.authorId, key: ValueKey(blog.authorId)),
+            child: UserIconAndName(blog.authorId, height: 50, key: ValueKey(blog.authorId)),
           ),
           sizedBoxSpace,
           Container(

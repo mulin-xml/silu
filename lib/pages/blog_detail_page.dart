@@ -58,16 +58,8 @@ class _BlogDetailPageState extends State<BlogDetailPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.brown,
         elevation: 0,
-        title: SizedBox(
-          height: 40,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              UserTopbar(widget.blog.authorId),
-              FollowButton(widget.blog.authorId),
-            ],
-          ),
-        ),
+        title: UserIconAndName(widget.blog.authorId, height: 40),
+        actions: [FollowButton(widget.blog.authorId)],
       ),
       body: ListView(
         children: [
@@ -263,7 +255,7 @@ class _CommentItemState extends State<CommentItem> {
         padding: const EdgeInsets.all(10),
         alignment: Alignment.centerLeft,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(height: 20, child: UserTopbar(widget.authorId)),
+          UserIconAndName(widget.authorId, height: 20),
           Text(widget.content),
         ]),
       ),

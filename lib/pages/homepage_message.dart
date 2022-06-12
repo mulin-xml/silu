@@ -99,7 +99,7 @@ class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClient
 
   Widget _msgItem(int userId, String time, String content) {
     return ListTile(
-      title: SizedBox(height: 100, child: UserTopbar(userId)),
+      title: UserIconAndName(userId, height: 50),
       subtitle: Text(content + time),
     );
   }
