@@ -90,8 +90,6 @@ class _AddressSelectorState extends State<AddressSelector> {
       for (var elm in addressList) {
         _addrList.add(Address.fromMap(elm));
       }
-    } else {
-      print(rsp.data);
     }
     setState(() {});
   }

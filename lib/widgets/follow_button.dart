@@ -26,8 +26,8 @@ class _FollowButtonState extends State<FollowButton> {
       child: FutureBuilder<UserInfo>(
         future: UserInfoCache().latestUserInfo(widget.userId),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            _isFollowed = snapshot.data?.isFollowed ?? false;
+          if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+            _isFollowed = snapshot.data!.isFollowed;
             return _isFollowed ? _followedButton() : _unFollowedButton();
           }
           return _unFollowedButton();

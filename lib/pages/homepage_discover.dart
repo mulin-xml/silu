@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:silu/amap.dart';
 
+import 'package:silu/amap.dart';
 import 'package:silu/global_declare.dart';
 import 'package:silu/widgets/appbar_view.dart';
 import 'package:silu/widgets/blog_view.dart';

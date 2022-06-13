@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:silu/pages/force_update_page.dart';
 
+import 'package:silu/pages/force_update_page.dart';
 import 'package:silu/pages/upload_blog_page.dart';
 import 'package:silu/pages/homepage_discover.dart';
 import 'package:silu/pages/homepage_message.dart';
@@ -65,13 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body: PageView.builder(
         controller: _pageController,
         itemCount: pages.length,
-        // physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) => pages[index],
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onPageChanged: (index) => setState(() => _currentIndex = index),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (BuildContext context) => const UploadBlogPage())),

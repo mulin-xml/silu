@@ -19,8 +19,8 @@ class UserIcon extends StatelessWidget {
     return FutureBuilder<UserInfo>(
       future: UserInfoCache().cachedUserInfo(userId),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          return _imgBox(snapshot.data?.iconKey ?? '');
+        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+          return _imgBox(snapshot.data!.iconKey);
         }
         return _imgBox('');
       },
@@ -58,8 +58,8 @@ class UserIconAndName extends StatelessWidget {
           FutureBuilder<UserInfo>(
             future: UserInfoCache().cachedUserInfo(authorId),
             builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                return Text(snapshot.data?.userName ?? '', style: const TextStyle(inherit: false, color: Colors.brown));
+              if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                return Text(snapshot.data!.userName, style: const TextStyle(inherit: false, color: Colors.brown));
               }
               return Container();
             },
