@@ -47,7 +47,8 @@ class _MessagePageState extends State<MessagePage> with AutomaticKeepAliveClient
     return Scaffold(
       appBar: appBarView('消息'),
       body: RefreshIndicator(
-        child: ListView(children: _chatUserWidgets.values.toList()),
+        // child: ListView(children: _chatUserWidgets.values.toList()),
+        child: const Center(child: Text('暂无新消息')),
         onRefresh: () async {
           _getMessages();
         },

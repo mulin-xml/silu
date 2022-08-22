@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -116,7 +117,31 @@ class _LoginPageState extends State<LoginPage> {
                   value: _isReadProtocol,
                   onChanged: (value) => setState(() => _isReadProtocol = !_isReadProtocol),
                 ),
-                const Expanded(child: Text('我已阅读并同意用户协议和隐私政策和儿童/青少年个人信息保护规则', textScaleFactor: 0.8)),
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(children: [
+                      const TextSpan(text: '我已阅读并同意'),
+                      TextSpan(
+                        text: '《用户协议》',
+                        style: const TextStyle(color: Colors.blue),
+                        recognizer: TapGestureRecognizer()..onTap = _showService,
+                      ),
+                      const TextSpan(text: '和'),
+                      TextSpan(
+                        text: '《隐私政策》',
+                        style: const TextStyle(color: Colors.blue),
+                        recognizer: TapGestureRecognizer()..onTap = _showPrivacy,
+                      ),
+                      const TextSpan(text: '和'),
+                      TextSpan(
+                        text: '《儿童/青少年个人信息保护规则》',
+                        style: const TextStyle(color: Colors.blue),
+                        recognizer: TapGestureRecognizer()..onTap = _showChild,
+                      ),
+                    ]),
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ),
               ],
             ),
           ),
@@ -128,7 +153,10 @@ class _LoginPageState extends State<LoginPage> {
               style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
               child: const Text('登录', textScaleFactor: 1.5),
               onPressed: () async {
-                if (!_isReadProtocol || _phoneNumController.text.length < 11 || _verifyController.text.isEmpty) {
+                if (!_isReadProtocol) {
+                  Fluttertoast.showToast(msg: '请阅读并同意相关条款');
+                  return;
+                } else if (_phoneNumController.text.length < 11 || _verifyController.text.isEmpty) {
                   Fluttertoast.showToast(msg: '请检查手机号和验证码');
                   return;
                 }
@@ -147,5 +175,32 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+  }
+
+  _showService() async {
+    final rsp = await SiluRequest().get('privacy');
+    if (rsp.statusCode == SiluResponse.ok) {
+      Fluttertoast.showToast(msg: 'd');
+    } else {
+      Fluttertoast.showToast(msg: '验证码错误');
+    }
+  }
+
+  _showPrivacy() async {
+    final rsp = await SiluRequest().get('privacy');
+    if (rsp.statusCode == SiluResponse.ok) {
+      Fluttertoast.showToast(msg: 'd');
+    } else {
+      Fluttertoast.showToast(msg: '验证码错误');
+    }
+  }
+
+  _showChild() async {
+    final rsp = await SiluRequest().get('privacy');
+    if (rsp.statusCode == SiluResponse.ok) {
+      Fluttertoast.showToast(msg: 'd');
+    } else {
+      Fluttertoast.showToast(msg: '验证码错误');
+    }
   }
 }
