@@ -180,27 +180,30 @@ class _LoginPageState extends State<LoginPage> {
   _showService() async {
     final rsp = await SiluRequest().get('privacy');
     if (rsp.statusCode == SiluResponse.ok) {
-      Fluttertoast.showToast(msg: 'd');
-    } else {
-      Fluttertoast.showToast(msg: '验证码错误');
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data['privacys']['service']))),
+      );
     }
   }
 
   _showPrivacy() async {
     final rsp = await SiluRequest().get('privacy');
     if (rsp.statusCode == SiluResponse.ok) {
-      Fluttertoast.showToast(msg: 'd');
-    } else {
-      Fluttertoast.showToast(msg: '验证码错误');
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data['privacys']['privacy']))),
+      );
     }
   }
 
   _showChild() async {
     final rsp = await SiluRequest().get('privacy');
     if (rsp.statusCode == SiluResponse.ok) {
-      Fluttertoast.showToast(msg: 'd');
-    } else {
-      Fluttertoast.showToast(msg: '验证码错误');
+      showDialog(
+        context: context,
+        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data['privacys']['service']))),
+      );
     }
   }
 }
