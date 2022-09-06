@@ -124,19 +124,19 @@ class _LoginPageState extends State<LoginPage> {
                       TextSpan(
                         text: '《用户协议》',
                         style: const TextStyle(color: Colors.blue),
-                        recognizer: TapGestureRecognizer()..onTap = _showService,
+                        recognizer: TapGestureRecognizer()..onTap = () => _showTxt('service'),
                       ),
                       const TextSpan(text: '和'),
                       TextSpan(
                         text: '《隐私政策》',
                         style: const TextStyle(color: Colors.blue),
-                        recognizer: TapGestureRecognizer()..onTap = _showPrivacy,
+                        recognizer: TapGestureRecognizer()..onTap = () => _showTxt('privacy'),
                       ),
                       const TextSpan(text: '和'),
                       TextSpan(
                         text: '《儿童/青少年个人信息保护规则》',
                         style: const TextStyle(color: Colors.blue),
-                        recognizer: TapGestureRecognizer()..onTap = _showChild,
+                        recognizer: TapGestureRecognizer()..onTap = () => _showTxt('child_protection'),
                       ),
                     ]),
                     style: const TextStyle(fontSize: 12),
@@ -177,32 +177,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  _showService() async {
-    final rsp = await SiluRequest().get('privacy');
+  _showTxt(String api) async {
+    final rsp = await SiluRequest().get(api);
     if (rsp.statusCode == SiluResponse.ok) {
       showDialog(
         context: context,
-        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data['privacys']['service']))),
-      );
-    }
-  }
-
-  _showPrivacy() async {
-    final rsp = await SiluRequest().get('privacy');
-    if (rsp.statusCode == SiluResponse.ok) {
-      showDialog(
-        context: context,
-        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data['privacys']['privacy']))),
-      );
-    }
-  }
-
-  _showChild() async {
-    final rsp = await SiluRequest().get('privacy');
-    if (rsp.statusCode == SiluResponse.ok) {
-      showDialog(
-        context: context,
-        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data['privacys']['service']))),
+        builder: (context) => Dialog(child: SingleChildScrollView(child: Text(rsp.data))),
       );
     }
   }

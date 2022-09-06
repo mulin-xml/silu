@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -27,9 +29,10 @@ class VersionCheck {
       print('[Version Error] LOCAL($localVersion)');
       return false; // 联网失败，不强制更新
     }
-    _latestVersion = rsp.data['version_info']['latest_version'];
-    _downloadUrl = rsp.data['version_info']['download_url'];
-    return _isVersionIllegal(localVersion, rsp.data['version_info']['support_min_version']);
+    final data = jsonDecode(rsp.data);
+    _latestVersion = data['version_info']['latest_version'];
+    _downloadUrl = data['version_info']['download_url'];
+    return _isVersionIllegal(localVersion, data['version_info']['support_min_version']);
   }
 
   bool _isVersionIllegal(String localVersion, String supportMinVersion) {

@@ -22,7 +22,7 @@ class SiluRequest {
   Future<SiluResponse> get(String api) async {
     try {
       final response = await _dio.get(api);
-      return SiluResponse(response.statusCode ?? 0, jsonDecode(response.data));
+      return SiluResponse(response.statusCode ?? 0, response.data);
     } on DioError catch (e) {
       print('[Get Error] API($api) CODE(${e.response?.statusCode}) RSP(${e.response})');
       return SiluResponse(e.response?.statusCode ?? -1, e.response?.data);
